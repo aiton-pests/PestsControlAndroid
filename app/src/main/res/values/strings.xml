@@ -1,0 +1,46 @@
+<resources>
+    <string name="app_name">森林防治</string>
+    <!-- Strings related to login -->
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="welcome">"Welcome !"</string>
+    <string name="invalid_username">Not a valid username</string>
+    <string name="invalid_password">Password must be >5 characters</string>
+    <string name="login_failed">"Login failed"</string>
+    <string name="qrcode">二维码</string>
+    <string name="tree_walk">树径</string>
+    <string name="bag_number">袋数</string>
+    <string name="fell_pic">砍倒照片</string>
+    <string name="stump_pic">树桩照片</string>
+    <string name="finish_pic">完成照片</string>
+    <string name="operator">作业人</string>
+    <string name="village">村</string>
+    <string name="db">大班</string>
+    <string name="xb">小班</string>
+    <string name="save">保存</string>
+    <string name="cancel">取消</string>
+    <string name="operator_man">鲁仁华</string>
+    <string name="village_default">大郅村</string>
+    <string name="db_default">03</string>
+    <string name="xb_default">808</string>
+    <string name="tv_address">同安区大平镇大新村</string>
+    <string name="login_message">已同意《警卫任务许可及服务协议》及《隐私政策》</string>
+    <string name="pests_type">业务类型</string>
+    <string name="lv_bags">袋数</string>
+    <string name="username">15959184067</string>
+    <string name="et_me_nickname">Mike</string>
+    <string name="sw_tianditu">天地图</string>
+    <string name="sw_gallery_google">Google</string>
+    <string name="sw_gallery_osm">OpenStreetMap</string>
+    <string name="sw_gallery_amap">高德地图</string>
+    <string name="tv_gallery_map">加载地图</string>
+    <string name="tv_load_shp">增加离线地图</string>
+    <string name="sw_geop_label">Geoq地图</string>
+    <string name="sw_arcgis_label">ArcGIS地图</string>
+    <string name="load_shp_label">加载SHP</string>
+    <string name="load_geodatabase_label">加载GeoDatabase</string>
+    <string name="tv_town">镇</string>
+    <string name="pests_cancel">是否取消保存数据？</string>
+</resources>

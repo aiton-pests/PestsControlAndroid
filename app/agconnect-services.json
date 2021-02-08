@@ -1,0 +1,14 @@
+{
+	"client":{
+		"appType":"1",
+		"cp_id":"260086000050257197",
+		"product_id":"736430079244794398",
+		"client_id":"547612018434126464",
+		"client_secret":"09CD5589A296FEFFB33E0EA9BD2FC3C4636CF54077C06A21BE2BB954304C9826",
+		"project_id":"736430079244794398",
+		"app_id":"103747029",
+		"api_key":"CgB6e3x9xYyHmkioswnpQ8SHPvy6Lw2zfDrasGzVzDgvQ3aSEg1sK4VpQouQ9gL28unQFw6KcvTxKEb0gQFgYcB9",
+		"package_name":"com.aiton.pestscontrolandroid"
+	},
+	"configuration_version":"1.0"
+}

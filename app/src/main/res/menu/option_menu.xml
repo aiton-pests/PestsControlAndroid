@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/menu_search"
+        android:orderInCategory="1"
+        android:title="搜索菜单"
+        android:icon="@android:drawable/ic_menu_search"
+        app:showAsAction="always|collapseActionView"/>
+    <item android:id="@+id/menu_setting"
+        android:title="系统设置"
+        android:icon="@android:drawable/ic_menu_share"
+        android:orderInCategory="1"
+        app:showAsAction="never"/>
+    <item android:id="@+id/menu_our"
+        android:title="个人设置"
+        android:icon="@android:drawable/ic_menu_share"
+        android:orderInCategory="1"
+        app:showAsAction="never"/>
+
+    <item android:id="@+id/menu_loadshp"
+        android:title="加载离线地图"
+        android:icon="@android:drawable/ic_menu_share"
+        android:orderInCategory="1"
+        app:showAsAction="never"/>
+
+    <item android:id="@+id/menu_loadbasemap"
+        android:title="加载地图底图"
+        android:icon="@android:drawable/ic_menu_share"
+        android:orderInCategory="1"
+        app:showAsAction="never"/>
+    <item android:id="@+id/menu_updateserver"
+        android:title="上传数据服务"
+        android:icon="@android:drawable/ic_menu_share"
+        android:orderInCategory="1"
+        app:showAsAction="never"/>
+
+    <item android:id="@+id/menu_downloadserver"
+        android:title="下载数据服务"
+        android:icon="@android:drawable/ic_menu_share"
+        android:orderInCategory="1"
+        app:showAsAction="never"/>
+    <item android:id="@+id/menu_about"
+        android:title="关于我们"
+        android:icon="@android:drawable/ic_menu_share"
+        android:orderInCategory="1"
+        app:showAsAction="never"/>
+    <item android:id="@+id/menu_logout"
+        android:title="退出登陆"
+        android:icon="@android:drawable/ic_menu_share"
+        android:orderInCategory="1"
+        app:showAsAction="never"/>
+
+</menu>
