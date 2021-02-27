@@ -29,10 +29,15 @@ import static com.aiton.pestscontrolandroid.AppConstance.TAG;
 public class LoginViewModel extends AndroidViewModel {
 
     private MutableLiveData<UcenterMemberModel> loginResult = new MutableLiveData<>();
+    private MutableLiveData<Result> result = new MutableLiveData<>();
     SavedStateHandle handle;
 
     public LoginViewModel(@NonNull Application application) {
         super(application);
+    }
+
+    public MutableLiveData<Result> getResult() {
+        return result;
     }
 
     public MutableLiveData<UcenterMemberModel> getLoginResult() {
@@ -54,6 +59,7 @@ public class LoginViewModel extends AndroidViewModel {
 
                     @Override
                     public void onNext(@io.reactivex.rxjava3.annotations.NonNull Result result) {
+                        getResult().setValue(result);
                         if (result.getSuccess()){
                             Log.e(TAG, "onNext: " + result.toString() );
                             String token = (String) result.getData().get("token");
@@ -107,12 +113,21 @@ public class LoginViewModel extends AndroidViewModel {
                                     });
 
 
+                        }else{
+                            getLoginResult().setValue(null);
                         }
                     }
 
                     @Override
                     public void onError(@io.reactivex.rxjava3.annotations.NonNull Throwable e) {
                         disposable.dispose();
+                        getResult().setValue(Result.error());
+                        if (e.getMessage().equals("HTTP 404 Not Found")){
+                            getLoginResult().setValue(null);
+                        }else if (e.getMessage().equals("Not Found")){
+                            getLoginResult().setValue(null);
+
+                        }
                     }
 
                     @Override

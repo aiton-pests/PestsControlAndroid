@@ -22,7 +22,8 @@
         android:required="true" />
 
     <application
-        android:allowBackup="true"
+        android:allowBackup="false"
+        tools:replace="android:allowBackup"
         android:networkSecurityConfig="@xml/network_config"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"

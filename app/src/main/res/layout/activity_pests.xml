@@ -413,11 +413,10 @@
                 android:id="@+id/ac_operator"
                 android:layout_width="140dp"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="32dp"
                 android:text="@string/operator_man"
                 android:textAlignment="textEnd"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/iv_add_operator"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
@@ -429,6 +428,15 @@
                 app:layout_constraintBottom_toBottomOf="@+id/ac_operator"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/ac_operator" />
+
+            <ImageView
+                android:id="@+id/iv_add_operator"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="@+id/ac_operator"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/ac_operator"
+                app:srcCompat="@android:drawable/ic_input_add" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 
@@ -576,6 +584,7 @@
                 android:enabled="false"
                 android:inputType="textPersonName"
                 android:text="Name"
+                android:textAlignment="textEnd"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />

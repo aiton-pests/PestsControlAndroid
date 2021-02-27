@@ -102,8 +102,6 @@ public class MainViewModel extends AndroidViewModel {
     }
 
     public void uploadServer(PestsModel pestsModel) {
-
-
         RetrofitUtil.getInstance().getPestsService().savePests(pestsModel)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

@@ -3,6 +3,7 @@ package com.aiton.pestscontrolandroid.ui.main;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -30,6 +31,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Spinner;
 import android.widget.Toast;
 import android.widget.ZoomControls;
 
@@ -49,7 +51,9 @@ import com.aiton.pestscontrolandroid.ui.setting.SettingActivity;
 import com.aiton.pestscontrolandroid.ui.setting.SettingViewModel;
 import com.aiton.pestscontrolandroid.utils.AMapTiledLayerClass;
 import com.aiton.pestscontrolandroid.utils.GoogleMapLayer;
+import com.aiton.pestscontrolandroid.utils.SPUtil;
 import com.aiton.pestscontrolandroid.utils.TianDiTuTiledLayerClass;
+import com.esri.arcgisruntime.ArcGISRuntimeEnvironment;
 import com.esri.arcgisruntime.concurrent.ListenableFuture;
 import com.esri.arcgisruntime.data.Feature;
 import com.esri.arcgisruntime.data.FeatureQueryResult;
@@ -73,6 +77,7 @@ import com.esri.arcgisruntime.layers.Layer;
 import com.esri.arcgisruntime.layers.OpenStreetMapLayer;
 import com.esri.arcgisruntime.layers.WebTiledLayer;
 import com.esri.arcgisruntime.loadable.LoadStatus;
+import com.esri.arcgisruntime.location.LocationDataSource;
 import com.esri.arcgisruntime.mapping.ArcGISMap;
 import com.esri.arcgisruntime.mapping.Basemap;
 import com.esri.arcgisruntime.mapping.GeoElement;
@@ -82,6 +87,7 @@ import com.esri.arcgisruntime.mapping.view.DefaultMapViewOnTouchListener;
 import com.esri.arcgisruntime.mapping.view.Graphic;
 import com.esri.arcgisruntime.mapping.view.GraphicsOverlay;
 import com.esri.arcgisruntime.mapping.view.IdentifyLayerResult;
+import com.esri.arcgisruntime.mapping.view.LocationDisplay;
 import com.esri.arcgisruntime.mapping.view.MapView;
 import com.esri.arcgisruntime.mapping.view.SketchEditor;
 import com.esri.arcgisruntime.mapping.view.SketchStyle;
@@ -99,6 +105,7 @@ import com.huawei.hms.ml.scan.HmsScan;
 import com.huawei.hms.ml.scan.HmsScanAnalyzerOptions;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -109,12 +116,20 @@ import cn.com.qiter.pests.PestsModel;
 import cn.com.qiter.pests.Result;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.StrUtil;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "PestsControl";
+
+    private LocationDisplay mLocationDisplay;
+    private Spinner mSpinner;
+    private final int requestCode4Arcgis = 2;
+    private final String[] reqPermissions = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission
+            .ACCESS_COARSE_LOCATION};
+
     ///////////华为 SCAN KIT ////////////// 开始
     public static final int DEFAULT_VIEW = 0x22;
 
@@ -183,7 +198,6 @@ public class MainActivity extends AppCompatActivity {
 
     //加载shp方式一
     private void openShp() {
-        SettingModel settingModel = settingViewModel.getSettingmodel().getValue();
         //"/storage/sdcard0/Android/data/com.aiton.pestscontrolandroid/files/qiter/qiter.shp"
         // instantiate shapefile feature table with the path to the .shp file
         shapefileFeatureTable = new ShapefileFeatureTable(shpPath);
@@ -217,7 +231,7 @@ public class MainActivity extends AppCompatActivity {
                 mMapView.getMap().getOperationalLayers().add(shapefileLayer);
             }
         });
-        queryBySelectFeaturesAsync();
+        //queryBySelectFeaturesAsync();
     }
 
     private void showGeoDatabase() {
@@ -230,7 +244,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         if (shpFile == null) {
-            Toast.makeText(this, "无法加载离线地图文件", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getResources().getString(R.string.cant_load_geodatabase_file), Toast.LENGTH_SHORT).show();
             mainViewModel.setLoadedShp(false);
             return;
         }
@@ -255,7 +269,7 @@ public class MainActivity extends AppCompatActivity {
                     SimpleLineSymbol lineSymbol = new SimpleLineSymbol(SimpleLineSymbol.Style.SOLID, Color.BLACK, 1);
                     SimpleFillSymbol fillSymbol = new SimpleFillSymbol(SimpleFillSymbol.Style.SOLID, Color.YELLOW, lineSymbol);
                     mFeatureLayer.setRenderer(new SimpleRenderer(fillSymbol));
-                    mFeatureLayer.setOpacity(0.5f);
+                    mFeatureLayer.setOpacity(0.2f);
                     mFeatureLayer.setVisible(true);// 隐藏
                     mMapView.getMap().getOperationalLayers().add(mFeatureLayer);
                 }
@@ -278,7 +292,7 @@ public class MainActivity extends AppCompatActivity {
         mFeatureLayer.setRenderer(new SimpleRenderer(fillSymbol));
         mMapView.getMap().getOperationalLayers().add(mFeatureLayer);
 
-        queryByIdentify();
+        // queryByIdentify();
 
     }
 
@@ -347,7 +361,7 @@ public class MainActivity extends AppCompatActivity {
         // SimpleRenderer renderer = new SimpleRenderer(simpleMarkerSymbol);
 
         // mFeatureLayer.setRenderer(renderer);
-        queryByIdentify();
+        //queryByIdentify();
 
     }
 
@@ -355,9 +369,14 @@ public class MainActivity extends AppCompatActivity {
      * 查询shp方式mFeatureLayer
      */
     public void queryByIdentify() {
+
         mMapView.setOnTouchListener(new DefaultMapViewOnTouchListener(this, mMapView) {
             @Override
             public boolean onSingleTapConfirmed(MotionEvent e) {
+//                mLocationDisplay.setAutoPanMode(LocationDisplay.AutoPanMode.RECENTER);
+//                if (!mLocationDisplay.isStarted())
+//                    mLocationDisplay.startAsync();
+                LocationDataSource.Location location = mLocationDisplay.getLocation();
                 mFeatureLayer.clearSelection();
                 Point screenPoint = new Point(Math.round(e.getX()), Math.round(e.getY()));
                 int tolerance = 10;
@@ -369,27 +388,43 @@ public class MainActivity extends AppCompatActivity {
                     try {
                         IdentifyLayerResult identifyLayerResult = identifyLayerResultFuture.get();
                         int counter = 0;
+                        List<Map<String, String>> maps = new ArrayList<>();
                         for (GeoElement element : identifyLayerResult.getElements()) {
                             if (element instanceof Feature) {
                                 Feature feature = (Feature) element;
+
+
+                                Map<String, Object> attributes = feature.getAttributes();
+                                Log.e(TAG, "run: " + attributes.toString());
+                                Map<String, Object> hm = (Map<String, Object>) attributes;
+                                Map<String, String> map = new HashMap<>();
+                                Object jyxzcname = hm.get(AppConstance.JYXZCNAME);
+                                Object cgqname = hm.get(AppConstance.CGQNAME);
+                                Object dbh = hm.get(AppConstance.DBH);
+                                Object xbh = hm.get(AppConstance.XBH);
+                                map.put(AppConstance.JYXZCNAME, jyxzcname.toString());
+                                map.put(AppConstance.CGQNAME, cgqname.toString());
+                                map.put(AppConstance.DBH, dbh.toString());
+                                map.put(AppConstance.XBH, xbh.toString());
+                                map.put(AppConstance.LONGITUDE, String.valueOf(location.getPosition().getX()));
+                                map.put(AppConstance.LATIDUTE, String.valueOf(location.getPosition().getY()));
+                                maps.add(map);
                                 mFeatureLayer.selectFeature(feature);
                                 counter++;
                                 Log.d(TAG, "Selection #: " + counter + " Table name: " + feature.getFeatureTable().getFields().toString());
                                 List<Field> fieldList = feature.getFeatureTable().getFields();
                                 Log.e(TAG, "onSingleTapConfirmed: " + feature.getAttributes().toString());
-//                                Field field =  feature.getFeatureTable().getField("Shape_Area");
-//                                Log.e(TAG, "onSingleTapConfirmed: " + field.getDomain().toString() );
                                 for (Field f :
                                         fieldList) {
                                     //  Log.e(TAG, "onSingleTapConfirmed: " + f.toString() );
-                                    Log.e(TAG, "onSingleTapConfirmed: " + f.getName());
+                                    // Log.e(TAG, "onSingleTapConfirmed: " + f.getName());
 //                                    Log.e(TAG, "onSingleTapConfirmed: " + f.getDomain().toString() );
 //                                    Log.e(TAG, "onSingleTapConfirmed: " + f.getAlias() );
 //                                    Log.e(TAG, "onSingleTapConfirmed: " + f.getLength() );
                                 }
                             }
                         }
-                        Toast.makeText(getApplicationContext(), counter + " features selected", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.feature_selected) + counter + ";" + maps.toString(), Toast.LENGTH_LONG).show();
                     } catch (Exception ex) {
                         Log.e(TAG, "Select feature failed: " + ex.getMessage());
                     }
@@ -471,23 +506,21 @@ public class MainActivity extends AppCompatActivity {
     /**
      * 调用 根据经纬度点，查询要素数据。
      * 再调用 SCAN KIT
+     *
      * @param location
      */
-    public void queryByPointloglat(Location location) {
+    public void queryByPointloglat(LocationDataSource.Location location) {
         //android.graphics.Point screenPoint = new android.graphics.Point(Math.round(e.getX()), Math.round(e.getY()));
         //com.esri.arcgisruntime.geometry.Point clickPoint = mMapView.screenToLocation(screenPoint);
-        com.esri.arcgisruntime.geometry.Point clickPoint = new com.esri.arcgisruntime.geometry.Point(location.getLongitude(), location.getLatitude());
+
+        com.esri.arcgisruntime.geometry.Point clickPoint = location.getPosition();
         int tolerance = 1;
         double mapTolerance = tolerance * mMapView.getUnitsPerDensityIndependentPixel();
         SpatialReference spatialReference = mMapView.getSpatialReference();
         Envelope envelope = new Envelope(clickPoint.getX() - mapTolerance, clickPoint.getY() - mapTolerance,
                 clickPoint.getX() + mapTolerance, clickPoint.getY() + mapTolerance, spatialReference);
 //投影坐标转换成经纬度
-        //Point wgsPoint = (Point) GeometryEngine.project(p, mMapView.getSpatialReference());
-        //Point point = mMapView.screenToLocation(x, y);
         QueryParameters query = new QueryParameters();
-        SpatialReference sr = SpatialReference.create(4326);//设置空间参考坐标系
-        // Envelope envelope = new Envelope(p,10,10);//后面2个参数指的是点的高和低
         query.setGeometry(envelope);// 设置空间几何对象
         query.setReturnGeometry(true);
         query.setSpatialRelationship(QueryParameters.SpatialRelationship.WITHIN);
@@ -499,50 +532,67 @@ public class MainActivity extends AppCompatActivity {
                     FeatureQueryResult result = future.get();
                     //mFeatureLayer.getFeatureTable().deleteFeaturesAsync(result);
                     Iterator<Feature> iterator = result.iterator();
+                    Integer test = SPUtil.builder(getApplication().getApplicationContext(), AppConstance.APP_SP).getData(AppConstance.ISTEST, Integer.class);
+                    // 1 表示生产环境（发布） ； 0 表示测试环境
+                    if (test.compareTo(0) != 0) {
+                        int counter = 0;
+                        while (iterator.hasNext()) {
+                            counter++;
+                            mainViewModel.setSelectedFeature(counter);
+                            Feature feature = iterator.next();
 
-                    int counter = 0;
-                    while (iterator.hasNext()) {
-                        counter++;
-                        mainViewModel.setSelectedFeature(counter);
-                        Feature feature = iterator.next();
-
-                        Map<String, Object> attributes = feature.getAttributes();
-                        Log.e(TAG, "run: "+ attributes.toString() );
-                        Map<String,Object> hm = (Map<String, Object>) attributes;
-                        Object jyxzcname = hm.get(AppConstance.JYXZCNAME);
-                        Object cgqname = hm.get(AppConstance.CGQNAME);
-                        Object dbh = hm.get(AppConstance.DBH);
-                        Object xbh = hm.get(AppConstance.XBH);
-                        Map<String,String> map = new HashMap<>();
-                        map.put(AppConstance.JYXZCNAME,jyxzcname.toString());
-                        map.put(AppConstance.CGQNAME,cgqname.toString());
-                        map.put(AppConstance.DBH,dbh.toString());
-                        map.put(AppConstance.XBH,xbh.toString());
-                        map.put(AppConstance.LONGITUDE,String.valueOf(location.getLongitude()));
-                        map.put(AppConstance.LATIDUTE,String.valueOf(location.getLatitude()));
-                        mainViewModel.setMap(map);
-                        Log.e(TAG, "run: " + mainViewModel.getMap().toString());
-                        for (String key : attributes.keySet()) {
-                            Log.e("xyh" + key, String.valueOf(attributes.get(key)));
-                        }
-                        if (mainViewModel.getMap().size() > 0){
-                            /////////////////华为SCAN KIT ////////////////// 调用扫码功能
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                ActivityCompat.requestPermissions(MainActivity.this,
-                                        new String[]{Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE},
-                                        DEFAULT_VIEW);
+                            Map<String, Object> attributes = feature.getAttributes();
+                            Log.e(TAG, "run: " + attributes.toString());
+                            Map<String, Object> hm = (Map<String, Object>) attributes;
+                            Object jyxzcname = hm.get(AppConstance.JYXZCNAME);
+                            Object cgqname = hm.get(AppConstance.CGQNAME);
+                            Object dbh = hm.get(AppConstance.DBH);
+                            Object xbh = hm.get(AppConstance.XBH);
+                            Map<String, String> map = new HashMap<>();
+                            map.put(AppConstance.JYXZCNAME, jyxzcname.toString());
+                            map.put(AppConstance.CGQNAME, cgqname.toString());
+                            map.put(AppConstance.DBH, dbh.toString());
+                            map.put(AppConstance.XBH, xbh.toString());
+                            map.put(AppConstance.LONGITUDE, String.valueOf(location.getPosition().getX()));
+                            map.put(AppConstance.LATIDUTE, String.valueOf(location.getPosition().getY()));
+                            mainViewModel.setMap(map);
+                            Log.e(TAG, "run: " + mainViewModel.getMap().toString());
+                            for (String key : attributes.keySet()) {
+                                Log.e("xyh" + key, String.valueOf(attributes.get(key)));
                             }
-                        }else{
-                            Toast.makeText(getApplicationContext() ,"定位位置无法找到林业数据（镇、村、大班、小班）",Toast.LENGTH_SHORT).show();
+                            if (mainViewModel.getMap().size() > 0) {
+                                /////////////////华为SCAN KIT ////////////////// 调用扫码功能
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                    ActivityCompat.requestPermissions(MainActivity.this,
+                                            new String[]{Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE},
+                                            DEFAULT_VIEW);
+                                }
+                            } else {
+                                Toast.makeText(getApplicationContext(), getResources().getString(R.string.point_message), Toast.LENGTH_SHORT).show();
+                            }
+                            //高亮显示选中区域
+                            mFeatureLayer.selectFeature(feature);
+                            Geometry geometry = feature.getGeometry();
+                            mMapView.setViewpointGeometryAsync(geometry.getExtent());
+
                         }
-                        //高亮显示选中区域
-                        mFeatureLayer.selectFeature(feature);
-                        Geometry geometry = feature.getGeometry();
-                        mMapView.setViewpointGeometryAsync(geometry.getExtent());
 
+                    } else {
+                        Map<String, String> map = new HashMap<>();
+                        map.put(AppConstance.JYXZCNAME, "新店镇");
+                        map.put(AppConstance.CGQNAME, "新店社区居委会");
+                        map.put(AppConstance.DBH, "01");
+                        map.put(AppConstance.XBH, "811");
+                        map.put(AppConstance.LONGITUDE, "118.23904583");
+                        map.put(AppConstance.LATIDUTE, "24.60177837");
+                        mainViewModel.setMap(map);
+                        /////////////////华为SCAN KIT ////////////////// 调用扫码功能
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                            ActivityCompat.requestPermissions(MainActivity.this,
+                                    new String[]{Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE},
+                                    DEFAULT_VIEW);
+                        }
                     }
-
-
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -750,7 +800,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setExtentMap(Location location) {
-        mMapView.setViewpointCenterAsync(new com.esri.arcgisruntime.geometry.Point(location.getLongitude(), location.getLatitude()), 90000);
+
+        mMapView.setViewpoint(new Viewpoint(location.getLatitude(), location.getLongitude(), 100000));
+//        mMapView.setViewpointCenterAsync(new com.esri.arcgisruntime.geometry.Point(location.getLongitude(), location.getLatitude()), 90000);
     }
 
 
@@ -765,7 +817,20 @@ public class MainActivity extends AppCompatActivity {
         if (permissions == null || grantResults == null || grantResults.length < 2 || grantResults[0] != PackageManager.PERMISSION_GRANTED || grantResults[1] != PackageManager.PERMISSION_GRANTED) {
             return;
         }
+// If request is cancelled, the result arrays are empty.
+        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED && requestCode == requestCode4Arcgis) {
+            // Location permission was granted. This would have been triggered in response to failing to start the
+            // LocationDisplay, so try starting this again.
+            mLocationDisplay.startAsync();
+        } else {
+            // If permission was denied, show toast to inform user what was chosen. If LocationDisplay is started again,
+            // request permission UX will be shown again, option should be shown to allow never showing the UX again.
+            // Alternative would be to disable functionality so request is not shown again.
+            //Toast.makeText(this, getString(R.string.location_permission_denied), Toast.LENGTH_SHORT).show();
 
+            // Update UI to reflect that the location display did not actually start
+            //mSpinner.setSelection(0, true);
+        }
         if (requestCode == DEFAULT_VIEW) {
             //start ScankitActivity for scanning barcode
             ScanUtil.startScan(MainActivity.this, REQUEST_CODE_SCAN, new HmsScanAnalyzerOptions.Creator().setHmsScanTypes(HmsScan.ALL_SCAN_TYPE).create());
@@ -795,11 +860,13 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(this, ((HmsScan) obj).getOriginalValue(), Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(MainActivity.this, PestsActivity.class);
                     PestsModel pests = new PestsModel();
-                    pests.setQrcode(((HmsScan) obj).getOriginalValue());
-                    HashMap<String,String> map = (HashMap<String, String>) mainViewModel.getMap();
+                    String qrcode = ((HmsScan) obj).getOriginalValue();
+                    String resultQrcode = StrUtil.subAfter(qrcode, "=", true);
+                    pests.setQrcode(resultQrcode);
+                    HashMap<String, String> map = (HashMap<String, String>) mainViewModel.getMap();
 //                    Bundle nBundle = new Bundle();
                     intent.putExtra(AppConstance.PESTSMODEL, pests);
-                    intent.putExtra(AppConstance.FEATURE_ATTRIBUTE_MAP , map);
+                    intent.putExtra(AppConstance.FEATURE_ATTRIBUTE_MAP, map);
                     startActivity(intent);
                 }
                 return;
@@ -814,6 +881,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        SPUtil.builder(getApplication().getApplicationContext(), AppConstance.APP_SP).setData(AppConstance.ISTEST, 1);
+        ArcGISRuntimeEnvironment.setLicense(AppConstance.API_KEY);
         settingViewModel = new ViewModelProvider(this).get(SettingViewModel.class);
         pestsViewModel = new ViewModelProvider(this).get(PestsViewModel.class);
         mainViewModel = new ViewModelProvider(this).get(MainViewModel.class);
@@ -828,12 +897,56 @@ public class MainActivity extends AppCompatActivity {
         mGraphicsOverlay = addGraphicsOverlay(mMapView);
         initToolbarZoom();
         initFAB();
+        // set the map to the map view
 
-        setMap();
+        if (arcGISMap == null) {
+            setMap();
+        }
+        // get the MapView's LocationDisplay
+        mLocationDisplay = mMapView.getLocationDisplay();
+        // Listen to changes in the status of the location data source.
+        mLocationDisplay.addDataSourceStatusChangedListener(dataSourceStatusChangedEvent -> {
+
+            // If LocationDisplay started OK, then continue.
+            if (dataSourceStatusChangedEvent.isStarted())
+                return;
+
+            // No error is reported, then continue.
+            if (dataSourceStatusChangedEvent.getError() == null)
+                return;
+
+            // If an error is found, handle the failure to start.
+            // Check permissions to see if failure may be due to lack of permissions.
+            boolean permissionCheck1 = ContextCompat.checkSelfPermission(this, reqPermissions[0]) ==
+                    PackageManager.PERMISSION_GRANTED;
+            boolean permissionCheck2 = ContextCompat.checkSelfPermission(this, reqPermissions[1]) ==
+                    PackageManager.PERMISSION_GRANTED;
+
+            if (!(permissionCheck1 && permissionCheck2)) {
+                // If permissions are not already granted, request permission from the user.
+                ActivityCompat.requestPermissions(this, reqPermissions, requestCode4Arcgis);
+            } else {
+                // Report other unknown failure types to the user - for example, location services may not
+                // be enabled on the device.
+                String message = String.format("Error in DataSourceStatusChangedListener: %s", dataSourceStatusChangedEvent
+                        .getSource().getLocationDataSource().getError().getMessage());
+                Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+
+                // Update UI to reflect that the location display did not actually start
+                mSpinner.setSelection(0, true);
+            }
+        });
+
+        mLocationDisplay.setAutoPanMode(LocationDisplay.AutoPanMode.RECENTER);
+        if (!mLocationDisplay.isStarted())
+            mLocationDisplay.startAsync();
+
+
+        showGeoDatabase();
         pestsViewModel.findAll().observe(this, new Observer<List<Pests>>() {
             @Override
             public void onChanged(List<Pests> pests) {
-                Log.e(TAG, "pestsViewModel.findAll().observe: " +pests.toString() );
+                Log.e(TAG, "pestsViewModel.findAll().observe: " + pests.toString());
             }
         });
         /**
@@ -842,65 +955,20 @@ public class MainActivity extends AppCompatActivity {
         pestsViewModel.findAll(true).observe(this, new Observer<List<Pests>>() {
             @Override
             public void onChanged(List<Pests> pests) {
-                if (pests != null && !pests.isEmpty()) {
-                    for (Pests s :
-                            pests) {
 
-                        Log.e(TAG, "onChanged: " + pests.toString());
-                        PestsModel pestsModel = new PestsModel();
-                        pestsModel.setQrcode(s.getQrcode());
-                        pestsModel.setAppId(s.getId());
-                        pestsModel.setBagNumber(s.getBagNumber());
-                        pestsModel.setDb(s.getDb());
-                        pestsModel.setXb(s.getXb());
-                        pestsModel.setDeviceId(s.getDeviceId());
-                        if (s.getFellPic() != null) {
-                            File fellpic = new File(s.getFellPic());
-                            String filepath = ossUpload(fellpic);
-                            pestsModel.setFellPic("http://"+AppConstance.BUCKETNAME+"."+AppConstance.ENDPOINT+"/"+filepath);
-                        } else {
-                            pestsModel.setFellPic("");
-                        }
-
-                        if (s.getStumpPic() != null) {
-                            File stumpPic = new File(s.getStumpPic());
-                            String filepath = ossUpload(stumpPic);
-                            pestsModel.setStumpPic("http://"+AppConstance.BUCKETNAME+"."+AppConstance.ENDPOINT+"/"+filepath);
-                        } else {
-                            pestsModel.setStumpPic("");
-                        }
-                        if (s.getFinishPic() != null) {
-                            File finishPic = new File(s.getFinishPic());
-                            String filepath = ossUpload(finishPic);
-                            pestsModel.setFinishPic("http://"+AppConstance.BUCKETNAME+"."+AppConstance.ENDPOINT+"/"+filepath);
-                        } else {
-                            pestsModel.setFinishPic("");
-                        }
-                        pestsModel.setLatitude(s.getLatitude());
-                        pestsModel.setLongitude(s.getLongitude());
-                        pestsModel.setOperator(s.getOperator());
-                        pestsModel.setPestsType(s.getPestsType());
-                        pestsModel.setPositionError(s.getPositionError());
-                        pestsModel.setTown(s.getTown());
-                        pestsModel.setTreeWalk(s.getTreeWalk());
-                        pestsModel.setUserId(s.getUserId());
-                        pestsModel.setVillage(s.getVillage());
-                        pestsModel.setStime(s.getStime());
-                        mainViewModel.uploadServer(pestsModel);
-                    }
-                }
             }
         });
         pestsViewModel.findAll(false).observe(this, new Observer<List<Pests>>() {
             @Override
             public void onChanged(List<Pests> pests) {
-                //if (pests != null && !pests.isEmpty())
-                   // Log.e(TAG, "onChanged: " + pests.toString() );
+                if (pests != null && !pests.isEmpty())
+                    Log.e(TAG, "手机端数据新增加一条: " + pests.toString());
             }
         });
+
     }
 
-    public String ossUpload(File file){
+    public String ossUpload(File file) {
         //初始化OssService类，参数分别是Content，accessKeyId，accessKeySecret，endpoint，bucketName（后4个参数是您自己阿里云Oss中参数）
         OssService ossService = new OssService(getApplication(), AppConstance.ACCESS_KEY_ID, AppConstance.ACCESS_KEY_SECRET, AppConstance.ENDPOINT, AppConstance.BUCKETNAME);
 //初始化OSSClient
@@ -914,31 +982,22 @@ public class MainActivity extends AppCompatActivity {
         ossService.setProgressCallback(new OssService.ProgressCallback() {
             @Override
             public void onProgressCallback(double progress) {
-                runOnUiThread(new Runnable(){
+                runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Log.e(TAG, "run: " + progress );
+                        Log.e(TAG, "run: " + progress);
                     }
                 });
             }
         });
         return appFilePath;
     }
+
     private void setMap() {
         arcGISMap = new ArcGISMap();
-        // set the map to the map view
-        arcGISMap.addBasemapChangedListener(new ArcGISMap.BasemapChangedListener() {
-            @Override
-            public void basemapChanged(ArcGISMap.BasemapChangedEvent basemapChangedEvent) {
-                Log.e(TAG, "basemapChanged: " + basemapChangedEvent.toString());
-                //   arcGISMap.getBasemap().getBaseLayers().add(basemapChangedEvent.g);
-            }
-        });
-        SettingModel model = settingViewModel.getSettingModel4SP();
-        if (model.getTiandiShow()) {
-
+//        SettingModel model = settingViewModel.getSettingModel4SP();
+        if (true) {
             Basemap basemap = new Basemap();
-//            basemap.getBaseLayers().clear();
             basemap.setName(AppConstance.TIANDI_MAP);
             WebTiledLayer webTiledLayer = TianDiTuTiledLayerClass.CreateTianDiTuTiledLayer(TianDiTuTiledLayerClass.LayerType.TIANDITU_IMAGE_2000);
             webTiledLayer.loadAsync();
@@ -946,102 +1005,65 @@ public class MainActivity extends AppCompatActivity {
             webTiledLayer1.loadAsync();
             basemap.getBaseLayers().add(webTiledLayer);
             basemap.getBaseLayers().add(webTiledLayer1);
-
-//            LayerList name = arcGISMap.getBasemap().getBaseLayers();
-//            boolean contains = name.equals(AppConstance.TIANDI_MAP);
-//            if (!contains){
             arcGISMap.setBasemap(basemap);
+        }
+//        if (model.getGeoShow()) {
+//            Basemap geoBasemap = new Basemap();
+//            geoBasemap.setName(AppConstance.GEO_MAP);
+//            String theURLString = "http://map.geoq.cn/arcgis/rest/services/ChinaOnlineCommunity/MapServer";
+//            ArcGISTiledLayer mainArcGISTiledLayer = new ArcGISTiledLayer(theURLString);
+//            geoBasemap.getBaseLayers().add(mainArcGISTiledLayer);
+//            arcGISMap.setBasemap(geoBasemap);
+//        }
+//
+//        if (model.getGoogleShow()) {
+//            Basemap googleBasemap = new Basemap();
+//            googleBasemap.setName(AppConstance.GOOGLE_MAP);
+//            WebTiledLayer googleLayer = null;
+//            try {
+//                googleLayer = GoogleMapLayer.CreateGoogleLayer(GoogleMapLayer.MapType.IMAGE);
+//                googleLayer.loadAsync();
+//
+//            } catch (Exception e) {
+//                Toast.makeText(this, "Google地图加载失败，请关闭", Toast.LENGTH_SHORT).show();
 //            }
-
-        }
-
-        if (model.getGeoShow()) {
-
-
-            Basemap geoBasemap = new Basemap();
-//            geoBasemap.getBaseLayers().clear();
-            geoBasemap.setName(AppConstance.GEO_MAP);
-            String theURLString = "http://map.geoq.cn/arcgis/rest/services/ChinaOnlineCommunity/MapServer";
-            ArcGISTiledLayer mainArcGISTiledLayer = new ArcGISTiledLayer(theURLString);
-            geoBasemap.getBaseLayers().add(mainArcGISTiledLayer);
-//            boolean contains = arcGISMap.getBasemap().getName().equals(AppConstance.GEO_MAP);
-//            if (!contains){
-            arcGISMap.setBasemap(geoBasemap);
+//            // 加载谷歌地图
+//            try {
+//
+//                googleBasemap.getBaseLayers().add(googleLayer);
+////                boolean contains = arcGISMap.getBasemap().getName().equals(AppConstance.GOOGLE_MAP);
+////                if (!contains){
+//                arcGISMap.setBasemap(googleBasemap);
+////                }
+//            } catch (Exception e) {
+//                Toast.makeText(this, "Google地图加载失败，请关闭", Toast.LENGTH_SHORT).show();
 //            }
-
-
-        }
-
-        if (model.getGoogleShow()) {
-
-            Basemap googleBasemap = new Basemap();
-//            googleBasemap.getBaseLayers().clear();
-            googleBasemap.setName(AppConstance.GOOGLE_MAP);
-            WebTiledLayer googleLayer = null;
-            try {
-                googleLayer = GoogleMapLayer.CreateGoogleLayer(GoogleMapLayer.MapType.IMAGE);
-                googleLayer.loadAsync();
-
-            } catch (Exception e) {
-                Toast.makeText(this, "Google地图加载失败，请关闭", Toast.LENGTH_SHORT).show();
-            }
-            // 加载谷歌地图
-            try {
-
-                googleBasemap.getBaseLayers().add(googleLayer);
-//                boolean contains = arcGISMap.getBasemap().getName().equals(AppConstance.GOOGLE_MAP);
-//                if (!contains){
-                arcGISMap.setBasemap(googleBasemap);
-//                }
-            } catch (Exception e) {
-                Toast.makeText(this, "Google地图加载失败，请关闭", Toast.LENGTH_SHORT).show();
-            }
-        }
-        if (model.getaMapShow()) {
-            // 加载高德地图
-
-            Basemap
-                    aMapBasemap = new Basemap();
-//            aMapBasemap.getBaseLayers().clear();
-            aMapBasemap.setName(AppConstance.AMAP_MAP);
-            WebTiledLayer aMap = AMapTiledLayerClass.CreateAMapTiledLayer(AMapTiledLayerClass.LayerType.AMAP_IMAGE);
-            aMap.loadAsync();
-            aMapBasemap.getBaseLayers().add(aMap);
-//            boolean contains = arcGISMap.getBasemap().getName().equals(AppConstance.AMAP_MAP);
-//            if (!contains){
-            arcGISMap.setBasemap(aMapBasemap);
-//            }
-        }
-        if (model.getOsmShow()) {
-            //加载OpenStreetMap底图
-            Basemap
-                    osmBasemap = new Basemap();
-//            osmBasemap.getBaseLayers().clear();
-            osmBasemap.setName(AppConstance.OSM_MAP);
-            OpenStreetMapLayer streetlayer = new OpenStreetMapLayer();
-            osmBasemap.getBaseLayers().add(streetlayer);
-
-//            boolean contains = arcGISMap.getBasemap().getName().equals(AppConstance.OSM_MAP);
-//            if (!contains){
-            arcGISMap.setBasemap(osmBasemap);
-//            }
-        }
-        if (model.getArcgisShow()) {
-
-            Basemap
-                    arcgisBasemap = new Basemap();
-//            arcgisBasemap.getBaseLayers().clear();
-            arcgisBasemap.setName(AppConstance.ARCGIS_MAP);
-            String arcurl = "http://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer";
-            ArcGISTiledLayer arcGISTiledLayer = new ArcGISTiledLayer(arcurl);
-            arcgisBasemap.getBaseLayers().add(arcGISTiledLayer);
-
-//            boolean contains = arcGISMap.getBasemap().getName().equals(AppConstance.ARCGIS_MAP);
-//            if (!contains){
-            arcGISMap.setBasemap(arcgisBasemap);
-//            }
-        }
-
+//        }
+//        if (model.getaMapShow()) {
+//            // 加载高德地图
+//            Basemap aMapBasemap = new Basemap();
+//            aMapBasemap.setName(AppConstance.AMAP_MAP);
+//            WebTiledLayer aMap = AMapTiledLayerClass.CreateAMapTiledLayer(AMapTiledLayerClass.LayerType.AMAP_IMAGE);
+//            aMap.loadAsync();
+//            aMapBasemap.getBaseLayers().add(aMap);
+//            arcGISMap.setBasemap(aMapBasemap);
+//        }
+//        if (model.getOsmShow()) {
+//            //加载OpenStreetMap底图
+//            Basemap osmBasemap = new Basemap();
+//            osmBasemap.setName(AppConstance.OSM_MAP);
+//            OpenStreetMapLayer streetlayer = new OpenStreetMapLayer();
+//            osmBasemap.getBaseLayers().add(streetlayer);
+//            arcGISMap.setBasemap(osmBasemap);
+//        }
+//        if (model.getArcgisShow()) {
+//            Basemap arcgisBasemap = new Basemap();
+//            arcgisBasemap.setName(AppConstance.ARCGIS_MAP);
+//            String arcurl = "http://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer";
+//            ArcGISTiledLayer arcGISTiledLayer = new ArcGISTiledLayer(arcurl);
+//            arcgisBasemap.getBaseLayers().add(arcGISTiledLayer);
+//            arcGISMap.setBasemap(arcgisBasemap);
+//        }
         mMapView.setMap(arcGISMap);
     }
 
@@ -1066,30 +1088,30 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent1);
                 break;
             case R.id.menu_updateserver:
-                updateServer();
+                updateServer(false);
                 break;
-            case R.id.menu_loadbasemap:
-                setMap();
-                break;
+//            case R.id.menu_loadbasemap:
+//                setMap();
+//                break;
             case R.id.menu_loadshp:
                 showGeoDatabase();
                 break;
-            case R.id.menu_downloadserver:
-                downloadServer();
+            case R.id.menu_update_againr:
+                updateServer(true);
                 break;
-            case R.id.menu_logout:
-                logout();
-                break;
-            case R.id.menu_about:
+//            case R.id.menu_logout:
+//                //logout();
+//                break;
+            case R.id.menu_delete:
                 //                showShapefile();
 //                openShp();
 //                showServiceFeatureTable();
-                pestsViewModel.deleteAll();
+                deletePestsByUpdate(true);
                 Basemap basemap = arcGISMap.getBasemap();
                 LayerList sic = basemap.getBaseLayers();
-                Log.e(TAG, "onOptionsItemSelected: " + sic.size() );
+                Log.e(TAG, "onOptionsItemSelected: " + sic.size());
                 LayerList si = mMapView.getMap().getOperationalLayers();
-                Log.e(TAG, "onOptionsItemSelected: " + si.size() );
+                Log.e(TAG, "onOptionsItemSelected: " + si.size());
                 //   Toast.makeText(this, mMapView.getSpatialReference().getWKText() + " --- " + mMapView.getSpatialReference().toString(), Toast.LENGTH_LONG).show();
                 break;
             default:
@@ -1098,18 +1120,13 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void logout() {
-        loginViewModel.logout();
-        Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-        startActivity(intent);
-    }
-
     private void downloadServer() {
         RetrofitUtil.getInstance().getPestsService().findAll()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new io.reactivex.rxjava3.core.Observer<Result>() {
                     private Disposable disposable;
+
                     @Override
                     public void onSubscribe(@io.reactivex.rxjava3.annotations.NonNull Disposable d) {
                         disposable = d;
@@ -1117,8 +1134,8 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public void onNext(@io.reactivex.rxjava3.annotations.NonNull Result result) {
-                        if (result.getSuccess()){
-                            Log.e(TAG, "onNext: " + result.toString() );
+                        if (result.getSuccess()) {
+                            Log.e(TAG, "onNext: " + result.toString());
                         }
                     }
 
@@ -1134,65 +1151,104 @@ public class MainActivity extends AppCompatActivity {
                 });
     }
 
-    private void updateServer() {
-
-        Pests[] pests = pestsViewModel.findAllObject();
-//        if (pests[0].isUpdateServer()){
-//            pests[0].setUpdateServer(false);
-//        }else{
-//            pests[0].setUpdateServer(true);
-//        }
-//
-//        if (pests[11].isUpdateServer()){
-//            pests[11].setUpdateServer(false);
-//        }else{
-//            pests[11].setUpdateServer(true);
-//        }
-//        pestsViewModel.update(pests[11]);
-//        pestsViewModel.update(pests[0]);
+    private void deletePestsByUpdate(boolean isUpdate) {
+        Pests[] pests = pestsViewModel.findAllObject(isUpdate);
         for (Pests p :
                 pests) {
-
-            if (p.isUpdateServer()){
-               p.setUpdateServer(false);
-            }else{
-                p.setUpdateServer(true);
-            }
-            pestsViewModel.update(p);
-            Log.e(TAG, "updateServer: " + p.toString() );
+            pestsViewModel.delete(p);
         }
     }
 
-    private void initFAB() {
+    private void updateServer(boolean isUpdate) {
+        Pests[] pests = pestsViewModel.findAllObject(isUpdate);
+        for (Pests p :
+                pests) {
+            p.setUpdateServer(true);
+            pestsViewModel.update(p);
 
+            Log.e(TAG, "服务器数据上传一条: " + pests.toString());
+            PestsModel pestsModel = new PestsModel();
+            pestsModel.setQrcode(p.getQrcode());
+            pestsModel.setAppId(p.getId());
+            pestsModel.setBagNumber(p.getBagNumber());
+            pestsModel.setDb(p.getDb());
+            pestsModel.setXb(p.getXb());
+            pestsModel.setDeviceId(p.getDeviceId());
+            if (p.getFellPic() != null) {
+                File fellpic = new File(p.getFellPic());
+                String filepath = ossUpload(fellpic);
+                pestsModel.setFellPic("http://" + AppConstance.BUCKETNAME + "." + AppConstance.ENDPOINT + "/" + filepath);
+            } else {
+                pestsModel.setFellPic("");
+            }
+
+            if (p.getStumpPic() != null) {
+                File stumpPic = new File(p.getStumpPic());
+                String filepath = ossUpload(stumpPic);
+                pestsModel.setStumpPic("http://" + AppConstance.BUCKETNAME + "." + AppConstance.ENDPOINT + "/" + filepath);
+            } else {
+                pestsModel.setStumpPic("");
+            }
+            if (p.getFinishPic() != null) {
+                File finishPic = new File(p.getFinishPic());
+                String filepath = ossUpload(finishPic);
+                pestsModel.setFinishPic("http://" + AppConstance.BUCKETNAME + "." + AppConstance.ENDPOINT + "/" + filepath);
+            } else {
+                pestsModel.setFinishPic("");
+            }
+            pestsModel.setLatitude(p.getLatitude());
+            pestsModel.setLongitude(p.getLongitude());
+            pestsModel.setOperator(p.getOperator());
+            pestsModel.setPestsType(p.getPestsType());
+            pestsModel.setPositionError(p.getPositionError());
+            pestsModel.setTown(p.getTown());
+            pestsModel.setTreeWalk(p.getTreeWalk());
+            pestsModel.setUserId(p.getUserId());
+            pestsModel.setVillage(p.getVillage());
+            pestsModel.setStime(p.getStime());
+            mainViewModel.uploadServer(pestsModel);
+
+            //pestsViewModel.deleteWithId(s.getId());
+
+            Log.e(TAG, "updateServer: " + p.toString());
+        }
+    }
+
+    private void setInitExtentMap() {
+        //判断GPS是否正常启动
+        if (!mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+
+            //返回开启GPS导航设置界面
+            Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+            startActivityForResult(intent, 0);
+            return;
+        }
+        int requestPermissionsCode = 2;
+        String[] requestPermissions = new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
+        if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            ActivityCompat.requestPermissions(MainActivity.this, requestPermissions, requestPermissionsCode);
+            return;
+        }
+        Location location = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        markLocation(location);
+    }
+
+    private void initFAB() {
         fabLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //判断GPS是否正常启动
-                if (!mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                // setInitExtentMap();
+                mLocationDisplay.setAutoPanMode(LocationDisplay.AutoPanMode.RECENTER);
+                if (!mLocationDisplay.isStarted())
+                    mLocationDisplay.startAsync();
 
-                    //返回开启GPS导航设置界面
-                    Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                    startActivityForResult(intent, 0);
-                    return;
-                }
-                int requestPermissionsCode = 2;
-                String[] requestPermissions = new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
-                if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    // TODO: Consider calling
-                    //    ActivityCompat#requestPermissions
-                    // here to request the missing permissions, and then overriding
-                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                    //                                          int[] grantResults)
-                    // to handle the case where the user grants the permission. See the documentation
-                    // for ActivityCompat#requestPermissions for more details.
-                    ActivityCompat.requestPermissions(MainActivity.this, requestPermissions, requestPermissionsCode);
-                    return;
-                }
-                Location location = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                markLocation(location);
-//                mLocationManager.addGpsStatusListener(listener);
-                //     mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, locationListener);
             }
         });
 
@@ -1201,30 +1257,35 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                if (mainViewModel.isLoadedShp()){
+                if (mainViewModel.isLoadedShp()) {
                     //判断GPS是否正常启动
-                    if (!mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+//                    if (!mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+//
+//                        //返回开启GPS导航设置界面
+//                        Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+//                        startActivityForResult(intent, 0);
+//                        return;
+//                    }
+//                    int requestPermissionsCode = 2;
+//                    String[] requestPermissions = new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
+//                    if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//                        // TODO: Consider calling
+//                        //    ActivityCompat#requestPermissions
+//                        // here to request the missing permissions, and then overriding
+//                        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+//                        //                                          int[] grantResults)
+//                        // to handle the case where the user grants the permission. See the documentation
+//                        // for ActivityCompat#requestPermissions for more details.
+//                        ActivityCompat.requestPermissions(MainActivity.this, requestPermissions, requestPermissionsCode);
+//                        return;
+//                    }
+//                    Location location = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
-                        //返回开启GPS导航设置界面
-                        Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                        startActivityForResult(intent, 0);
-                        return;
-                    }
-                    int requestPermissionsCode = 2;
-                    String[] requestPermissions = new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
-                    if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                        // TODO: Consider calling
-                        //    ActivityCompat#requestPermissions
-                        // here to request the missing permissions, and then overriding
-                        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                        //                                          int[] grantResults)
-                        // to handle the case where the user grants the permission. See the documentation
-                        // for ActivityCompat#requestPermissions for more details.
-                        ActivityCompat.requestPermissions(MainActivity.this, requestPermissions, requestPermissionsCode);
-                        return;
-                    }
-                    Location location = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                    markLocation(location);
+                    mLocationDisplay.setAutoPanMode(LocationDisplay.AutoPanMode.RECENTER);
+                    if (!mLocationDisplay.isStarted())
+                        mLocationDisplay.startAsync();
+                    LocationDataSource.Location location = mLocationDisplay.getLocation();
+                    //markLocation(location);
                     queryByPointloglat(location);
                     // mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, locationListener);
                     // AGConnectCrash.getInstance().testIt(MainActivity.this);

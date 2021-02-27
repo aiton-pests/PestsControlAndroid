@@ -28,6 +28,7 @@ import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -48,6 +49,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -72,7 +74,9 @@ public class PestsActivity extends AppCompatActivity {
     private ImageView ivFinish;
     private ImageView ivStump;
     private ImageView ivFell;
-
+    private ImageView ivAddOperator;
+    //pests 操作人员记录和自动显示
+    private ArrayAdapter<String> adapter;
     // 拍照的requestCode  分别为Fell PIC
     private static final int CAMERA_REQUEST_CODE_FELL = 0x00000007;
     // 拍照的requestCode  分别为stump PIC
@@ -326,13 +330,46 @@ public class PestsActivity extends AppCompatActivity {
         }
     }
 
+    private boolean setDataSource(String operator){
+        if (operator != null){
+            List operators = SPUtil.builder(getApplicationContext(),AppConstance.APP_SP).getDataList(AppConstance.OPERATOR,List.class);
+            if (operators != null){
+                if (!operators.contains(operator)){
+                    operators.add(operator);
+                    SPUtil.builder(getApplicationContext(),AppConstance.APP_SP).setDataList(AppConstance.OPERATOR,operators);
+                }
+
+                adapter.addAll(operators);
+                adapter.notifyDataSetChanged();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private List<String> getDataSource() {
+        List operators = SPUtil.builder(getApplicationContext(),AppConstance.APP_SP).getDataList(AppConstance.OPERATOR,List.class);
+        if (operators != null){
+            return operators;
+        }else{
+            return new ArrayList<>();
+        }
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pests);
         pestsViewModel = new ViewModelProvider(this).get(PestsViewModel.class);
+        ivAddOperator = findViewById(R.id.iv_add_operator);
         acOperator = findViewById(R.id.ac_operator);
+        /*
+         * 1.使用手工方式的list数组适配器
+         */
+        adapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_list_item_1, getDataSource());
+        acOperator.setAdapter(adapter);
         ibFellPic = findViewById(R.id.ib_fell_pic);
         ibStumpPic = findViewById(R.id.ib_stump_pic);
         ibFinishPic = findViewById(R.id.ib_finish_pic);
@@ -349,7 +386,15 @@ public class PestsActivity extends AppCompatActivity {
         ivFell = findViewById(R.id.iv_fell);
         ivFinish = findViewById(R.id.iv_finish);
         ivStump = findViewById(R.id.iv_stump);
-
+        ivAddOperator.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String operator = acOperator.getText().toString();
+                Toast.makeText(getApplicationContext(),"Operator ; " + operator , Toast.LENGTH_LONG).show();
+                Log.e(TAG, "operator: " + operator);
+                setDataSource(operator);
+            }
+        });
         pestsViewModel.findAll().observe(this, new Observer<List<Pests>>() {
             @Override
             public void onChanged(List<Pests> pests) {
@@ -440,6 +485,9 @@ public class PestsActivity extends AppCompatActivity {
 
                 pests.setUpdateServer(false);
                 pestsViewModel.insert(pests);
+
+                Intent intent = new Intent(PestsActivity.this, MainActivity.class);
+                startActivity(intent);
             }
         });
         ibFellPic.setOnClickListener(new View.OnClickListener() {

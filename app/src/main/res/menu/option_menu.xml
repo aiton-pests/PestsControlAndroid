@@ -11,11 +11,6 @@
         android:icon="@android:drawable/ic_menu_share"
         android:orderInCategory="1"
         app:showAsAction="never"/>
-    <item android:id="@+id/menu_our"
-        android:title="个人设置"
-        android:icon="@android:drawable/ic_menu_share"
-        android:orderInCategory="1"
-        app:showAsAction="never"/>
 
     <item android:id="@+id/menu_loadshp"
         android:title="加载离线地图"
@@ -23,31 +18,36 @@
         android:orderInCategory="1"
         app:showAsAction="never"/>
 
-    <item android:id="@+id/menu_loadbasemap"
-        android:title="加载地图底图"
-        android:icon="@android:drawable/ic_menu_share"
-        android:orderInCategory="1"
-        app:showAsAction="never"/>
+<!--    <item android:id="@+id/menu_loadbasemap"-->
+<!--        android:title="加载地图底图"-->
+<!--        android:icon="@android:drawable/ic_menu_share"-->
+<!--        android:orderInCategory="1"-->
+<!--        app:showAsAction="never"/>-->
     <item android:id="@+id/menu_updateserver"
         android:title="上传数据服务"
         android:icon="@android:drawable/ic_menu_share"
         android:orderInCategory="1"
         app:showAsAction="never"/>
+    <item android:id="@+id/menu_update_againr"
+            android:title="再次上传数据"
+            android:icon="@android:drawable/ic_menu_share"
+            android:orderInCategory="1"
+            app:showAsAction="never"/>
+    <item android:id="@+id/menu_delete"
+        android:title="删除已上传数据"
+        android:icon="@android:drawable/ic_menu_share"
+        android:orderInCategory="1"
+        app:showAsAction="never"/>
+    <item android:id="@+id/menu_our"
+        android:title="个人信息"
+        android:icon="@android:drawable/ic_menu_share"
+        android:orderInCategory="1"
+        app:showAsAction="never"/>
 
-    <item android:id="@+id/menu_downloadserver"
-        android:title="下载数据服务"
-        android:icon="@android:drawable/ic_menu_share"
-        android:orderInCategory="1"
-        app:showAsAction="never"/>
-    <item android:id="@+id/menu_about"
-        android:title="关于我们"
-        android:icon="@android:drawable/ic_menu_share"
-        android:orderInCategory="1"
-        app:showAsAction="never"/>
-    <item android:id="@+id/menu_logout"
-        android:title="退出登陆"
-        android:icon="@android:drawable/ic_menu_share"
-        android:orderInCategory="1"
-        app:showAsAction="never"/>
+<!--    <item android:id="@+id/menu_logout"-->
+<!--        android:title="退出登陆"-->
+<!--        android:icon="@android:drawable/ic_menu_share"-->
+<!--        android:orderInCategory="1"-->
+<!--        app:showAsAction="never"/>-->
 
 </menu>

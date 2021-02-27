@@ -46,12 +46,9 @@ import java.util.regex.Pattern;
 
 public class SettingActivity extends AppCompatActivity {
     int REQUESTCODE_FROM_ACTIVITY = 1000;
-    String filePaths = "";
     private TextView tvLoadShp, tvGalleryMap;
     private SettingViewModel settingViewModel;
-    private RadioButton rbArcGIS, rbGeoq, rbGoogle, rbAmap, rbTiandi, rbOSM;
-    private RadioGroup rgBasemap;
-    private ImageView ivLoadShp,imageView2;
+    private ImageView ivLoadShp;
     private RecyclerView recyclerView;
     ShpAdapter adapter;
 
@@ -67,69 +64,34 @@ public class SettingActivity extends AppCompatActivity {
         }
         recyclerView = findViewById(R.id.rv_shp);
         ivLoadShp = findViewById(R.id.iv_load_file);
-        imageView2 = findViewById(R.id.imageView2);
-        imageView2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Log.e(AppConstance.TAG, "getSettingModel4SP: " + settingViewModel.getSettingModel4SP().toString() );
-                Log.e(AppConstance.TAG, "getSettingmodel:getValue " + settingViewModel.getSettingmodel().getValue().toString() );
-            }
-        });
-        tvLoadShp = findViewById(R.id.tv_load_shp);
-        tvGalleryMap = findViewById(R.id.tv_gallery_map);
-        rbArcGIS = findViewById(R.id.rb_arcgis);
-        rbAmap = findViewById(R.id.rb_amap);
-        rbGeoq = findViewById(R.id.rb_geo);
-        rbGoogle = findViewById(R.id.rb_google);
-        rbOSM = findViewById(R.id.rb_osm);
-        rbTiandi = findViewById(R.id.rb_tiandi);
-        rgBasemap = findViewById(R.id.rg_basemap);
-//        rgBasemap.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+//        imageView2.setOnClickListener(new View.OnClickListener() {
 //            @Override
-//            public void onCheckedChanged(RadioGroup radioGroup, int i) {
-//                SettingModel model  =settingViewModel.getSettingmodel().getValue();
-//
-//                if (i == rbTiandi.getId()){
-//                    model.setTiandiShow(true);
-//                    settingViewModel.getSettingmodel().setValue(model);
-//                }else if (i == rbAmap.getId()){
-//                    model.setaMapShow(true);
-//                    settingViewModel.getSettingmodel().setValue(model);
-//                }else if (i == rbArcGIS.getId()){
-//                    model.setArcgisShow(true);
-//                    settingViewModel.getSettingmodel().setValue(model);
-//                }else if (i == rbGeoq.getId()){
-//                    model.setGeoShow(true);
-//                    settingViewModel.getSettingmodel().setValue(model);
-//                }else if (i == rbGoogle.getId()){
-//                    model.setGoogleShow(true);
-//                    settingViewModel.getSettingmodel().setValue(model);
-//                }else if (i == rbOSM.getId()){
-//                    model.setOsmShow(true);
-//                    settingViewModel.getSettingmodel().setValue(model);
-//                }
+//            public void onClick(View view) {
+//                Log.e(AppConstance.TAG, "getSettingModel4SP: " + settingViewModel.getSettingModel4SP().toString() );
+//                Log.e(AppConstance.TAG, "getSettingmodel:getValue " + settingViewModel.getSettingmodel().getValue().toString() );
 //            }
 //        });
+        tvLoadShp = findViewById(R.id.tv_load_shp);
 
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         adapter = new ShpAdapter(settingViewModel);
         recyclerView.setAdapter(adapter);
-        settingViewModel.getSettingmodel().observe(this, new Observer<SettingModel>() {
-            @Override
-            public void onChanged(SettingModel settingModel) {
-                if (settingModel != null) {
-                    rbAmap.setChecked(settingModel.getaMapShow());
-                    rbArcGIS.setChecked(settingModel.getArcgisShow());
-                    rbGeoq.setChecked(settingModel.getGeoShow());
-                    rbGoogle.setChecked(settingModel.getGoogleShow());
-                    rbOSM.setChecked(settingModel.getOsmShow());
-                    rbTiandi.setChecked(settingModel.getTiandiShow());
-                    settingViewModel.saveSettingModel2SP();
-                }
-            }
-        });
+//        settingViewModel.getSettingmodel().observe(this, new Observer<SettingModel>() {
+//            @Override
+//            public void onChanged(SettingModel settingModel) {
+//                if (settingModel != null) {
+//                    rbAmap.setChecked(settingModel.getaMapShow());
+//                    rbArcGIS.setChecked(settingModel.getArcgisShow());
+//                    rbGeoq.setChecked(settingModel.getGeoShow());
+//                    rbGoogle.setChecked(settingModel.getGoogleShow());
+//                    rbOSM.setChecked(settingModel.getOsmShow());
+//                    rbTiandi.setChecked(settingModel.getTiandiShow());
+//                    settingViewModel.saveSettingModel2SP();
+//                }
+//            }
+//        });
         settingViewModel.getShpFile().observe(this, new Observer<List<ShpFile>>() {
             @Override
             public void onChanged(List<ShpFile> shpFiles) {
@@ -157,85 +119,87 @@ public class SettingActivity extends AppCompatActivity {
                     Log.e(AppConstance.TAG, "onClick: " + files1.toString());
                     List<ShpFile> shpFiles = FileUtil.convertGeoFile2ShpFile(files1);
                     settingViewModel.getShpFile().setValue(shpFiles);
-
+                    if (files1.isEmpty() || files1.size() == 0){
+                        Toast.makeText(getApplicationContext(),getResources().getString(R.string.no_file_exist),Toast.LENGTH_SHORT).show();
+                    }
                 }
             });
         } catch (Exception e) {
             e.printStackTrace();
         }
 //
-        rbArcGIS.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                SettingModel model = settingViewModel.getSettingmodel().getValue();
-                if (b) {
-                    model.setArcgisShow(true);
-                } else {
-                    model.setArcgisShow(false);
-                }
-                settingViewModel.getSettingmodel().setValue(model);
-            }
-        });
-        rbAmap.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                SettingModel model = settingViewModel.getSettingmodel().getValue();
-                if (b) {
-                    model.setaMapShow(true);
-                } else {
-                    model.setaMapShow(false);
-                }
-                settingViewModel.getSettingmodel().setValue(model);
-            }
-        });
-        rbGeoq.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                SettingModel model = settingViewModel.getSettingmodel().getValue();
-                if (b) {
-                    model.setGeoShow(true);
-                } else {
-                    model.setGeoShow(false);
-                }
-                settingViewModel.getSettingmodel().setValue(model);
-            }
-        });
-        rbGoogle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                SettingModel model = settingViewModel.getSettingmodel().getValue();
-                if (b) {
-                    model.setGoogleShow(true);
-                } else {
-                    model.setGoogleShow(false);
-                }
-                settingViewModel.getSettingmodel().setValue(model);
-            }
-        });
-        rbOSM.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                SettingModel model = settingViewModel.getSettingmodel().getValue();
-                if (b) {
-                    model.setOsmShow(true);
-                } else {
-                    model.setOsmShow(false);
-                }
-                settingViewModel.getSettingmodel().setValue(model);
-            }
-        });
-        rbTiandi.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                SettingModel model = settingViewModel.getSettingmodel().getValue();
-                if (b) {
-                    model.setTiandiShow(true);
-                } else {
-                    model.setTiandiShow(false);
-                }
-                settingViewModel.getSettingmodel().setValue(model);
-            }
-        });
+//        rbArcGIS.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//            @Override
+//            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+//                SettingModel model = settingViewModel.getSettingmodel().getValue();
+//                if (b) {
+//                    model.setArcgisShow(true);
+//                } else {
+//                    model.setArcgisShow(false);
+//                }
+//                settingViewModel.getSettingmodel().setValue(model);
+//            }
+//        });
+//        rbAmap.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//            @Override
+//            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+//                SettingModel model = settingViewModel.getSettingmodel().getValue();
+//                if (b) {
+//                    model.setaMapShow(true);
+//                } else {
+//                    model.setaMapShow(false);
+//                }
+//                settingViewModel.getSettingmodel().setValue(model);
+//            }
+//        });
+//        rbGeoq.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//            @Override
+//            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+//                SettingModel model = settingViewModel.getSettingmodel().getValue();
+//                if (b) {
+//                    model.setGeoShow(true);
+//                } else {
+//                    model.setGeoShow(false);
+//                }
+//                settingViewModel.getSettingmodel().setValue(model);
+//            }
+//        });
+//        rbGoogle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//            @Override
+//            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+//                SettingModel model = settingViewModel.getSettingmodel().getValue();
+//                if (b) {
+//                    model.setGoogleShow(true);
+//                } else {
+//                    model.setGoogleShow(false);
+//                }
+//                settingViewModel.getSettingmodel().setValue(model);
+//            }
+//        });
+//        rbOSM.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//            @Override
+//            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+//                SettingModel model = settingViewModel.getSettingmodel().getValue();
+//                if (b) {
+//                    model.setOsmShow(true);
+//                } else {
+//                    model.setOsmShow(false);
+//                }
+//                settingViewModel.getSettingmodel().setValue(model);
+//            }
+//        });
+//        rbTiandi.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//            @Override
+//            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+//                SettingModel model = settingViewModel.getSettingmodel().getValue();
+//                if (b) {
+//                    model.setTiandiShow(true);
+//                } else {
+//                    model.setTiandiShow(false);
+//                }
+//                settingViewModel.getSettingmodel().setValue(model);
+//            }
+//        });
 
     }
 
@@ -246,7 +210,7 @@ public class SettingActivity extends AppCompatActivity {
                 //同意申请权限
             } else {
                 // 用户拒绝申请权限
-                Toast.makeText(SettingActivity.this, "请同意写操作来记录心率原始数据", Toast.LENGTH_SHORT).show();
+                Toast.makeText(SettingActivity.this, getResources().getString(R.string.storage_permission), Toast.LENGTH_SHORT).show();
             }
             return;
         }
@@ -254,7 +218,6 @@ public class SettingActivity extends AppCompatActivity {
     }
 
     /**
-     * TODO  文件选择 的问题是  可以选择文本文件；图片；视频 等常规文件，但无法选择geodatabase
      *
      * @param requestCode
      * @param resultCode
@@ -273,20 +236,16 @@ public class SettingActivity extends AppCompatActivity {
                 Log.e(AppConstance.TAG, "onActivityResult: " + path);
                 if ("file".equalsIgnoreCase(uri.getScheme())) {//使用第三方应用打开
                     path = uri.getPath();
-                    // tv.setText(path);
-                    Toast.makeText(this, path + "11111", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getResources().getString(R.string.storage_permission) + path, Toast.LENGTH_SHORT).show();
                     return;
                 }
                 if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT) {//4.4以后
                     // String path = getPath(this, uri);
-                    List<String> filess = FileUtil.getFiles("/storage/sdcard1/Download/geodatabase", "geodatabase", true);
+//                    List<String> filess = FileUtil.getFiles("/storage/sdcard1/Download/geodatabase", "geodatabase", true);
                     Log.e(AppConstance.TAG, "onClick: " + files.toString());
-                    Toast.makeText(this, path + "11111", Toast.LENGTH_SHORT).show();
-                    //   Toast.makeText(this, path, Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(this, path + "11111", Toast.LENGTH_SHORT).show();
                 } else {//4.4以下下系统调用方法
                     // String path = getRealPathFromURI(uri);
-                    //tv.setText(path);
-                    // Toast.makeText(SettingActivity.this, path + "222222", Toast.LENGTH_SHORT).show();
                 }
             }
         }

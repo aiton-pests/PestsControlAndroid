@@ -30,6 +30,7 @@ import com.aiton.pestscontrolandroid.ui.main.MainActivity;
 import com.aiton.pestscontrolandroid.utils.SPUtil;
 import com.google.android.material.snackbar.Snackbar;
 
+import cn.com.qiter.pests.Result;
 import cn.com.qiter.pests.UcenterMemberModel;
 import cn.com.qiter.pests.UserModel;
 
@@ -47,13 +48,27 @@ public class LoginActivity extends AppCompatActivity {
         final EditText passwordEditText = findViewById(R.id.password);
         final Button loginButton = findViewById(R.id.login);
         final ProgressBar loadingProgressBar = findViewById(R.id.loading);
-
+        loginViewModel.getResult().observe(this, new Observer<Result>() {
+            @Override
+            public void onChanged(Result result) {
+                Toast.makeText(getApplicationContext(), result.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+        ////用户无登陆测试使用 start
+//        UcenterMemberModel uuu = new UcenterMemberModel();
+//        uuu.setNickname("test");
+//        uuu.setPassword("test");
+//        uuu.setMobile("159591184055");
+//        loginViewModel.getLoginResult().setValue(uuu);
+        ////用户无登陆测试使用  end
         loginViewModel.getLoginResult().observe(this, new Observer<UcenterMemberModel>() {
             @Override
             public void onChanged(UcenterMemberModel model) {
                 if (model == null) {
                     //Snackbar.make(getApplication().getApplicationContext().get, getResources().getString(R.string.invalid_username), Snackbar.LENGTH_LONG).setAction("Action", null).show();
                     Toast.makeText(getApplicationContext(),getResources().getString(R.string.invalid_username),Toast.LENGTH_SHORT).show();
+                    loadingProgressBar.setVisibility(View.INVISIBLE);
+
                     return;
                 }
                 loadingProgressBar.setVisibility(View.GONE);

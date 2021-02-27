@@ -10,6 +10,8 @@ public class AppConstance {
     public static final String USER_MODEL = "USER_MODEL";
     public static final String SETTING_MODEL = "SETTING_MODEL";
     public final static  String TAG = "PESTS";
+    public final static  String TAG_ME = "TAG_ME";
+
     public static final String SHP_FILE = "SHP_FILE";
 
     public static final String AMAP_MAP = "AMAP";
@@ -33,7 +35,9 @@ public class AppConstance {
     public static final String ENDPOINT = "oss-cn-hangzhou.aliyuncs.com";
     public static final String BUCKETNAME = "pestscontrol";
 
-
+    public static final boolean isTest = false;
+    // 1 表示生产环境（发布） ； 0 表示测试环境
+    public static final String ISTEST = "ISTEST";
 
     public static final String SELECTED_FEATURE = "SELECTED_FEATURE";
     // 镇
@@ -46,10 +50,12 @@ public class AppConstance {
     public static final String LATIDUTE = "LATIDUTE";
 
     public static final String URL_PESTS_SAVE = "pests/addPestsControl";
-    public static final String URL_APP = "http://pests.qiter.com.cn:9000/educenter/";
+    public static final String URL_APP = "http://8222.qiter.com.cn:9000/educenter/";
     public static final String URL_PESTS_FINDALL_CALL = "pests/findAll/call";
     public static final String URL_PESTS_FINDALL = "pests/findAll";
     public static final String UCENTER_MEMBER_MODEL = "UCENTER_MEMBER_MODEL";
     public static final String URL_USER_LOGIN = "member/login/{mobile}/{password}";
     public static final String URL_USER_GET_MEMBER_INFO = "member/getMemberInfo";
+    public static final String API_KEY = "runtimelite,1000,rud6848143592,none,PM0RJAY3FLB5JPJA4066";
+    public static final String OPERATOR = "OPERATOR";
 }
