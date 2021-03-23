@@ -1,5 +1,6 @@
 package com.aiton.pestscontrolandroid.ui.me;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
@@ -7,6 +8,7 @@ import androidx.lifecycle.ViewModelProvider;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -45,8 +47,7 @@ public class MeActivity extends AppCompatActivity {
     LoginViewModel loginViewModel;
     private ImageView blurImageView;
     private ImageView avatarImageView;
-//    private EditText etGmtModified,etPassword ,etMobile ,etNickname;
-    private Switch swDisabled,swTest,swAbout;
+    private Switch swDisabled,swTest,swAbout,swTiandi;
     TextView tvMobile,tvNickname;
     Button btnLogout,btnDisplayTest;
     @Override
@@ -55,10 +56,7 @@ public class MeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_me);
         blurImageView = findViewById(R.id.h_back);
         avatarImageView = findViewById(R.id.h_head);
-//        etNickname = findViewById(R.id.et_nickname);
-////        etMobile = findViewById(R.id.et_mobile);
-//        etPassword = findViewById(R.id.et_password);
-//        etGmtModified = findViewById(R.id.ed_modify_time);
+        swTiandi = findViewById(R.id.sw_tiandi);
         swDisabled = findViewById(R.id.sw_disabled);
         swAbout = findViewById(R.id.sw_about);
         tvMobile = findViewById(R.id.user_val);
@@ -66,18 +64,34 @@ public class MeActivity extends AppCompatActivity {
         swTest = findViewById(R.id.sw_test);
         btnLogout = findViewById(R.id.btn_logout);
         btnDisplayTest = findViewById(R.id.btn_display_test);
+        swTiandi.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                meViewModel.saveTianDiMap2SHP(isChecked);
+               // meViewModel.getTiandiMap().setValue(isChecked);
+            }
+        });
+        ActionBar actionBar = getSupportActionBar();
+        if(actionBar != null){
+            actionBar.setHomeButtonEnabled(true);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
         pestsViewModel = new ViewModelProvider(this).get(PestsViewModel.class);
         mainViewModel = new ViewModelProvider(this).get(MainViewModel.class);
         loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
         meViewModel = new ViewModelProvider(this).get(MeViewModel.class);
+        meViewModel.loadTianDiMap();
+        meViewModel.getTiandiMap().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                swTiandi.setChecked(aBoolean);
+            }
+        });
+
         btnDisplayTest.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Pests[] pests = pestsViewModel.findAllObject();
-                for (Pests pests1:
-                        pests) {
-                    Log.e(AppConstance.TAG, "Pests: " + pests1.toString() );
-                }
+
             }
         });
         btnLogout.setOnClickListener(new View.OnClickListener() {
@@ -89,27 +103,21 @@ public class MeActivity extends AppCompatActivity {
         meViewModel.getMutableLiveData().observe(this, new Observer<UcenterMemberModel>() {
             @Override
             public void onChanged(UcenterMemberModel model) {
-                initMember(model);
+                if (model != null)
+                    initMember(model);
             }
         });
-        meViewModel.getIsTest().observe(this, new Observer<Integer>() {
+        meViewModel.loadTest();
+        meViewModel.getIsTest().observe(this, new Observer<Boolean>() {
             @Override
-            public void onChanged(Integer integer) {
-                if (integer.compareTo(0) == 0){
-                    swTest.setChecked(true);
-                }else{
-                    swTest.setChecked(false);
-                }
+            public void onChanged(Boolean aBoolean) {
+                swTest.setChecked(aBoolean);
             }
         });
         swTest.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked){
-                    meViewModel.setTest(0);
-                }else{
-                    meViewModel.setTest(1);
-                }
+                meViewModel.setTest(isChecked);
             }
         });
         swAbout.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -122,13 +130,24 @@ public class MeActivity extends AppCompatActivity {
                     Log.e(AppConstance.TAG_ME, "Pests: " + pests1.toString() );
                 }
 
-                UcenterMemberModel loggedInUser = SPUtil.builder(getApplicationContext(), AppConstance.APP_SP).getData(AppConstance.UCENTER_MEMBER_MODEL, UcenterMemberModel.class);
-                Log.e(AppConstance.TAG_ME, "UcenterMemberModel: " + loggedInUser.toString() );
-                Toast.makeText(getApplicationContext(),loggedInUser.toString(),Toast.LENGTH_LONG).show();
+                List<String> operators = SPUtil.builder(getApplicationContext(),AppConstance.APP_SP).getDataList(AppConstance.OPERATOR,String.class);
 
-                Integer test = SPUtil.builder(getApplication().getApplicationContext(), AppConstance.APP_SP).getData(AppConstance.ISTEST, Integer.class);
-                Log.e(AppConstance.TAG_ME, "test: " + test );
-                Toast.makeText(getApplicationContext(),"test: " + test.toString(),Toast.LENGTH_LONG).show();
+                for (String op :
+                        operators) {
+                    Log.e("PESTS", "onClick: " + op );
+                }
+
+                UcenterMemberModel loggedInUser = SPUtil.builder(getApplicationContext(), AppConstance.APP_SP).getData(AppConstance.UCENTER_MEMBER_MODEL, UcenterMemberModel.class);
+                if (loggedInUser != null){
+                    Log.e(AppConstance.TAG_ME, "UcenterMemberModel: " + loggedInUser.toString() );
+                    Toast.makeText(getApplicationContext(),loggedInUser.toString(),Toast.LENGTH_LONG).show();
+                }
+                Boolean tiandi = SPUtil.builder(getApplication().getApplicationContext(), AppConstance.APP_SP).getData(AppConstance.TIANDIMAP, Boolean.class);
+                Log.e(AppConstance.TAG_ME, "天地图/ArcGIS: " + tiandi );
+                Toast.makeText(getApplicationContext(),"天地图/ArcGIS: " + tiandi,Toast.LENGTH_LONG).show();
+                Boolean test = SPUtil.builder(getApplication().getApplicationContext(), AppConstance.APP_SP).getData(AppConstance.ISTEST, Boolean.class);
+                Log.e(AppConstance.TAG_ME, "测试用户: " + test );
+                Toast.makeText(getApplicationContext(),"测试用户: " + test,Toast.LENGTH_LONG).show();
                 SettingModel spSetting = SPUtil.builder(getApplicationContext(),AppConstance.APP_SP).getData(AppConstance.SETTING_MODEL,SettingModel.class);
                 Log.e(AppConstance.TAG_ME, "SettingModel: " + spSetting.toString() );
                 Toast.makeText(getApplicationContext(),spSetting.toString(),Toast.LENGTH_LONG).show();
@@ -165,5 +184,16 @@ public class MeActivity extends AppCompatActivity {
 //        etGmtModified.setText(umm.getGmtModified());
         swDisabled.setChecked(umm.getIsDisabled());
 
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                this.finish(); // back button
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

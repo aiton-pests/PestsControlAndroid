@@ -30,7 +30,7 @@ import com.aiton.pestscontrolandroid.ui.main.MainActivity;
 import com.aiton.pestscontrolandroid.utils.SPUtil;
 import com.google.android.material.snackbar.Snackbar;
 
-import cn.com.qiter.pests.Result;
+import cn.com.qiter.common.Result;
 import cn.com.qiter.pests.UcenterMemberModel;
 import cn.com.qiter.pests.UserModel;
 

@@ -11,7 +11,8 @@ public class RetrofitUtil {
     private Retrofit mRetrofit;
     private PestsService pestsService;
     private UserService userService;
-
+    private TrapService trapService;
+    private DictService dictService;
     private RetrofitUtil() {
         mRetrofit = new Retrofit.Builder()
                 .baseUrl(AppConstance.URL_APP)
@@ -20,6 +21,8 @@ public class RetrofitUtil {
                 .build();
         pestsService = mRetrofit.create(PestsService.class);
         userService = mRetrofit.create(UserService.class);
+        trapService = mRetrofit.create(TrapService.class);
+        dictService = mRetrofit.create(DictService.class);
     }
 
     public static RetrofitUtil getInstance() {
@@ -33,8 +36,16 @@ public class RetrofitUtil {
         return sInstance;
     }
 
+    public DictService getDictService() {
+        return dictService;
+    }
+
     public UserService getUserService() {
         return userService;
+    }
+
+    public TrapService getTrapService() {
+        return trapService;
     }
 
     public PestsService getPestsService() {

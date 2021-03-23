@@ -4,7 +4,6 @@ plugins {
     id 'com.android.application'
 }
 apply plugin: 'com.huawei.agconnect'
-apply plugin: 'com.aliyun.ams.emas-services'
 android {
     compileSdkVersion 30
     buildToolsVersion "30.0.3"
@@ -17,7 +16,7 @@ android {
         minSdkVersion 26
         targetSdkVersion 30
         versionCode 1
-        versionName "1.0"
+        versionName "1.1"
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments = [AROUTER_MODULE_NAME: project.getName()]
@@ -25,7 +24,23 @@ android {
         }
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
-
+    packagingOptions {
+        exclude 'META-INF/spring-configuration-metadata.json'
+        exclude 'META-INF/additional-spring-configuration-metadata.json'
+        exclude 'META-INF/spring.schemas'
+        exclude 'META-INF/spring.factories'
+        exclude 'META-INF/spring.handlers'
+        exclude 'META-INF/spring.tooling'
+        exclude 'META-INF/INDEX.LIST'
+        exclude 'META-INF/license.txt'
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'notice.txt'
+        exclude 'license.txt'
+        exclude 'changelog.txt'
+        exclude 'META-INF/notice.txt'
+        exclude 'readme.txt'
+        exclude 'META-INF/io.netty.versions.properties'
+    }
     buildTypes {
         release {
             minifyEnabled false
@@ -39,6 +54,8 @@ android {
 }
 
 dependencies {
+    implementation 'org.conscrypt:conscrypt-openjdk-uber:1.1.3'
+
     implementation 'jp.wasabeef:glide-transformations:4.3.0'
     // If you want to use the GPU Filters
     implementation 'jp.co.cyberagent.android:gpuimage:2.1.0'
@@ -84,6 +101,8 @@ dependencies {
     // 华为
     implementation 'com.huawei.agconnect:agconnect-core:1.4.2.301'
     implementation  'com.huawei.agconnect:agconnect-crash:1.4.2.301'
+    // add the Analytics Kit for Huawei Analytics
+    implementation 'com.huawei.hms:hianalytics:5.1.0.300'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     implementation("io.reactivex.rxjava3:rxjava:3.0.4")
     implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
@@ -92,17 +111,19 @@ dependencies {
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:4.7.2'
     // Qiter
-    implementation 'cn.com.qiter:pests:1.0-20210204.112046-6'
     implementation 'com.esri.arcgisruntime:arcgis-android:100.8.0'
+    implementation 'cn.com.qiter:pests:1.0-20210312.120133-3'
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'com.google.android.material:material:1.1.0'
     implementation 'androidx.annotation:annotation:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.2.0'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0'
-    implementation 'cn.com.qiter:pests:1.0-20210121.070501-2'
+    implementation 'cn.com.qiter:common:1.0-20210311.090757-2'
+
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    implementation 'com.huawei.hms:location:5.0.4.300'
 }

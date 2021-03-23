@@ -16,7 +16,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.internal.LinkedTreeMap;
 
-import cn.com.qiter.pests.Result;
+import cn.com.qiter.common.Result;
 import cn.com.qiter.pests.UcenterMemberModel;
 import cn.com.qiter.pests.UserModel;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;

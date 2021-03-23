@@ -20,7 +20,7 @@
     </string-array>
     <string-array name="array_pests_type">
         <item>诱木</item>
-        <item>砍倒的树</item>
+        <item>枯死木</item>
         <item>诱捕器</item>
     </string-array>
 </resources>

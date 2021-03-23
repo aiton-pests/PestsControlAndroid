@@ -28,6 +28,7 @@ public class AppConstance {
     public static final int GEO_MAP_LAYER_INDEX = 6;
     public static final String FEATURE_ATTRIBUTE = "FEATURE_ATTRIBUTE";
     public static final String PESTSMODEL = "PestsModel";
+    public static final String TRAPMODEL = "TrapModel";
     public static final String FEATURE_ATTRIBUTE_MAP = "FEATURE_ATTRIBUTE_MAP";
     // Aliyun OSS
     public static final String ACCESS_KEY_ID = "LTAI4GBswqfEBwAotuWDWt66";
@@ -49,13 +50,25 @@ public class AppConstance {
     public static final String LONGITUDE = "LONGITUDE";
     public static final String LATIDUTE = "LATIDUTE";
 
-    public static final String URL_PESTS_SAVE = "pests/addPestsControl";
-    public static final String URL_APP = "http://8222.qiter.com.cn:9000/educenter/";
-    public static final String URL_PESTS_FINDALL_CALL = "pests/findAll/call";
-    public static final String URL_PESTS_FINDALL = "pests/findAll";
+    // https://8222.qiter.com.cn/
+    // http://testpests.qiter.com.cn:9000/
+    public static final String URL_APP = "https://8222.qiter.com.cn/";
+    public static final String URL_PESTS_SAVE = "educenter/pests/addPestsControl";
+    public static final String URL_PESTS_FINDALL_CALL = "educenter/pests/findAll/call";
+    public static final String URL_PESTS_FINDALL = "educenter/pests/findAll";
+
+    public static final String URL_DICT_NAME = "educms/dictionary/getByName/{name}";
+
+    public static final String URL_TRAP_SAVE = "educenter/trap/add";
+    public static final String URL_TRAP_FINDALL_CALL = "educenter/trap/findAll/call";
+    public static final String URL_TRAP_FINDALL = "educenter/trap/findAll";
+
     public static final String UCENTER_MEMBER_MODEL = "UCENTER_MEMBER_MODEL";
-    public static final String URL_USER_LOGIN = "member/login/{mobile}/{password}";
-    public static final String URL_USER_GET_MEMBER_INFO = "member/getMemberInfo";
+    public static final String URL_USER_LOGIN = "educenter/member/login/{mobile}/{password}";
+    public static final String URL_USER_GET_MEMBER_INFO = "educenter/member/getMemberInfo";
     public static final String API_KEY = "runtimelite,1000,rud6848143592,none,PM0RJAY3FLB5JPJA4066";
     public static final String OPERATOR = "OPERATOR";
+    public static final String TIANDIMAP = "TIANDIMAP";
+    public static final String DICT_NAME_PESTS_TYPE = "pests.pests.type";
+    public static final String TRAP_REMARK = "TRAP_REMARK";
 }

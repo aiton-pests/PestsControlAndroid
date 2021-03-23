@@ -1,9 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <paths>
+        <external-path name="external" path="." />
+
         <!-- 这个是保存拍照图片的路径,必须配置。 -->
-        <external-files-path
-            name="images"
-            path="Pictures" />
+        <external-files-path name="images" path="Pictures" />
+
+        <cache-path name="cache" path="." />
+
+        <external-cache-path name="external_cache" path="." />
+
+        <files-path name="files" path="." />
     </paths>
 </resources>

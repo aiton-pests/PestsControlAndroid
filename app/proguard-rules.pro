@@ -45,3 +45,14 @@
 -keep class com.bumptech.glide.load.data.ParcelFileDescriptorRewinder$InternalRewinder {
   *** rewind();
 }
+#org.conscrypt
+-dontwarn org.conscrypt.**
+-keep class org.conscrypt.** { *; }
+-keep interface org.conscrypt.** { *; }
+-keep class com.hianalytics.android.**{*;}
+-keep class com.huawei.**{*;}
+
+-keep class com.huawei.hms.**{*;}
+
+
+

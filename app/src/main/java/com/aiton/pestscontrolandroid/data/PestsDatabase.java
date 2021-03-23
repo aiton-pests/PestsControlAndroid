@@ -8,8 +8,10 @@ import androidx.room.RoomDatabase;
 
 import com.aiton.pestscontrolandroid.data.persistence.Pests;
 import com.aiton.pestscontrolandroid.data.persistence.PestsDao;
+import com.aiton.pestscontrolandroid.data.persistence.Trap;
+import com.aiton.pestscontrolandroid.data.persistence.TrapDao;
 
-@Database(entities = {Pests.class}, version = 6, exportSchema = false)
+@Database(entities = {Pests.class, Trap.class}, version = 7, exportSchema = false)
 public abstract class PestsDatabase extends RoomDatabase {
     private static PestsDatabase INSTALL;
 
@@ -25,4 +27,5 @@ public abstract class PestsDatabase extends RoomDatabase {
     }
 
     public abstract PestsDao getPestsDao();
+    public abstract TrapDao getTrapDao();
 }

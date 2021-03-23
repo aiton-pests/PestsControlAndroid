@@ -3,10 +3,6 @@ package com.aiton.pestscontrolandroid.data.model;
 import java.io.Serializable;
 import java.util.List;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 
 public class SettingModel implements Serializable {

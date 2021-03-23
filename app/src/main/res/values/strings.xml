@@ -53,4 +53,20 @@
     <string name="no_file_exist">手机（内部存储-Download）目录下没有下载geodatabase文件，请联系技术员</string>
     <string name="storage_permission">用户拒绝申请权限</string>
     <string name="cant_load_geodatabase_file">无法加载离线地图文件</string>
+    <string name="youmu">诱木</string>
+    <string name="sw_tiandi">天地图/ArcGIS图</string>
+    <string name="scount">数量</string>
+    <string name="remark">备注</string>
+    <string name="first">第一张</string>
+    <string name="second">第二张</string>
+    <string name="catchwarn">第一次收虫</string>
+    <string name="lure_replace">是否更换诱芯</string>
+    <string name="trap_btn_update">上传数据</string>
+    <string name="trap_update_again_btn">再次上传</string>
+    <string name="trap_delete_btn">删除数据</string>
+    <string name="position">偏移（米）</string>
+    <string name="count">数量</string>
+    <string name="lure_replaces">换芯</string>
+    <string name="scounts">只</string>
+    <string name="second_receve">第二次收虫</string>
 </resources>

@@ -1,6 +1,7 @@
 package com.aiton.pestscontrolandroid.ui.setting;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -18,6 +19,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
@@ -61,6 +63,12 @@ public class SettingActivity extends AppCompatActivity {
                 != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE},
                     1000);
+        }
+
+        ActionBar actionBar = getSupportActionBar();
+        if(actionBar != null){
+            actionBar.setHomeButtonEnabled(true);
+            actionBar.setDisplayHomeAsUpEnabled(true);
         }
         recyclerView = findViewById(R.id.rv_shp);
         ivLoadShp = findViewById(R.id.iv_load_file);
@@ -217,6 +225,15 @@ public class SettingActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                this.finish(); // back button
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
     /**
      *
      * @param requestCode

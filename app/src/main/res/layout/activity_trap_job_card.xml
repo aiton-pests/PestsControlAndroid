@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="4dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_constraintBottom_toTopOf="@+id/guideline17"
+            app:layout_constraintTop_toTopOf="@+id/guideline17">
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline19"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.9" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline24"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.8" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline21"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.4" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline23"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.6" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline22"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.2" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline16"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintGuide_percent="0.25" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline17"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintGuide_percent="0.50" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline20"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintGuide_percent="0.75" />
+
+            <TextView
+                android:id="@+id/trap_card_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="10"
+                app:layout_constraintBottom_toTopOf="@+id/guideline16"
+                app:layout_constraintStart_toStartOf="@+id/guideline22"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/trap_card_deviceId"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ID8858"
+                app:layout_constraintBottom_toTopOf="@+id/guideline16"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/trap_card_operator"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="鲁仁华"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/guideline23"
+                app:layout_constraintTop_toTopOf="@+id/guideline20" />
+
+            <TextView
+                android:id="@+id/trap_card_town"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="新店镇"
+                app:layout_constraintBottom_toTopOf="@+id/guideline20"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/guideline17" />
+
+            <TextView
+                android:id="@+id/trap_card_village"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="新店村"
+                app:layout_constraintBottom_toTopOf="@+id/guideline20"
+                app:layout_constraintStart_toStartOf="@+id/guideline22"
+                app:layout_constraintTop_toTopOf="@+id/guideline17" />
+
+            <TextView
+                android:id="@+id/trap_card_xb"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="811"
+                app:layout_constraintBottom_toTopOf="@+id/guideline20"
+                app:layout_constraintStart_toStartOf="@+id/guideline23"
+                app:layout_constraintTop_toTopOf="@+id/guideline17" />
+
+            <TextView
+                android:id="@+id/trap_card_db"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="811"
+                app:layout_constraintBottom_toTopOf="@+id/guideline20"
+                app:layout_constraintEnd_toStartOf="@+id/guideline23"
+                app:layout_constraintTop_toTopOf="@+id/guideline17" />
+
+            <TextView
+                android:id="@+id/trap_card_position_error"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="7"
+                app:layout_constraintBottom_toTopOf="@+id/guideline16"
+                app:layout_constraintEnd_toStartOf="@+id/guideline23"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/trap_card_remark"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="第一次收虫"
+                app:layout_constraintBottom_toTopOf="@+id/guideline16"
+                app:layout_constraintStart_toStartOf="@+id/guideline23"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/trap_card_longitude"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="116.428415"
+                app:layout_constraintBottom_toTopOf="@+id/guideline17"
+                app:layout_constraintStart_toStartOf="@+id/guideline22"
+                app:layout_constraintTop_toTopOf="@+id/guideline16" />
+
+            <TextView
+                android:id="@+id/trap_card_latitude"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="39.937289"
+                app:layout_constraintBottom_toTopOf="@+id/guideline17"
+                app:layout_constraintStart_toStartOf="@+id/guideline23"
+                app:layout_constraintTop_toTopOf="@+id/guideline16" />
+
+            <TextView
+                android:id="@+id/trap_card_stime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="2021-2-27 23:05:40"
+                android:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/guideline20" />
+
+            <TextView
+                android:id="@+id/trap_card_lure_replace"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="是"
+                app:layout_constraintBottom_toTopOf="@+id/guideline17"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/guideline16" />
+
+            <Switch
+                android:id="@+id/trap_card_update"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/guideline19"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/textView21"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:text="@string/position"
+                app:layout_constraintBottom_toTopOf="@+id/guideline16"
+                app:layout_constraintEnd_toStartOf="@+id/trap_card_position_error"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/textView22"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="@string/scounts"
+                app:layout_constraintBottom_toTopOf="@+id/guideline16"
+                app:layout_constraintStart_toEndOf="@+id/trap_card_count"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

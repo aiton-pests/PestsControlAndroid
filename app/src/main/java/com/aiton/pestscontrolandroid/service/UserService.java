@@ -5,8 +5,8 @@ import com.aiton.pestscontrolandroid.data.model.LoggedInUser;
 
 import java.util.List;
 
+import cn.com.qiter.common.Result;
 import cn.com.qiter.pests.PestsModel;
-import cn.com.qiter.pests.Result;
 import cn.com.qiter.pests.UcenterMemberModel;
 import cn.com.qiter.pests.UserModel;
 import io.reactivex.rxjava3.core.Observable;

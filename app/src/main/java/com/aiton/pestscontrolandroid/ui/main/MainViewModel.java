@@ -19,8 +19,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import cn.com.qiter.common.Result;
 import cn.com.qiter.pests.PestsModel;
-import cn.com.qiter.pests.Result;
 import cn.hutool.core.date.DateTime;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.disposables.Disposable;
@@ -101,37 +101,4 @@ public class MainViewModel extends AndroidViewModel {
         }
     }
 
-    public void uploadServer(PestsModel pestsModel) {
-        RetrofitUtil.getInstance().getPestsService().savePests(pestsModel)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new io.reactivex.rxjava3.core.Observer<Result>() {
-                    Disposable disposable;
-
-                    @Override
-                    public void onSubscribe(@io.reactivex.rxjava3.annotations.NonNull Disposable d) {
-                        disposable = d;
-                    }
-
-                    @Override
-                    public void onNext(@io.reactivex.rxjava3.annotations.NonNull Result result) {
-                        if (result.getSuccess()) {
-                            Log.e(AppConstance.TAG, "onNext: " + result.toString());
-                        }
-                    }
-
-                    @Override
-                    public void onError(@io.reactivex.rxjava3.annotations.NonNull Throwable e) {
-                        disposable.dispose();
-                    }
-
-                    @Override
-                    public void onComplete() {
-
-                    }
-                });
-//                        pestsViewModel.delete(s);
-
-
-    }
 }

@@ -27,6 +27,7 @@ import android.os.FileUtils;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -35,14 +36,18 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.aiton.pestscontrolandroid.AppConstance;
 import com.aiton.pestscontrolandroid.R;
 import com.aiton.pestscontrolandroid.data.persistence.Pests;
+import com.aiton.pestscontrolandroid.service.RetrofitUtil;
 import com.aiton.pestscontrolandroid.ui.main.MainActivity;
 import com.aiton.pestscontrolandroid.utils.SPUtil;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.gson.Gson;
+import com.google.gson.internal.LinkedTreeMap;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -56,10 +61,16 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 
+import cn.com.qiter.common.Result;
+import cn.com.qiter.pests.DictModel;
 import cn.com.qiter.pests.PestsModel;
 import cn.com.qiter.pests.UcenterMemberModel;
 import cn.com.qiter.pests.UserModel;
 import cn.hutool.core.date.DateUtil;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.annotations.NonNull;
+import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class PestsActivity extends AppCompatActivity {
     private static final String TAG = "PestsActivity";
@@ -69,6 +80,7 @@ public class PestsActivity extends AppCompatActivity {
     private Spinner spPestsType, spTreeWalk, spBags;
     private AutoCompleteTextView acOperator;
     private PestsViewModel pestsViewModel;
+    private TextView tv_address;
 //    private CameraXManager manager;
 //    private PreviewView previewView;
     private ImageView ivFinish;
@@ -182,7 +194,7 @@ public class PestsActivity extends AppCompatActivity {
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                         //适配Android 7.0文件权限，通过FileProvider创建一个content类型的Uri
-                        photoUri = FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", photoFile);
+                        photoUri = FileProvider.getUriForFile(this, getPackageName() + ".provider", photoFile);
                     } else {
                         photoUri = Uri.fromFile(photoFile);
                     }
@@ -254,7 +266,7 @@ public class PestsActivity extends AppCompatActivity {
         return file;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.Q)
+
     public File uriToFileApiQ(Uri uri) {
         File file = null;
         //android10以上转换
@@ -270,7 +282,9 @@ public class PestsActivity extends AppCompatActivity {
                     InputStream is = contentResolver.openInputStream(uri);
                     File cache = new File(PestsActivity.this.getExternalCacheDir().getAbsolutePath(), Math.round((Math.random() + 1) * 1000) + displayName);
                     FileOutputStream fos = new FileOutputStream(cache);
-                    FileUtils.copy(is, fos);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        FileUtils.copy(is, fos);
+                    }
                     file = cache;
                     fos.close();
                     is.close();
@@ -332,7 +346,7 @@ public class PestsActivity extends AppCompatActivity {
 
     private boolean setDataSource(String operator){
         if (operator != null){
-            List operators = SPUtil.builder(getApplicationContext(),AppConstance.APP_SP).getDataList(AppConstance.OPERATOR,List.class);
+            List<String> operators = SPUtil.builder(getApplicationContext(),AppConstance.APP_SP).getDataList(AppConstance.OPERATOR,String.class);
             if (operators != null){
                 if (!operators.contains(operator)){
                     operators.add(operator);
@@ -348,15 +362,56 @@ public class PestsActivity extends AppCompatActivity {
     }
 
     private List<String> getDataSource() {
-        List operators = SPUtil.builder(getApplicationContext(),AppConstance.APP_SP).getDataList(AppConstance.OPERATOR,List.class);
+        List<String> operators = SPUtil.builder(getApplicationContext(),AppConstance.APP_SP).getDataList(AppConstance.OPERATOR,String.class);
         if (operators != null){
             return operators;
         }else{
-            return new ArrayList<>();
+            String name = "lrh鲁仁华";
+            List<String> list = new ArrayList<>();
+            list.add(name);
+            setDataSource(name);
+            return list;
         }
 
     }
+    private void getDict(){
+        RetrofitUtil.getInstance().getDictService().getDictByName(AppConstance.DICT_NAME_PESTS_TYPE).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new io.reactivex.rxjava3.core.Observer<Result>() {
+                    Disposable disposable;
+                    @Override
+                    public void onSubscribe(@NonNull Disposable d) {
+                        disposable = d;
+                    }
 
+                    @Override
+                    public void onNext(@NonNull Result result) {
+                        if (result.getSuccess()) {
+                            List<LinkedTreeMap> list = (List) result.getData().get("items");
+                            List<String> strings = new ArrayList<>();
+                            for (LinkedTreeMap map :
+                                    list) {
+                                strings.add(String.valueOf(map.get("value")));
+                            }
+                            ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_spinner_item, strings);
+                            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                            spPestsType.setAdapter(adapter);
+
+                            // Log.e(AppConstance.TAG, "onNext: " + strings.toString());
+                        }
+                    }
+
+                    @Override
+                    public void onError(@NonNull Throwable e) {
+                        disposable.dispose();
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -367,9 +422,10 @@ public class PestsActivity extends AppCompatActivity {
         /*
          * 1.使用手工方式的list数组适配器
          */
-        adapter = new ArrayAdapter<String>(this,
+        adapter = new ArrayAdapter<String>(getApplicationContext(),
                 android.R.layout.simple_list_item_1, getDataSource());
         acOperator.setAdapter(adapter);
+        tv_address = findViewById(R.id.tv_address);
         ibFellPic = findViewById(R.id.ib_fell_pic);
         ibStumpPic = findViewById(R.id.ib_stump_pic);
         ibFinishPic = findViewById(R.id.ib_finish_pic);
@@ -412,6 +468,7 @@ public class PestsActivity extends AppCompatActivity {
         etXb.setText(fam.get(AppConstance.XBH));
         etVillage.setText(fam.get(AppConstance.CGQNAME));
         etTown.setText(fam.get(AppConstance.JYXZCNAME));
+        tv_address.setText(fam.get(AppConstance.JYXZCNAME) + fam.get(AppConstance.CGQNAME));
 //        previewView = findViewById(R.id.previewView);
 //        manager = new CameraXManager(this,previewView);
 //        manager.startCamera();
@@ -433,7 +490,6 @@ public class PestsActivity extends AppCompatActivity {
         });
         btnSave.setOnClickListener(new View.OnClickListener() {
 
-            @RequiresApi(api = Build.VERSION_CODES.Q)
             @Override
             public void onClick(View view) {
                 UcenterMemberModel userModel = SPUtil.builder(getApplication().getApplicationContext(), AppConstance.APP_SP).getData(AppConstance.UCENTER_MEMBER_MODEL, UcenterMemberModel.class);
@@ -479,7 +535,17 @@ public class PestsActivity extends AppCompatActivity {
 
 
                 }else{
-//                    mCutUri = Uri.fromFile(imgFile);
+                    if (mCameraImagePathFinish != null){
+                        pests.setFinishPic(mCameraImagePathFinish);
+                    }
+                    if (mCameraImagePathStump != null){
+                        pests.setStumpPic(mCameraImagePathStump);
+                    }
+                    if (mCameraImagePathFell != null){
+                        pests.setFellPic(mCameraImagePathFell);
+                    }
+
+//                    mCutUri = Uri.fromFile(mCameraImagePathFinish);
 //                    mCutFile = imgFile;
                 }
 
@@ -511,6 +577,22 @@ public class PestsActivity extends AppCompatActivity {
             }
         });
 
-
+        getDict();
     }
+
+    /**
+     * 禁用返回键
+     * @param event
+     * @return
+     */
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        if (event.getKeyCode() == KeyEvent.KEYCODE_BACK ) {
+            //do something.
+            return true;
+        } else {
+            return super.dispatchKeyEvent(event);
+        }
+    }
+
 }

@@ -8,8 +8,8 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/relativeLayout"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_width="600dp"
+        android:layout_height="336dp"
         app:layout_constraintBottom_toTopOf="@+id/guideline14"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -24,8 +24,8 @@
 
         <ImageView
             android:id="@+id/h_back"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -35,7 +35,7 @@
             android:id="@+id/h_head"
             android:layout_width="88dp"
             android:layout_height="88dp"
-            android:layout_marginBottom="24dp"
+            android:layout_marginBottom="32dp"
             app:layout_constraintBottom_toTopOf="@+id/guideline15"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
@@ -43,10 +43,11 @@
 
         <TextView
             android:id="@+id/user_val"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="16dp"
             android:text="182****5882"
+            android:textAlignment="textStart"
             android:textColor="@color/white"
             android:textSize="17sp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -56,10 +57,11 @@
 
         <TextView
             android:id="@+id/user_name"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
+            android:layout_marginEnd="16dp"
             android:text="张三"
+            android:textAlignment="textEnd"
             android:textColor="@color/white"
             android:textSize="17sp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -91,7 +93,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.40" />
+        app:layout_constraintGuide_percent="0.35" />
 
     <Switch
         android:id="@+id/sw_disabled"
@@ -101,8 +103,8 @@
         android:text="@string/member_disabled"
         android:textSize="14sp"
         app:layout_constraintBottom_toTopOf="@+id/sw_test"
-        app:layout_constraintEnd_toEndOf="@+id/sw_test"
-        app:layout_constraintStart_toStartOf="@+id/sw_test"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/sw_about" />
 
     <Switch
@@ -111,41 +113,50 @@
         android:layout_height="45dp"
         android:layout_marginTop="8dp"
         android:text="@string/istest"
+        app:layout_constraintBottom_toTopOf="@+id/sw_tiandi"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/sw_disabled" />
+
+    <Switch
+        android:id="@+id/sw_tiandi"
+        android:layout_width="0dp"
+        android:layout_height="45dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/sw_tiandi"
+        app:layout_constraintBottom_toTopOf="@+id/guideline3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/sw_test" />
 
     <Button
         android:id="@+id/btn_logout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
         android:text="@string/btn_logout"
-        app:layout_constraintBottom_toBottomOf="@+id/btn_display_test"
-        app:layout_constraintEnd_toStartOf="@+id/btn_display_test"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/btn_display_test" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/btn_display_test"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
         android:text="@string/btn_display_test"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/btn_logout" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <Switch
         android:id="@+id/sw_about"
         android:layout_width="0dp"
         android:layout_height="45dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="16dp"
         android:text="@string/about"
         app:layout_constraintBottom_toTopOf="@+id/sw_disabled"
-        app:layout_constraintEnd_toEndOf="@+id/sw_disabled"
-        app:layout_constraintStart_toStartOf="@+id/sw_disabled"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/guideline14" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
