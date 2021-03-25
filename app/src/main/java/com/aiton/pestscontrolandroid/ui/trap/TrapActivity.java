@@ -86,6 +86,8 @@ public class TrapActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_trap);
         trapViewModel = new ViewModelProvider(this).get(TrapViewModel.class);
+
+        initRemarkDataSource();
         etQrcode = findViewById(R.id.etQrcode);
         swLureReplace = findViewById(R.id.sw_lure_replace);
         operatorAdd = findViewById(R.id.trap_operator_add);
@@ -223,7 +225,6 @@ public class TrapActivity extends AppCompatActivity {
             }
         });
 
-        initRemarkDataSource();
     }
 
 
@@ -458,8 +459,10 @@ public class TrapActivity extends AppCompatActivity {
         return false;
     }
     private void initRemarkDataSource(){
-        List<String> list = new ArrayList<>();
-        if (remarkAdapter != null){
+        List<String> operators = SPUtil.builder(getApplicationContext(),AppConstance.APP_SP).getDataList(AppConstance.TRAP_REMARK,String.class);
+        if (operators == null && operators.size() == 0) {
+            List<String> list = new ArrayList<>();
+
             list.add("gss挂设");
             list.add("scc第一次收虫");
             list.add("scc第二次收虫");
@@ -476,11 +479,10 @@ public class TrapActivity extends AppCompatActivity {
             list.add("scc第十三次收虫");
             list.add("scc第十四次收虫");
             list.add("scc第十五次收虫");
-            for (String item :
-                    list) {
-                setRemarkDataSource(item);
-            }
+            SPUtil.builder(getApplicationContext(),AppConstance.APP_SP).setDataList(AppConstance.TRAP_REMARK,list);
         }
+
+
     }
     private List<String> getRemarkDataSource() {
         List<String> operators = SPUtil.builder(getApplicationContext(),AppConstance.APP_SP).getDataList(AppConstance.TRAP_REMARK,String.class);
@@ -488,6 +490,22 @@ public class TrapActivity extends AppCompatActivity {
             return operators;
         }else{
             List<String> list = new ArrayList<>();
+            list.add("gss挂设");
+            list.add("scc第一次收虫");
+            list.add("scc第二次收虫");
+            list.add("scc第三次收虫");
+            list.add("scc第四次收虫");
+            list.add("scc第五次收虫");
+            list.add("scc第六次收虫");
+            list.add("scc第七次收虫");
+            list.add("scc第八次收虫");
+            list.add("scc第九次收虫");
+            list.add("scc第十次收虫");
+            list.add("scc第十一次收虫");
+            list.add("scc第十二次收虫");
+            list.add("scc第十三次收虫");
+            list.add("scc第十四次收虫");
+            list.add("scc第十五次收虫");
             return list;
         }
 
