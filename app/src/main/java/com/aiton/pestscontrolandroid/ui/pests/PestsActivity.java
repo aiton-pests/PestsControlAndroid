@@ -1,13 +1,11 @@
 package com.aiton.pestscontrolandroid.ui.pests;
 
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.core.os.EnvironmentCompat;
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -46,7 +44,6 @@ import com.aiton.pestscontrolandroid.service.RetrofitUtil;
 import com.aiton.pestscontrolandroid.ui.main.MainActivity;
 import com.aiton.pestscontrolandroid.utils.SPUtil;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
 
 import java.io.File;
@@ -62,11 +59,10 @@ import java.util.Locale;
 import java.util.Random;
 
 import cn.com.qiter.common.Result;
-import cn.com.qiter.pests.DictModel;
 import cn.com.qiter.pests.PestsModel;
 import cn.com.qiter.pests.UcenterMemberModel;
-import cn.com.qiter.pests.UserModel;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.StrUtil;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.disposables.Disposable;
@@ -75,7 +71,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 public class PestsActivity extends AppCompatActivity {
     private static final String TAG = "PestsActivity";
     private Button btnCancel,btnSave;
-    private EditText etQrcode,etVillage,etDb,etXb,etTown;
+    private EditText etQrcode,etVillage,etDb,etXb,etTown,etPestsCodeInt;
     private ImageButton ibFellPic,ibStumpPic,ibFinishPic;
     private Spinner spPestsType, spTreeWalk, spBags;
     private AutoCompleteTextView acOperator;
@@ -360,7 +356,13 @@ public class PestsActivity extends AppCompatActivity {
         }
         return false;
     }
-
+    private void setDefaultOper(String operator) {
+        SPUtil.builder(getApplicationContext(),AppConstance.APP_SP).setData(AppConstance.PESTS_OPERATOR_DEFAULT,operator);
+    }
+    public void displayDefaultOperator(){
+        String defaultOper = SPUtil.builder(getApplicationContext(),AppConstance.APP_SP).getData(AppConstance.PESTS_OPERATOR_DEFAULT,String.class);
+        acOperator.setText(defaultOper);
+    }
     private List<String> getDataSource() {
         List<String> operators = SPUtil.builder(getApplicationContext(),AppConstance.APP_SP).getDataList(AppConstance.OPERATOR,String.class);
         if (operators != null){
@@ -396,7 +398,11 @@ public class PestsActivity extends AppCompatActivity {
                             ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_spinner_item, strings);
                             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                             spPestsType.setAdapter(adapter);
-
+                            String defaultSelection = SPUtil.builder(getApplicationContext(),AppConstance.APP_SP).getData(AppConstance.PESTS_TYPE_DEFAULT,String.class);
+                            if (StrUtil.isEmpty(defaultSelection) || StrUtil.isNullOrUndefined(defaultSelection)){
+                                defaultSelection = "0";
+                            }
+                            spPestsType.setSelection(Integer.valueOf(defaultSelection),true);
                             // Log.e(AppConstance.TAG, "onNext: " + strings.toString());
                         }
                     }
@@ -404,6 +410,16 @@ public class PestsActivity extends AppCompatActivity {
                     @Override
                     public void onError(@NonNull Throwable e) {
                         disposable.dispose();
+
+                        String[] mItems = getResources().getStringArray(R.array.array_pests_type);
+                        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_spinner_item, mItems);
+                        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                        spPestsType.setAdapter(adapter);
+                        String defaultSelection = SPUtil.builder(getApplicationContext(),AppConstance.APP_SP).getData(AppConstance.PESTS_TYPE_DEFAULT,String.class);
+                        if (StrUtil.isEmpty(defaultSelection) || StrUtil.isNullOrUndefined(defaultSelection)){
+                            defaultSelection = "0";
+                        }
+                        spPestsType.setSelection(Integer.valueOf(defaultSelection),true);
                     }
 
                     @Override
@@ -416,6 +432,7 @@ public class PestsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pests);
+        etPestsCodeInt = findViewById(R.id.et_pests_code_int_it);
         pestsViewModel = new ViewModelProvider(this).get(PestsViewModel.class);
         ivAddOperator = findViewById(R.id.iv_add_operator);
         acOperator = findViewById(R.id.ac_operator);
@@ -442,6 +459,7 @@ public class PestsActivity extends AppCompatActivity {
         ivFell = findViewById(R.id.iv_fell);
         ivFinish = findViewById(R.id.iv_finish);
         ivStump = findViewById(R.id.iv_stump);
+
         ivAddOperator.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -460,9 +478,24 @@ public class PestsActivity extends AppCompatActivity {
                 }
             }
         });
-
+//        pestsViewModel.getCodeInt().observe(this, new Observer<Integer>() {
+//            @Override
+//            public void onChanged(Integer integer) {
+//                if (integer != null){
+//                    if (integer.compareTo(0) ==0){
+//                        Toast.makeText(getApplicationContext(),"二维码不存在，请联系管理员！",Toast.LENGTH_SHORT).show();
+//                    }else {
+//                        etPestsCodeInt.setText(String.valueOf(integer));
+//                    }
+//
+//                }
+//            }
+//        });
         PestsModel pestsModel = (PestsModel) getIntent().getSerializableExtra(AppConstance.PESTSMODEL);
         etQrcode.setText(pestsModel.getQrcode());
+//        if (!StrUtil.isNullOrUndefined(pestsModel.getQrcode()) && !StrUtil.isEmpty(pestsModel.getQrcode())){
+//            pestsViewModel.updateCodeInt(pestsModel.getQrcode());
+//        }
         HashMap<String,String> fam = (HashMap<String, String>) getIntent().getSerializableExtra(AppConstance.FEATURE_ATTRIBUTE_MAP);
         etDb.setText(fam.get(AppConstance.DBH));
         etXb.setText(fam.get(AppConstance.XBH));
@@ -501,6 +534,8 @@ public class PestsActivity extends AppCompatActivity {
                 pests.setTown(fam.get(AppConstance.JYXZCNAME));
                 pests.setBagNumber(spBags.getSelectedItem().toString());
                 pests.setOperator(acOperator.getText().toString());
+
+                SPUtil.builder(getApplicationContext(),AppConstance.APP_SP).setData(AppConstance.PESTS_TYPE_DEFAULT,String.valueOf(spPestsType.getSelectedItemPosition()));
                 pests.setPestsType(spPestsType.getSelectedItem().toString());
                 pests.setQrcode(etQrcode.getText().toString());
                 pests.setUserId(userModel.getId());
@@ -509,6 +544,7 @@ public class PestsActivity extends AppCompatActivity {
                 pests.setPositionError(String.valueOf(new Random().nextInt(10)));
                 pests.setLongitude(Double.valueOf(fam.get(AppConstance.LONGITUDE)));
                 pests.setLatitude(Double.valueOf(fam.get(AppConstance.LATIDUTE)));
+                pests.setCodeInt(etPestsCodeInt.getText().toString());
                 if (isAndroidQ){
                     if (mCameraUriFell != null){
                         File fi = uriToFileApiQ(mCameraUriFell);
@@ -551,7 +587,7 @@ public class PestsActivity extends AppCompatActivity {
 
                 pests.setUpdateServer(false);
                 pestsViewModel.insert(pests);
-
+                setDefaultOper(pests.getOperator());
                 Intent intent = new Intent(PestsActivity.this, MainActivity.class);
                 startActivity(intent);
             }
@@ -578,6 +614,7 @@ public class PestsActivity extends AppCompatActivity {
         });
 
         getDict();
+        displayDefaultOperator();
     }
 
     /**

@@ -13,6 +13,7 @@ public class RetrofitUtil {
     private UserService userService;
     private TrapService trapService;
     private DictService dictService;
+    private QrcodeService qrcodeService;
     private RetrofitUtil() {
         mRetrofit = new Retrofit.Builder()
                 .baseUrl(AppConstance.URL_APP)
@@ -23,6 +24,7 @@ public class RetrofitUtil {
         userService = mRetrofit.create(UserService.class);
         trapService = mRetrofit.create(TrapService.class);
         dictService = mRetrofit.create(DictService.class);
+        qrcodeService = mRetrofit.create(QrcodeService.class);
     }
 
     public static RetrofitUtil getInstance() {
@@ -34,6 +36,10 @@ public class RetrofitUtil {
             }
         }
         return sInstance;
+    }
+
+    public QrcodeService getQrcodeService() {
+        return qrcodeService;
     }
 
     public DictService getDictService() {

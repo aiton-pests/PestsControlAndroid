@@ -35,6 +35,8 @@ public class Trap {
     private String db;
     @ColumnInfo(name = "qrcode")
     private String qrcode;
+    @ColumnInfo(name = "code_int")
+    private String codeInt;
     @ColumnInfo(name = "user_id")
     private String userId;
     @ColumnInfo(name = "update_server")
@@ -57,30 +59,6 @@ public class Trap {
     public Trap() {
     }
 
-    public Trap(int id, String deviceId, String stime, double longitude, double latitude, String positionError, String town, String village, String operator, String xb, String db, String qrcode, String userId, boolean updateServer, Integer scount, String pic1, String pic2, String remark, Integer lureReplaced, String projectId, Integer isChecked) {
-        this.id = id;
-        this.deviceId = deviceId;
-        this.stime = stime;
-        this.longitude = longitude;
-        this.latitude = latitude;
-        this.positionError = positionError;
-        this.town = town;
-        this.village = village;
-        this.operator = operator;
-        this.xb = xb;
-        this.db = db;
-        this.qrcode = qrcode;
-        this.userId = userId;
-        this.updateServer = updateServer;
-        this.scount = scount;
-        this.pic1 = pic1;
-        this.pic2 = pic2;
-        this.remark = remark;
-        this.lureReplaced = lureReplaced;
-        this.projectId = projectId;
-        this.isChecked = isChecked;
-    }
-
     @Override
     public String toString() {
         return "Trap{" +
@@ -96,6 +74,7 @@ public class Trap {
                 ", xb='" + xb + '\'' +
                 ", db='" + db + '\'' +
                 ", qrcode='" + qrcode + '\'' +
+                ", codeInt='" + codeInt + '\'' +
                 ", userId='" + userId + '\'' +
                 ", updateServer=" + updateServer +
                 ", scount=" + scount +
@@ -106,6 +85,39 @@ public class Trap {
                 ", projectId='" + projectId + '\'' +
                 ", isChecked=" + isChecked +
                 '}';
+    }
+
+    public Trap(int id, String deviceId, String stime, double longitude, double latitude, String positionError, String town, String village, String operator, String xb, String db, String qrcode, String codeInt, String userId, boolean updateServer, Integer scount, String pic1, String pic2, String remark, Integer lureReplaced, String projectId, Integer isChecked) {
+        this.id = id;
+        this.deviceId = deviceId;
+        this.stime = stime;
+        this.longitude = longitude;
+        this.latitude = latitude;
+        this.positionError = positionError;
+        this.town = town;
+        this.village = village;
+        this.operator = operator;
+        this.xb = xb;
+        this.db = db;
+        this.qrcode = qrcode;
+        this.codeInt = codeInt;
+        this.userId = userId;
+        this.updateServer = updateServer;
+        this.scount = scount;
+        this.pic1 = pic1;
+        this.pic2 = pic2;
+        this.remark = remark;
+        this.lureReplaced = lureReplaced;
+        this.projectId = projectId;
+        this.isChecked = isChecked;
+    }
+
+    public String getCodeInt() {
+        return codeInt;
+    }
+
+    public void setCodeInt(String codeInt) {
+        this.codeInt = codeInt;
     }
 
     public int getId() {

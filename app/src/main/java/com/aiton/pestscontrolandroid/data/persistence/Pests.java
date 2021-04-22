@@ -43,6 +43,8 @@ public class Pests {
     private String db;
     @ColumnInfo(name = "qrcode")
     private String qrcode;
+    @ColumnInfo(name = "code_int")
+    private String codeInt;
     @ColumnInfo(name = "user_id")
     private String userId;
     @ColumnInfo(name = "bag_number")
@@ -53,6 +55,10 @@ public class Pests {
 
     @ColumnInfo(name = "update_server")
     private boolean updateServer;
+
+    @Ignore
+    public Pests() {
+    }
 
     @Override
     public String toString() {
@@ -73,6 +79,7 @@ public class Pests {
                 ", xb='" + xb + '\'' +
                 ", db='" + db + '\'' +
                 ", qrcode='" + qrcode + '\'' +
+                ", codeInt='" + codeInt + '\'' +
                 ", userId='" + userId + '\'' +
                 ", bagNumber='" + bagNumber + '\'' +
                 ", pestsType='" + pestsType + '\'' +
@@ -80,11 +87,7 @@ public class Pests {
                 '}';
     }
 
-    @Ignore
-    public Pests() {
-    }
-
-    public Pests(int id, String deviceId, String stime, double longitude, double latitude, String positionError, String treeWalk, String fellPic, String stumpPic, String finishPic, String town, String village, String operator, String xb, String db, String qrcode, String userId, String bagNumber, String pestsType, boolean updateServer) {
+    public Pests(int id, String deviceId, String stime, double longitude, double latitude, String positionError, String treeWalk, String fellPic, String stumpPic, String finishPic, String town, String village, String operator, String xb, String db, String qrcode, String codeInt, String userId, String bagNumber, String pestsType, boolean updateServer) {
         this.id = id;
         this.deviceId = deviceId;
         this.stime = stime;
@@ -101,12 +104,20 @@ public class Pests {
         this.xb = xb;
         this.db = db;
         this.qrcode = qrcode;
+        this.codeInt = codeInt;
         this.userId = userId;
         this.bagNumber = bagNumber;
         this.pestsType = pestsType;
         this.updateServer = updateServer;
     }
 
+    public String getCodeInt() {
+        return codeInt;
+    }
+
+    public void setCodeInt(String codeInt) {
+        this.codeInt = codeInt;
+    }
 
     public boolean isUpdateServer() {
         return updateServer;

@@ -19,8 +19,8 @@
         <item>41cm以上</item>
     </string-array>
     <string-array name="array_pests_type">
-        <item>诱木</item>
         <item>枯死木</item>
-        <item>诱捕器</item>
+        <item>诱木</item>
+        <item>粉碎除害</item>
     </string-array>
 </resources>

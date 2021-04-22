@@ -52,12 +52,15 @@ public class AppConstance {
 
     // https://8222.qiter.com.cn/
     // http://testpests.qiter.com.cn:9000/
-    public static final String URL_APP = "https://8222.qiter.com.cn/";
+    public static final String URL_APP = "https://peststest.cn.utools.club/";
     public static final String URL_PESTS_SAVE = "educenter/pests/addPestsControl";
     public static final String URL_PESTS_FINDALL_CALL = "educenter/pests/findAll/call";
     public static final String URL_PESTS_FINDALL = "educenter/pests/findAll";
+    public static final String URL_ALIVE = "educenter/alive";
 
     public static final String URL_DICT_NAME = "educms/dictionary/getByName/{name}";
+
+    public static final String URL_QRCODE_INT = "educenter/qrcode/getOneByQrcode/{codeNumber}";
 
     public static final String URL_TRAP_SAVE = "educenter/trap/add";
     public static final String URL_TRAP_FINDALL_CALL = "educenter/trap/findAll/call";
@@ -68,7 +71,11 @@ public class AppConstance {
     public static final String URL_USER_GET_MEMBER_INFO = "educenter/member/getMemberInfo";
     public static final String API_KEY = "runtimelite,1000,rud6848143592,none,PM0RJAY3FLB5JPJA4066";
     public static final String OPERATOR = "OPERATOR";
+    public static final String OPERATOR_DEFAULT = "OPERATOR_DEFAULT";
+    public static final String PESTS_TYPE_DEFAULT = "PESTS_TYPE_DEFAULT";
+    public static final String PESTS_OPERATOR_DEFAULT = "PESTS_OPERATOR_DEFAULT";
     public static final String TIANDIMAP = "TIANDIMAP";
     public static final String DICT_NAME_PESTS_TYPE = "pests.pests.type";
     public static final String TRAP_REMARK = "TRAP_REMARK";
+    public static final String URL_TRAP_GET_QRCODE = "educenter/trap/getByQrcode/{qrcode}";
 }

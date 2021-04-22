@@ -38,4 +38,10 @@ public interface PestsService {
     @POST(AppConstance.URL_PESTS_SAVE)
     Observable<Result> savePests(@Body PestsModel domain);
 
+    /**
+     * 获取节点 使用rxjava
+     * @return
+     */
+    @GET(AppConstance.URL_ALIVE)
+    Observable<Result> aLive();
 }

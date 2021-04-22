@@ -69,4 +69,18 @@
     <string name="lure_replaces">换芯</string>
     <string name="scounts">只</string>
     <string name="second_receve">第二次收虫</string>
+    <string name="code_int">二维码</string>
+    <string name="trap_operator_set">挂设</string>
+    <string name="trap_operator_d">第</string>
+    <string name="trap_operator_sc">次收虫</string>
+    <string name="trap_operator_first">第一次收虫</string>
+    <string name="trap_operator_2">第二次收虫</string>
+    <string name="trap_operator_3">第三次收虫</string>
+    <string name="trap_operator_4">第四次收虫</string>
+    <string name="trap_operator_5">第五次收虫</string>
+    <string name="trap_operator_6">第六次收虫</string>
+    <string name="trap_operator_7">第七次收虫</string>
+    <string name="trap_operator_8">第八次收虫</string>
+    <string name="trap_operator_9">第九次收虫</string>
+    <string name="trap_operator_10">第十次收虫</string>
 </resources>

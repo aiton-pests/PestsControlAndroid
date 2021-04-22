@@ -64,21 +64,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                app:layout_constraintGuide_percent="0.25" />
-
-            <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/guideline17"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                app:layout_constraintGuide_percent="0.50" />
-
-            <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/guideline20"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                app:layout_constraintGuide_percent="0.75" />
+                app:layout_constraintGuide_percent="0.5" />
 
             <TextView
                 android:id="@+id/trap_card_count"
@@ -107,54 +93,7 @@
                 android:text="鲁仁华"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="@+id/guideline23"
-                app:layout_constraintTop_toTopOf="@+id/guideline20" />
-
-            <TextView
-                android:id="@+id/trap_card_town"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="新店镇"
-                app:layout_constraintBottom_toTopOf="@+id/guideline20"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/guideline17" />
-
-            <TextView
-                android:id="@+id/trap_card_village"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:text="新店村"
-                app:layout_constraintBottom_toTopOf="@+id/guideline20"
-                app:layout_constraintStart_toStartOf="@+id/guideline22"
-                app:layout_constraintTop_toTopOf="@+id/guideline17" />
-
-            <TextView
-                android:id="@+id/trap_card_xb"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:text="811"
-                app:layout_constraintBottom_toTopOf="@+id/guideline20"
-                app:layout_constraintStart_toStartOf="@+id/guideline23"
-                app:layout_constraintTop_toTopOf="@+id/guideline17" />
-
-            <TextView
-                android:id="@+id/trap_card_db"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="811"
-                app:layout_constraintBottom_toTopOf="@+id/guideline20"
-                app:layout_constraintEnd_toStartOf="@+id/guideline23"
-                app:layout_constraintTop_toTopOf="@+id/guideline17" />
-
-            <TextView
-                android:id="@+id/trap_card_position_error"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="7"
-                app:layout_constraintBottom_toTopOf="@+id/guideline16"
-                app:layout_constraintEnd_toStartOf="@+id/guideline23"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="@+id/guideline16" />
 
             <TextView
                 android:id="@+id/trap_card_remark"
@@ -167,26 +106,6 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/trap_card_longitude"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:text="116.428415"
-                app:layout_constraintBottom_toTopOf="@+id/guideline17"
-                app:layout_constraintStart_toStartOf="@+id/guideline22"
-                app:layout_constraintTop_toTopOf="@+id/guideline16" />
-
-            <TextView
-                android:id="@+id/trap_card_latitude"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:text="39.937289"
-                app:layout_constraintBottom_toTopOf="@+id/guideline17"
-                app:layout_constraintStart_toStartOf="@+id/guideline23"
-                app:layout_constraintTop_toTopOf="@+id/guideline16" />
-
-            <TextView
                 android:id="@+id/trap_card_stime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -194,16 +113,16 @@
                 android:visibility="visible"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/guideline20" />
+                app:layout_constraintTop_toTopOf="@+id/guideline16" />
 
             <TextView
                 android:id="@+id/trap_card_lure_replace"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="是"
-                app:layout_constraintBottom_toTopOf="@+id/guideline17"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/guideline16" />
+                app:layout_constraintBottom_toTopOf="@+id/guideline16"
+                app:layout_constraintEnd_toStartOf="@+id/guideline23"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <Switch
                 android:id="@+id/trap_card_update"
@@ -216,16 +135,6 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/textView21"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:text="@string/position"
-                app:layout_constraintBottom_toTopOf="@+id/guideline16"
-                app:layout_constraintEnd_toStartOf="@+id/trap_card_position_error"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
                 android:id="@+id/textView22"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -234,6 +143,15 @@
                 app:layout_constraintBottom_toTopOf="@+id/guideline16"
                 app:layout_constraintStart_toEndOf="@+id/trap_card_count"
                 app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tv_trap_code_int"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="8516"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/guideline23"
+                app:layout_constraintTop_toTopOf="@+id/guideline16" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

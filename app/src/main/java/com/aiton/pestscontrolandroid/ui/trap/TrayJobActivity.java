@@ -9,26 +9,29 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.aiton.pestscontrolandroid.AppConstance;
 import com.aiton.pestscontrolandroid.R;
-import com.aiton.pestscontrolandroid.data.persistence.Pests;
 import com.aiton.pestscontrolandroid.data.persistence.Trap;
 import com.aiton.pestscontrolandroid.service.OssService;
-import com.aiton.pestscontrolandroid.ui.myjob.PestsAdapter;
-import com.aiton.pestscontrolandroid.ui.pests.PestsViewModel;
+import com.aiton.pestscontrolandroid.service.RetrofitUtil;
 
 import java.io.File;
 import java.util.List;
 
-import cn.com.qiter.pests.PestsModel;
+import cn.com.qiter.common.Result;
 import cn.com.qiter.pests.TrapModel;
 import cn.hutool.core.date.DateTime;
-import cn.hutool.core.date.DateUtil;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.annotations.NonNull;
+import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class TrayJobActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
@@ -36,7 +39,7 @@ public class TrayJobActivity extends AppCompatActivity {
     private Button trapUpdate,trapUpdateAgain,trapDelete;
     TrapAdapter adapter;
     private static final String TAG = "TrayJobActivity";
-
+    ProgressBar progressBar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,6 +47,7 @@ public class TrayJobActivity extends AppCompatActivity {
         trapUpdate = findViewById(R.id.trap_update);
         trapUpdateAgain = findViewById(R.id.trap_update_again);
         trapDelete = findViewById(R.id.trap_delete_btn);
+        progressBar = findViewById(R.id.progressBar);
         recyclerView = findViewById(R.id.rv_trap);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         trapViewModel = new ViewModelProvider(this).get(TrapViewModel.class);
@@ -79,13 +83,68 @@ public class TrayJobActivity extends AppCompatActivity {
         trapUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                updateServer(false);
+                RetrofitUtil.getInstance().getPestsService().aLive()
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new io.reactivex.rxjava3.core.Observer<Result>() {
+                            Disposable disposable;
+                            @Override
+                            public void onSubscribe(@NonNull Disposable d) {
+                                disposable = d;
+                            }
+
+                            @Override
+                            public void onNext(@NonNull Result result) {
+                                if (result.getSuccess())
+                                    updateServer(false);
+                            }
+
+                            @Override
+                            public void onError(@NonNull Throwable e) {
+
+                                disposable.dispose();
+                                Toast.makeText(getApplicationContext(),"网络异常无法连接服务器！",Toast.LENGTH_SHORT).show();
+                            }
+
+                            @Override
+                            public void onComplete() {
+
+                            }
+                        });
             }
         });
         trapUpdateAgain.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                updateServer(true);
+                RetrofitUtil.getInstance().getPestsService().aLive()
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new io.reactivex.rxjava3.core.Observer<Result>() {
+                            Disposable disposable;
+                            @Override
+                            public void onSubscribe(@NonNull Disposable d) {
+                                disposable = d;
+                            }
+
+                            @Override
+                            public void onNext(@NonNull Result result) {
+                                if (result.getSuccess()){
+                                    updateServer(true);
+                                }
+
+                            }
+
+                            @Override
+                            public void onError(@NonNull Throwable e) {
+                                disposable.dispose();
+                                Toast.makeText(getApplicationContext(),"网络异常无法连接服务器！",Toast.LENGTH_SHORT).show();
+                            }
+
+                            @Override
+                            public void onComplete() {
+
+                            }
+                        });
             }
         });
         trapDelete.setOnClickListener(new View.OnClickListener() {
@@ -113,6 +172,7 @@ public class TrayJobActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        progressBar.setProgress((int)progress,true);
                         Log.e(TAG, "run: " + progress);
                     }
                 });
@@ -130,11 +190,12 @@ public class TrayJobActivity extends AppCompatActivity {
     private void updateServer(boolean isUpdate) {
         Trap[] traps1 = trapViewModel.findAllObject();
         Trap[] traps = trapViewModel.findAllObject(isUpdate);
+        int size = traps.length;
+//        progressBar.setMax(size);
+        int count = 0;
         for (Trap p :
                 traps) {
-            p.setUpdateServer(true);
-            trapViewModel.update(p);
-
+            count ++;
             Log.e(TAG, "服务器数据上传一条: " + p.toString());
             TrapModel model = new TrapModel();
             model.setQrcode(p.getQrcode());
@@ -167,9 +228,13 @@ public class TrayJobActivity extends AppCompatActivity {
             model.setUserId(p.getUserId());
             model.setVillage(p.getVillage());
             model.setStime(p.getStime());
-            trapViewModel.uploadServer(model);
-            Log.e(TAG, "updateServer: " + p.toString());
 
+            trapViewModel.uploadServer(model);
+
+            p.setUpdateServer(true);
+            trapViewModel.update(p);
+            Log.e(TAG, "updateServer: " + p.toString());
+//            progressBar.setProgress(count,true);
         }
     }
 
@@ -184,4 +249,28 @@ public class TrayJobActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if(keyCode == KeyEvent.KEYCODE_BACK) { //监控/拦截/屏蔽返回键
+            Toast.makeText(getApplicationContext(),"数据上传中禁用退回键",Toast.LENGTH_SHORT).show();
+            return true;
+        } else if(keyCode == KeyEvent.KEYCODE_MENU) {//MENU键
+            //监控/拦截菜单键
+            Toast.makeText(getApplicationContext(),"数据上传中禁用菜单键",Toast.LENGTH_SHORT).show();
+            return true;
+        } else if(keyCode == KeyEvent.KEYCODE_HOME) {//MENU键
+            //监控/拦截菜单键
+            Toast.makeText(getApplicationContext(),"数据上传中禁用HOME键",Toast.LENGTH_SHORT).show();
+            return true;
+        }else if(keyCode == KeyEvent.KEYCODE_POWER) {//MENU键
+            //监控/拦截菜单键
+            Toast.makeText(getApplicationContext(),"数据上传中禁用电源键",Toast.LENGTH_SHORT).show();
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
 }

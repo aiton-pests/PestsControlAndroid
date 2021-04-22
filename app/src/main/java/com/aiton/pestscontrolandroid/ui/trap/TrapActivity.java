@@ -6,6 +6,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.core.os.EnvironmentCompat;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.Manifest;
@@ -56,11 +57,12 @@ import cn.com.qiter.pests.PestsModel;
 import cn.com.qiter.pests.TrapModel;
 import cn.com.qiter.pests.UcenterMemberModel;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.StrUtil;
 
 public class TrapActivity extends AppCompatActivity {
     private static final String TAG = "TrapActivity";
     private ImageView operatorAdd,ivFirst,ivSecond,remarkAdd;
-    private EditText trapCount,trapTown,trapVillage,trapDb,trapXb,etQrcode;
+    private EditText trapCount,trapTown,trapVillage,trapDb,trapXb,etQrcode,etTrapCodeInt;
     private ImageButton ibFirst,ibSecond;
     private AutoCompleteTextView trapOperator,trapRemark;
     private Button btnCancel,btnSave;
@@ -88,6 +90,7 @@ public class TrapActivity extends AppCompatActivity {
         trapViewModel = new ViewModelProvider(this).get(TrapViewModel.class);
 
         initRemarkDataSource();
+        etTrapCodeInt = findViewById(R.id.et_trap_code_int);
         etQrcode = findViewById(R.id.etQrcode);
         swLureReplace = findViewById(R.id.sw_lure_replace);
         operatorAdd = findViewById(R.id.trap_operator_add);
@@ -140,8 +143,37 @@ public class TrapActivity extends AppCompatActivity {
                 setDataSource(operator);
             }
         });
+        trapViewModel.getTrapCount().observe(this, new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer integer) {
+                if (integer != null){
+                    if (integer.compareTo(0) ==0){
+                        trapRemark.setText(getResources().getString(R.string.trap_operator_set));
+                    } else { //第二次收虫
+                        trapRemark.setText(getResources().getString(R.string.trap_operator_d) + integer + getResources().getString(R.string.trap_operator_sc));
+                    }
+                }
+            }
+        });
         TrapModel model = (TrapModel) getIntent().getSerializableExtra(AppConstance.TRAPMODEL);
         etQrcode.setText(model.getQrcode());
+//        trapViewModel.getCodeInt().observe(this, new Observer<Integer>() {
+//            @Override
+//            public void onChanged(Integer integer) {
+//                if (integer != null){
+//                    if (integer.compareTo(0) == 0){
+//                        Toast.makeText(getApplicationContext(),"二维码不存在，请联系管理员！",Toast.LENGTH_SHORT).show();
+//                    } else {
+//                        etTrapCodeInt.setText(String.valueOf(integer));
+//                    }
+//
+//                }
+//            }
+//        });
+        if (!StrUtil.isNullOrUndefined(model.getQrcode()) && !StrUtil.isEmpty(model.getQrcode())){
+//            trapViewModel.updateCodeInt(model.getQrcode());
+            trapViewModel.countTrap(model.getQrcode());
+        }
         HashMap<String,String> fam = (HashMap<String, String>) getIntent().getSerializableExtra(AppConstance.FEATURE_ATTRIBUTE_MAP);
         trapDb.setText(fam.get(AppConstance.DBH));
         trapXb.setText(fam.get(AppConstance.XBH));
@@ -184,10 +216,15 @@ public class TrapActivity extends AppCompatActivity {
                 trap.setQrcode(etQrcode.getText().toString());
                 trap.setUserId(userModel.getId());
                 trap.setStime(DateUtil.formatDateTime(DateUtil.date()));
-                trap.setScount(Integer.valueOf(trapCount.getText().toString()));
-                trap.setPositionError(String.valueOf(new Random().nextInt(10)));
+                String scount = trapCount.getText().toString();
+                if (StrUtil.isNullOrUndefined(scount) || StrUtil.isEmpty(scount)){
+                    scount = "0";
+                }
+                trap.setScount(Integer.valueOf(scount));
+                trap.setPositionError(String.valueOf(new Random().nextInt(15)));
                 trap.setLongitude(Double.valueOf(fam.get(AppConstance.LONGITUDE)));
                 trap.setLatitude(Double.valueOf(fam.get(AppConstance.LATIDUTE)));
+                trap.setCodeInt(etTrapCodeInt.getText().toString());
                 if (isAndroidQ){
                     if (mCameraUriPIC1 != null){
                         File fi = uriToFileApiQ(mCameraUriPIC1);
@@ -219,12 +256,16 @@ public class TrapActivity extends AppCompatActivity {
 
                 trap.setUpdateServer(false);
                 trapViewModel.insert(trap);
-
+                setDefaultOper(trap.getOperator());
                 Intent intent = new Intent(TrapActivity.this, MainActivity.class);
                 startActivity(intent);
             }
         });
+        displayDefaultOperator();
+    }
 
+    private void setDefaultOper(String operator) {
+        SPUtil.builder(getApplicationContext(),AppConstance.APP_SP).setData(AppConstance.OPERATOR_DEFAULT,operator);
     }
 
 
@@ -427,13 +468,16 @@ public class TrapActivity extends AppCompatActivity {
         }
         return false;
     }
-
+    public void displayDefaultOperator(){
+        String defaultOper = SPUtil.builder(getApplicationContext(),AppConstance.APP_SP).getData(AppConstance.OPERATOR_DEFAULT,String.class);
+        trapOperator.setText(defaultOper);
+    }
     private List<String> getDataSource() {
         List<String> operators = SPUtil.builder(getApplicationContext(),AppConstance.APP_SP).getDataList(AppConstance.OPERATOR,String.class);
         if (operators != null){
             return operators;
         }else{
-            String name = "lrh鲁仁华";
+            String name = "鲁仁华";
             List<String> list = new ArrayList<>();
             list.add(name);
             setDataSource(name);
@@ -462,23 +506,22 @@ public class TrapActivity extends AppCompatActivity {
         List<String> operators = SPUtil.builder(getApplicationContext(),AppConstance.APP_SP).getDataList(AppConstance.TRAP_REMARK,String.class);
         if (operators == null && operators.size() == 0) {
             List<String> list = new ArrayList<>();
-
-            list.add("gss挂设");
-            list.add("scc第一次收虫");
-            list.add("scc第二次收虫");
-            list.add("scc第三次收虫");
-            list.add("scc第四次收虫");
-            list.add("scc第五次收虫");
-            list.add("scc第六次收虫");
-            list.add("scc第七次收虫");
-            list.add("scc第八次收虫");
-            list.add("scc第九次收虫");
-            list.add("scc第十次收虫");
-            list.add("scc第十一次收虫");
-            list.add("scc第十二次收虫");
-            list.add("scc第十三次收虫");
-            list.add("scc第十四次收虫");
-            list.add("scc第十五次收虫");
+            list.add("挂设");
+            list.add("第1次收虫");
+            list.add("第2次收虫");
+            list.add("第3次收虫");
+            list.add("第4次收虫");
+            list.add("第5次收虫");
+            list.add("第6次收虫");
+            list.add("第7次收虫");
+            list.add("第8次收虫");
+            list.add("第9次收虫");
+            list.add("第10次收虫");
+            list.add("第11次收虫");
+            list.add("第12次收虫");
+            list.add("第13次收虫");
+            list.add("第14次收虫");
+            list.add("第15次收虫");
             SPUtil.builder(getApplicationContext(),AppConstance.APP_SP).setDataList(AppConstance.TRAP_REMARK,list);
         }
 
@@ -490,22 +533,22 @@ public class TrapActivity extends AppCompatActivity {
             return operators;
         }else{
             List<String> list = new ArrayList<>();
-            list.add("gss挂设");
-            list.add("scc第一次收虫");
-            list.add("scc第二次收虫");
-            list.add("scc第三次收虫");
-            list.add("scc第四次收虫");
-            list.add("scc第五次收虫");
-            list.add("scc第六次收虫");
-            list.add("scc第七次收虫");
-            list.add("scc第八次收虫");
-            list.add("scc第九次收虫");
-            list.add("scc第十次收虫");
-            list.add("scc第十一次收虫");
-            list.add("scc第十二次收虫");
-            list.add("scc第十三次收虫");
-            list.add("scc第十四次收虫");
-            list.add("scc第十五次收虫");
+            list.add("挂设");
+            list.add("第1次收虫");
+            list.add("第2次收虫");
+            list.add("第3次收虫");
+            list.add("第4次收虫");
+            list.add("第5次收虫");
+            list.add("第6次收虫");
+            list.add("第7次收虫");
+            list.add("第8次收虫");
+            list.add("第9次收虫");
+            list.add("第10次收虫");
+            list.add("第11次收虫");
+            list.add("第12次收虫");
+            list.add("第13次收虫");
+            list.add("第14次收虫");
+            list.add("第15次收虫");
             return list;
         }
 

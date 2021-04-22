@@ -14,11 +14,16 @@ import com.aiton.pestscontrolandroid.data.persistence.PestsRepository;
 import com.aiton.pestscontrolandroid.data.persistence.Trap;
 import com.aiton.pestscontrolandroid.data.persistence.TrapRepository;
 import com.aiton.pestscontrolandroid.service.RetrofitUtil;
+import com.google.gson.internal.LinkedTreeMap;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import cn.com.qiter.common.Result;
 import cn.com.qiter.pests.TrapModel;
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.NumberUtil;
+import cn.hutool.core.util.StrUtil;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
@@ -29,6 +34,92 @@ public class TrapViewModel extends AndroidViewModel {
 
     public MutableLiveData<Integer> getProgress() {
         return progress;
+    }
+
+    private MutableLiveData<Integer> trapCount = new MutableLiveData<>();
+
+    public MutableLiveData<Integer> getTrapCount() {
+        return trapCount;
+    }
+
+    public void countTrap(String qrcode){
+        RetrofitUtil.getInstance().getTrapService().getByQrcode(qrcode)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new io.reactivex.rxjava3.core.Observer<Result>() {
+                    Disposable disposable;
+
+                    @Override
+                    public void onSubscribe(@io.reactivex.rxjava3.annotations.NonNull Disposable d) {
+                        disposable = d;
+                    }
+
+                    @Override
+                    public void onNext(@io.reactivex.rxjava3.annotations.NonNull Result result) {
+                        if (result.getSuccess()) {
+                            ArrayList ltm = (ArrayList) result.getData().get("trap");
+                            getTrapCount().setValue(ltm.size());
+                            Log.e(AppConstance.TAG, "onNext: " + result.toString());
+                        }
+                    }
+
+                    @Override
+                    public void onError(@io.reactivex.rxjava3.annotations.NonNull Throwable e) {
+                        disposable.dispose();
+                        getTrapCount().setValue(0);
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+    }
+
+    private MutableLiveData<Integer> codeInt = new MutableLiveData<>();
+
+    public MutableLiveData<Integer> getCodeInt() {
+        return codeInt;
+    }
+    public void updateCodeInt(String codeNumber){
+        RetrofitUtil.getInstance().getQrcodeService().getQrcode(codeNumber)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new io.reactivex.rxjava3.core.Observer<Result>() {
+                    Disposable disposable;
+
+                    @Override
+                    public void onSubscribe(@io.reactivex.rxjava3.annotations.NonNull Disposable d) {
+                        disposable = d;
+                    }
+
+                    @Override
+                    public void onNext(@io.reactivex.rxjava3.annotations.NonNull Result result) {
+                        if (result.getSuccess()) {
+                            LinkedTreeMap ltm = (LinkedTreeMap) result.getData().get("teacher");
+                            Double codeint = (Double) ltm.get("codeInt");
+                            int codeIntInt = codeint.intValue();
+                            getCodeInt().setValue(codeIntInt);
+                            Log.e(AppConstance.TAG, "onNext: " + result.toString());
+                        }
+                    }
+
+                    @Override
+                    public void onError(@io.reactivex.rxjava3.annotations.NonNull Throwable e) {
+                        disposable.dispose();
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+    }
+
+    private MutableLiveData<Trap> trapMutableLiveData = new MutableLiveData<>();
+
+    public MutableLiveData<Trap> getTrapMutableLiveData() {
+        return trapMutableLiveData;
     }
 
     public void uploadServer(TrapModel model) {
@@ -46,6 +137,7 @@ public class TrapViewModel extends AndroidViewModel {
                     @Override
                     public void onNext(@io.reactivex.rxjava3.annotations.NonNull Result result) {
                         if (result.getSuccess()) {
+
                             progress.setValue(100);
                             Log.e(AppConstance.TAG, "onNext: " + result.toString());
                         }

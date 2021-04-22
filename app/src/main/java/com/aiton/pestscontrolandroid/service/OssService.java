@@ -43,10 +43,10 @@ public class OssService {
         //这个初始化安全性没有Sts安全，如需要很高安全性建议用OSSStsTokenCredentialProvider创建（上一行创建方式）多出的参数SecurityToken为临时授权参数
         OSSCredentialProvider credentialProvider = new OSSPlainTextAKSKCredentialProvider(accessKeyId, accessKeySecret);
         ClientConfiguration conf = new ClientConfiguration();
-        conf.setConnectionTimeout(15 * 1000); // 连接超时，默认15秒
-        conf.setSocketTimeout(15 * 1000); // socket超时，默认15秒
-        conf.setMaxConcurrentRequest(8); // 最大并发请求数，默认5个
-        conf.setMaxErrorRetry(2); // 失败后最大重试次数，默认2次
+        conf.setConnectionTimeout(15 * 1000000); // 连接超时，默认15秒
+        conf.setSocketTimeout(15 * 1000000); // socket超时，默认15秒
+        conf.setMaxConcurrentRequest(50); // 最大并发请求数，默认5个
+        conf.setMaxErrorRetry(5); // 失败后最大重试次数，默认2次
 
         // oss为全局变量，endpoint是一个OSS区域地址
         oss = new OSSClient(context, endpoint, credentialProvider, conf);
@@ -119,6 +119,7 @@ public class OssService {
         });
         //task.cancel(); // 可以取消任务
         //task.waitUntilFinished(); // 可以等待直到任务完成
+
     }
 
 

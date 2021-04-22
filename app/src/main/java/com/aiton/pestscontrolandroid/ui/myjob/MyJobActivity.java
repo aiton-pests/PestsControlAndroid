@@ -7,11 +7,20 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.aiton.pestscontrolandroid.AppConstance;
@@ -19,29 +28,38 @@ import com.aiton.pestscontrolandroid.R;
 import com.aiton.pestscontrolandroid.data.model.ShpFile;
 import com.aiton.pestscontrolandroid.data.persistence.Pests;
 import com.aiton.pestscontrolandroid.service.OssService;
+import com.aiton.pestscontrolandroid.service.RetrofitUtil;
 import com.aiton.pestscontrolandroid.ui.pests.PestsViewModel;
 import com.aiton.pestscontrolandroid.ui.setting.ShpAdapter;
 
 import java.io.File;
 import java.util.List;
 
+import cn.com.qiter.common.Result;
 import cn.com.qiter.pests.PestsModel;
 import cn.hutool.core.date.DateTime;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.annotations.NonNull;
+import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class MyJobActivity extends AppCompatActivity {
     private static final String TAG = "MyJobActivity";
     private RecyclerView recyclerView;
     private PestsViewModel pestsViewModel;
     PestsAdapter adapter;
+    ProgressBar progressBar2;
     private Button pestsUpdate,pestsUpdateAgain,pestsDelete;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_job);
+//        registerReceiver(mHomeKeyEventReceiver, new IntentFilter(Intent.ACTION_CLOSE_SYSTEM_DIALOGS));
         pestsUpdate = findViewById(R.id.pests_update);
         pestsUpdateAgain = findViewById(R.id.pests_update_again);
         pestsDelete = findViewById(R.id.pests_delete);
         recyclerView = findViewById(R.id.rv_pests);
+        progressBar2 = findViewById(R.id.progressBar2);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         pestsViewModel = new ViewModelProvider(this).get(PestsViewModel.class);
         ActionBar actionBar = getSupportActionBar();
@@ -78,13 +96,69 @@ public class MyJobActivity extends AppCompatActivity {
         pestsUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                updateServer(false);
+                RetrofitUtil.getInstance().getPestsService().aLive()
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new io.reactivex.rxjava3.core.Observer<Result>() {
+                            Disposable disposable;
+                            @Override
+                            public void onSubscribe(@NonNull Disposable d) {
+                                disposable = d;
+                            }
+
+                            @Override
+                            public void onNext(@NonNull Result result) {
+                                if (result.getSuccess())
+                                    updateServer(false);
+                            }
+
+                            @Override
+                            public void onError(@NonNull Throwable e) {
+
+                                disposable.dispose();
+                                Toast.makeText(getApplicationContext(),"网络异常无法连接服务器！",Toast.LENGTH_SHORT).show();
+                            }
+
+                            @Override
+                            public void onComplete() {
+
+                            }
+                        });
+
             }
         });
         pestsUpdateAgain.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                updateServer(true);
+                RetrofitUtil.getInstance().getPestsService().aLive()
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new io.reactivex.rxjava3.core.Observer<Result>() {
+                            Disposable disposable;
+                            @Override
+                            public void onSubscribe(@NonNull Disposable d) {
+                                disposable = d;
+                            }
+
+                            @Override
+                            public void onNext(@NonNull Result result) {
+                                if (result.getSuccess())
+                                    updateServer(true);
+                            }
+
+                            @Override
+                            public void onError(@NonNull Throwable e) {
+
+                                disposable.dispose();
+                                Toast.makeText(getApplicationContext(),"网络异常无法连接服务器！",Toast.LENGTH_SHORT).show();
+                            }
+
+                            @Override
+                            public void onComplete() {
+
+                            }
+                        });
+
             }
         });
         pestsDelete.setOnClickListener(new View.OnClickListener() {
@@ -112,6 +186,7 @@ public class MyJobActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        progressBar2.setProgress((int)progress,true);
                         Log.e(TAG, "run: " + progress);
                     }
                 });
@@ -188,4 +263,28 @@ public class MyJobActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if(keyCode == KeyEvent.KEYCODE_BACK) { //监控/拦截/屏蔽返回键
+            Toast.makeText(getApplicationContext(),"数据上传中禁用退回键",Toast.LENGTH_SHORT).show();
+            return true;
+        } else if(keyCode == KeyEvent.KEYCODE_MENU) {//MENU键
+            //监控/拦截菜单键
+            Toast.makeText(getApplicationContext(),"数据上传中禁用菜单键",Toast.LENGTH_SHORT).show();
+            return true;
+        } else if(keyCode == KeyEvent.KEYCODE_HOME) {//MENU键
+            //监控/拦截菜单键
+            Toast.makeText(getApplicationContext(),"数据上传中禁用HOME键",Toast.LENGTH_SHORT).show();
+            return true;
+        }else if(keyCode == KeyEvent.KEYCODE_POWER) {//MENU键
+            //监控/拦截菜单键
+            Toast.makeText(getApplicationContext(),"数据上传中禁用电源键",Toast.LENGTH_SHORT).show();
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+
 }

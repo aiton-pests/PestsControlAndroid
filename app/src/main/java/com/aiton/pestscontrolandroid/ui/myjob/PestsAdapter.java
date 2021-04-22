@@ -57,20 +57,21 @@ public class PestsAdapter  extends RecyclerView.Adapter<PestsAdapter.PestsViewHo
     public void onBindViewHolder(@NonNull PestsAdapter.PestsViewHolder holder, int position) {
         final Pests p = pests.get(position);
         holder.tv_bag_number.setText(String.valueOf(p.getBagNumber()));
-        holder.tv_db.setText(p.getDb());
+//        holder.tv_db.setText(p.getDb());
         holder.tv_operator.setText(p.getOperator());
-        holder.tv_town.setText(p.getTown());
-        holder.tv_village.setText(p.getVillage());
-        holder.tv_xb.setText(p.getXb());
-        holder.tv_db.setText(p.getDb());
+//        holder.tv_town.setText(p.getTown());
+//        holder.tv_village.setText(p.getVillage());
+//        holder.tv_xb.setText(p.getXb());
+//        holder.tv_db.setText(p.getDb());
         holder.tv_stime.setText(p.getStime());
         holder.tvDeviceId.setText(p.getDeviceId());
         holder.tv_treeWalk.setText(p.getTreeWalk());
-        holder.tv_position_error.setText(p.getPositionError());
+//        holder.tv_position_error.setText(p.getPositionError());
         holder.tv_pests_type.setText(p.getPestsType());
-        holder.tv_latitude.setText(String.valueOf(p.getLatitude()));
-        holder.tv_longitude.setText(String.valueOf(p.getLongitude()));
+//        holder.tv_latitude.setText(String.valueOf(p.getLatitude()));
+//        holder.tv_longitude.setText(String.valueOf(p.getLongitude()));
         holder.swUpdate.setChecked(p.isUpdateServer());
+        holder.tvPestsCodeInt.setText(p.getCodeInt());
         holder.itemView.setTag(p);
     }
 
@@ -80,7 +81,7 @@ public class PestsAdapter  extends RecyclerView.Adapter<PestsAdapter.PestsViewHo
     }
 
     public class PestsViewHolder extends RecyclerView.ViewHolder {
-        private TextView tvDeviceId,tv_treeWalk,tv_town,tv_village,tv_operator,tv_db,tv_xb,tv_position_error,tv_bag_number,tv_pests_type,tv_stime,tv_longitude,tv_latitude;
+        private TextView tvDeviceId,tv_treeWalk,tv_town,tv_village,tv_operator,tv_db,tv_xb,tv_position_error,tv_bag_number,tv_pests_type,tv_stime,tv_longitude,tv_latitude,tvPestsCodeInt;
         private Switch swUpdate;
 
         public PestsViewHolder(@NonNull View itemView) {
@@ -88,17 +89,18 @@ public class PestsAdapter  extends RecyclerView.Adapter<PestsAdapter.PestsViewHo
             this.swUpdate = itemView.findViewById(R.id.myjob_card_update);
             this.tvDeviceId = itemView.findViewById(R.id.myjob_card_deviceId);
             this.tv_treeWalk = itemView.findViewById(R.id.myjob_card_count);
-            this.tv_town = itemView.findViewById(R.id.myjob_card_town);
-            this.tv_village = itemView.findViewById(R.id.myjob_card_village);
+//            this.tv_town = itemView.findViewById(R.id.myjob_card_town);
+//            this.tv_village = itemView.findViewById(R.id.myjob_card_village);
             this.tv_operator = itemView.findViewById(R.id.myjob_card_operator);
-            this.tv_db = itemView.findViewById(R.id.myjob_card_db);
-            this.tv_xb = itemView.findViewById(R.id.myjob_card_xb);
-            this.tv_position_error = itemView.findViewById(R.id.myjob_card_position_error);
+//            this.tv_db = itemView.findViewById(R.id.myjob_card_db);
+//            this.tv_xb = itemView.findViewById(R.id.myjob_card_xb);
+//            this.tv_position_error = itemView.findViewById(R.id.myjob_card_position_error);
             this.tv_bag_number = itemView.findViewById(R.id.myjob_card_remark);
             this.tv_pests_type = itemView.findViewById(R.id.myjob_card_lure_replace);
             this.tv_stime = itemView.findViewById(R.id.myjob_card_stime);
-            this.tv_longitude = itemView.findViewById(R.id.myjob_card_longitude);
-            this.tv_latitude = itemView.findViewById(R.id.myjob_card_latitude);
+//            this.tv_longitude = itemView.findViewById(R.id.myjob_card_longitude);
+//            this.tv_latitude = itemView.findViewById(R.id.myjob_card_latitude);
+            this.tvPestsCodeInt = itemView.findViewById(R.id.tv_pests_code_int);
         }
     }
 }

@@ -15,6 +15,7 @@ import com.aiton.pestscontrolandroid.AppConstance;
 import com.aiton.pestscontrolandroid.data.persistence.Pests;
 import com.aiton.pestscontrolandroid.data.persistence.PestsRepository;
 import com.aiton.pestscontrolandroid.service.RetrofitUtil;
+import com.google.gson.internal.LinkedTreeMap;
 
 import java.util.List;
 import java.util.Map;
@@ -32,7 +33,49 @@ public class PestsViewModel extends AndroidViewModel {
     public MutableLiveData<Integer> getProgress() {
         return progress;
     }
+    private MutableLiveData<Integer> codeInt = new MutableLiveData<>();
 
+    public MutableLiveData<Integer> getCodeInt() {
+        return codeInt;
+    }
+    public void updateCodeInt(String codeNumber){
+        RetrofitUtil.getInstance().getQrcodeService().getQrcode(codeNumber)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new io.reactivex.rxjava3.core.Observer<Result>() {
+                    Disposable disposable;
+
+                    @Override
+                    public void onSubscribe(@io.reactivex.rxjava3.annotations.NonNull Disposable d) {
+                        disposable = d;
+                    }
+
+                    @Override
+                    public void onNext(@io.reactivex.rxjava3.annotations.NonNull Result result) {
+                        if (result.getSuccess()) {
+                            LinkedTreeMap ltm = (LinkedTreeMap) result.getData().get("teacher");
+                            if (ltm != null) {
+                                Double codeint = (Double) ltm.get("codeInt");
+                                int codeIntInt = codeint.intValue();
+                                getCodeInt().setValue(codeIntInt);
+                            }else {
+                                getCodeInt().setValue(0);
+                            }
+                            Log.e(AppConstance.TAG, "onNext: " + result.toString());
+                        }
+                    }
+
+                    @Override
+                    public void onError(@io.reactivex.rxjava3.annotations.NonNull Throwable e) {
+                        disposable.dispose();
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+    }
     public void uploadServer(PestsModel pestsModel) {
         RetrofitUtil.getInstance().getPestsService().savePests(pestsModel)
                 .subscribeOn(Schedulers.io())
