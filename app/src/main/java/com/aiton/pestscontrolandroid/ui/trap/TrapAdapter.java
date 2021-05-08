@@ -64,7 +64,7 @@ public class TrapAdapter extends RecyclerView.Adapter<TrapAdapter.TrapViewHolder
 //        holder.trap_card_xb.setText(String.valueOf(p.getXb()));
 //        holder.trap_card_position_error.setText(String.valueOf(p.getPositionError()));
         holder.trap_card_remark.setText(p.getRemark());
-        if (p.getLureReplaced() == 0){
+        if (p.getLureReplaced() == 1){
             holder.trap_card_lure_replace.setText("已换芯");
         }else{
             holder.trap_card_lure_replace.setText("没换芯");

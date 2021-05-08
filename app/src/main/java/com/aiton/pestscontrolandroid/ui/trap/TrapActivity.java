@@ -53,9 +53,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 
-import cn.com.qiter.pests.PestsModel;
-import cn.com.qiter.pests.TrapModel;
-import cn.com.qiter.pests.UcenterMemberModel;
+import cn.com.qiter.common.ordervo.UcenterMemberOrder;
+import cn.com.qiter.common.vo.PestsTrapModel;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 
@@ -155,7 +154,7 @@ public class TrapActivity extends AppCompatActivity {
                 }
             }
         });
-        TrapModel model = (TrapModel) getIntent().getSerializableExtra(AppConstance.TRAPMODEL);
+        PestsTrapModel model = (PestsTrapModel) getIntent().getSerializableExtra(AppConstance.TRAPMODEL);
         etQrcode.setText(model.getQrcode());
 //        trapViewModel.getCodeInt().observe(this, new Observer<Integer>() {
 //            @Override
@@ -197,7 +196,7 @@ public class TrapActivity extends AppCompatActivity {
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                UcenterMemberModel userModel = SPUtil.builder(getApplication().getApplicationContext(), AppConstance.APP_SP).getData(AppConstance.UCENTER_MEMBER_MODEL, UcenterMemberModel.class);
+                UcenterMemberOrder userModel = SPUtil.builder(getApplication().getApplicationContext(), AppConstance.APP_SP).getData(AppConstance.UCENTER_MEMBER_MODEL, UcenterMemberOrder.class);
                 Trap trap = new Trap();
                 trap.setDeviceId(userModel.getNickname());
                 trap.setDb(fam.get(AppConstance.DBH));

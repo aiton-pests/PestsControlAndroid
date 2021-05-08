@@ -31,8 +31,7 @@ import com.aiton.pestscontrolandroid.utils.SPUtil;
 import com.google.android.material.snackbar.Snackbar;
 
 import cn.com.qiter.common.Result;
-import cn.com.qiter.pests.UcenterMemberModel;
-import cn.com.qiter.pests.UserModel;
+import cn.com.qiter.common.ordervo.UcenterMemberOrder;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -61,9 +60,9 @@ public class LoginActivity extends AppCompatActivity {
 //        uuu.setMobile("159591184055");
 //        loginViewModel.getLoginResult().setValue(uuu);
         ////用户无登陆测试使用  end
-        loginViewModel.getLoginResult().observe(this, new Observer<UcenterMemberModel>() {
+        loginViewModel.getLoginResult().observe(this, new Observer<UcenterMemberOrder>() {
             @Override
-            public void onChanged(UcenterMemberModel model) {
+            public void onChanged(UcenterMemberOrder model) {
                 if (model == null) {
                     //Snackbar.make(getApplication().getApplicationContext().get, getResources().getString(R.string.invalid_username), Snackbar.LENGTH_LONG).setAction("Action", null).show();
                     Toast.makeText(getApplicationContext(),getResources().getString(R.string.invalid_username),Toast.LENGTH_SHORT).show();
@@ -128,7 +127,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void initLoginStatus() {
-        UcenterMemberModel loggedInUser = SPUtil.builder(this.getApplicationContext(), AppConstance.APP_SP).getData(AppConstance.UCENTER_MEMBER_MODEL, UcenterMemberModel.class);
+        UcenterMemberOrder loggedInUser = SPUtil.builder(this.getApplicationContext(), AppConstance.APP_SP).getData(AppConstance.UCENTER_MEMBER_MODEL, UcenterMemberOrder.class);
         if (loggedInUser !=null){
             loginViewModel.getLoginResult().setValue(loggedInUser);
         }

@@ -26,8 +26,9 @@ import java.io.File;
 import java.util.List;
 
 import cn.com.qiter.common.Result;
-import cn.com.qiter.pests.TrapModel;
+import cn.com.qiter.common.vo.PestsTrapModel;
 import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.disposables.Disposable;
@@ -197,7 +198,7 @@ public class TrayJobActivity extends AppCompatActivity {
                 traps) {
             count ++;
             Log.e(TAG, "服务器数据上传一条: " + p.toString());
-            TrapModel model = new TrapModel();
+            PestsTrapModel model = new PestsTrapModel();
             model.setQrcode(p.getQrcode());
             model.setAppId(p.getId());
             model.setLureReplaced(p.getLureReplaced());

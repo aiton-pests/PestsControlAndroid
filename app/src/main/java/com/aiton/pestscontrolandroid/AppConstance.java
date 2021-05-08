@@ -51,8 +51,8 @@ public class AppConstance {
     public static final String LATIDUTE = "LATIDUTE";
 
     // https://8222.qiter.com.cn/
-    // http://testpests.qiter.com.cn:9000/
-    public static final String URL_APP = "https://8222.qiter.com.cn/";
+    //https://peststest.cn.utools.club
+    public static final String URL_APP = "https://peststest.cn.utools.club/";
     public static final String URL_PESTS_SAVE = "educenter/pests/addPestsControl";
     public static final String URL_PESTS_FINDALL_CALL = "educenter/pests/findAll/call";
     public static final String URL_PESTS_FINDALL = "educenter/pests/findAll";

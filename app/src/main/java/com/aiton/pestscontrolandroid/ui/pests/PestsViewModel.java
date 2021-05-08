@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import cn.com.qiter.common.Result;
-import cn.com.qiter.pests.PestsModel;
+import cn.com.qiter.common.vo.PestsControlModel;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
@@ -76,7 +76,7 @@ public class PestsViewModel extends AndroidViewModel {
                     }
                 });
     }
-    public void uploadServer(PestsModel pestsModel) {
+    public void uploadServer(PestsControlModel pestsModel) {
         RetrofitUtil.getInstance().getPestsService().savePests(pestsModel)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

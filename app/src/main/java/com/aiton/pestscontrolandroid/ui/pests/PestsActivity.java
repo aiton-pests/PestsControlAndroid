@@ -59,8 +59,9 @@ import java.util.Locale;
 import java.util.Random;
 
 import cn.com.qiter.common.Result;
-import cn.com.qiter.pests.PestsModel;
-import cn.com.qiter.pests.UcenterMemberModel;
+
+import cn.com.qiter.common.ordervo.UcenterMemberOrder;
+import cn.com.qiter.common.vo.PestsControlModel;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -491,7 +492,7 @@ public class PestsActivity extends AppCompatActivity {
 //                }
 //            }
 //        });
-        PestsModel pestsModel = (PestsModel) getIntent().getSerializableExtra(AppConstance.PESTSMODEL);
+        PestsControlModel pestsModel = (PestsControlModel) getIntent().getSerializableExtra(AppConstance.PESTSMODEL);
         etQrcode.setText(pestsModel.getQrcode());
 //        if (!StrUtil.isNullOrUndefined(pestsModel.getQrcode()) && !StrUtil.isEmpty(pestsModel.getQrcode())){
 //            pestsViewModel.updateCodeInt(pestsModel.getQrcode());
@@ -525,7 +526,7 @@ public class PestsActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View view) {
-                UcenterMemberModel userModel = SPUtil.builder(getApplication().getApplicationContext(), AppConstance.APP_SP).getData(AppConstance.UCENTER_MEMBER_MODEL, UcenterMemberModel.class);
+                UcenterMemberOrder userModel = SPUtil.builder(getApplication().getApplicationContext(), AppConstance.APP_SP).getData(AppConstance.UCENTER_MEMBER_MODEL, UcenterMemberOrder.class);
                 Pests pests = new Pests();
                 pests.setDeviceId(userModel.getNickname());
                 pests.setDb(fam.get(AppConstance.DBH));

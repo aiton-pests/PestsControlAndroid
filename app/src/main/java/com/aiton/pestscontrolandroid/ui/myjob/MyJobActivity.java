@@ -36,8 +36,9 @@ import java.io.File;
 import java.util.List;
 
 import cn.com.qiter.common.Result;
-import cn.com.qiter.pests.PestsModel;
+import cn.com.qiter.common.vo.PestsControlModel;
 import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.disposables.Disposable;
@@ -209,7 +210,7 @@ public class MyJobActivity extends AppCompatActivity {
             pestsViewModel.update(p);
 
             Log.e(TAG, "服务器数据上传一条: " + pests.toString());
-            PestsModel pestsModel = new PestsModel();
+            PestsControlModel pestsModel = new PestsControlModel();
             pestsModel.setQrcode(p.getQrcode());
             pestsModel.setAppId(p.getId());
             pestsModel.setBagNumber(p.getBagNumber());

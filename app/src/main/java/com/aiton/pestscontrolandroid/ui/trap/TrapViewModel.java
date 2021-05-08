@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.com.qiter.common.Result;
-import cn.com.qiter.pests.TrapModel;
+import cn.com.qiter.common.vo.PestsTrapModel;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
@@ -122,7 +122,7 @@ public class TrapViewModel extends AndroidViewModel {
         return trapMutableLiveData;
     }
 
-    public void uploadServer(TrapModel model) {
+    public void uploadServer(PestsTrapModel model) {
         RetrofitUtil.getInstance().getTrapService().save(model)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

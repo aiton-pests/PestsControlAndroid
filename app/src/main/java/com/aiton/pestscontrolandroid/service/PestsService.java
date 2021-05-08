@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import cn.com.qiter.common.Result;
-import cn.com.qiter.pests.PestsModel;
+import cn.com.qiter.common.vo.PestsControlModel;
 import io.reactivex.rxjava3.core.Observable;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -36,7 +36,7 @@ public interface PestsService {
 
     // @FormUrlEncoded
     @POST(AppConstance.URL_PESTS_SAVE)
-    Observable<Result> savePests(@Body PestsModel domain);
+    Observable<Result> savePests(@Body PestsControlModel domain);
 
     /**
      * 获取节点 使用rxjava

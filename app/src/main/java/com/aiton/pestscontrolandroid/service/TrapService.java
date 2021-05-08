@@ -3,8 +3,7 @@ package com.aiton.pestscontrolandroid.service;
 import com.aiton.pestscontrolandroid.AppConstance;
 
 import cn.com.qiter.common.Result;
-import cn.com.qiter.pests.PestsModel;
-import cn.com.qiter.pests.TrapModel;
+import cn.com.qiter.common.vo.PestsTrapModel;
 import io.reactivex.rxjava3.core.Observable;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -39,6 +38,6 @@ public interface TrapService {
 
     // @FormUrlEncoded
     @POST(AppConstance.URL_TRAP_SAVE)
-    Observable<Result> save(@Body TrapModel domain);
+    Observable<Result> save(@Body PestsTrapModel domain);
 
 }

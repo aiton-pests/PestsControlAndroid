@@ -10,10 +10,11 @@ import androidx.lifecycle.MutableLiveData;
 import com.aiton.pestscontrolandroid.AppConstance;
 import com.aiton.pestscontrolandroid.utils.SPUtil;
 
-import cn.com.qiter.pests.UcenterMemberModel;
+import cn.com.qiter.common.ordervo.UcenterMemberOrder;
+
 
 public class MeViewModel extends AndroidViewModel {
-    private MutableLiveData<UcenterMemberModel> mutableLiveData;
+    private MutableLiveData<UcenterMemberOrder> mutableLiveData;
     private MutableLiveData<Boolean> isTest;
 
     ///天地图或ArcGIS地图
@@ -38,14 +39,14 @@ public class MeViewModel extends AndroidViewModel {
             }
         }
         if (mutableLiveData == null){
-            UcenterMemberModel umm = SPUtil.builder(getApplication(), AppConstance.APP_SP).getData(AppConstance.UCENTER_MEMBER_MODEL, UcenterMemberModel.class);
+            UcenterMemberOrder umm = SPUtil.builder(getApplication(), AppConstance.APP_SP).getData(AppConstance.UCENTER_MEMBER_MODEL, UcenterMemberOrder.class);
             mutableLiveData = new MutableLiveData<>();
             if (umm != null)
                 mutableLiveData.setValue(umm);
         }
     }
 
-    public MutableLiveData<UcenterMemberModel> getMutableLiveData() {
+    public MutableLiveData<UcenterMemberOrder> getMutableLiveData() {
         return mutableLiveData;
     }
 

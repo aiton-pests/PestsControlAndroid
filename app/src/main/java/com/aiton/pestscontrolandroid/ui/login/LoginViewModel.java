@@ -17,8 +17,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.internal.LinkedTreeMap;
 
 import cn.com.qiter.common.Result;
-import cn.com.qiter.pests.UcenterMemberModel;
-import cn.com.qiter.pests.UserModel;
+import cn.com.qiter.common.ordervo.UcenterMemberOrder;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.Disposable;
@@ -28,7 +27,7 @@ import static com.aiton.pestscontrolandroid.AppConstance.TAG;
 
 public class LoginViewModel extends AndroidViewModel {
 
-    private MutableLiveData<UcenterMemberModel> loginResult = new MutableLiveData<>();
+    private MutableLiveData<UcenterMemberOrder> loginResult = new MutableLiveData<>();
     private MutableLiveData<Result> result = new MutableLiveData<>();
     SavedStateHandle handle;
 
@@ -40,7 +39,7 @@ public class LoginViewModel extends AndroidViewModel {
         return result;
     }
 
-    public MutableLiveData<UcenterMemberModel> getLoginResult() {
+    public MutableLiveData<UcenterMemberOrder> getLoginResult() {
         return loginResult;
     }
 
@@ -79,9 +78,9 @@ public class LoginViewModel extends AndroidViewModel {
                                             if (result.getSuccess()){
                                                 Log.e(TAG, "onNext: " + result.toString() );
                                                 LinkedTreeMap ltm = (LinkedTreeMap) result.getData().get("userInfo");
-                                                Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
+                                                Gson gson = new GsonBuilder().enableComplexMapKeySerialization().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
                                                 String jsonString = gson.toJson(ltm);
-                                                UcenterMemberModel umm = gson.fromJson(jsonString,UcenterMemberModel.class);
+                                                UcenterMemberOrder umm = gson.fromJson(jsonString,UcenterMemberOrder.class);
 //                                                umm.setMobile(ltm.get("mobile").toString());
 //                                                umm.setPassword(ltm.get("password").toString());
 //                                                umm.setAge(((Double)ltm.get("age")).intValue());
@@ -199,7 +198,7 @@ public class LoginViewModel extends AndroidViewModel {
 
     public void logout() {
         loginResult.setValue(null);
-        UcenterMemberModel umm = SPUtil.builder(getApplication().getApplicationContext(), AppConstance.APP_SP).getData(AppConstance.UCENTER_MEMBER_MODEL, UcenterMemberModel.class);
+        UcenterMemberOrder umm = SPUtil.builder(getApplication().getApplicationContext(), AppConstance.APP_SP).getData(AppConstance.UCENTER_MEMBER_MODEL, UcenterMemberOrder.class);
         if (umm != null){
             SPUtil.builder(getApplication().getApplicationContext(), AppConstance.APP_SP).removeData(AppConstance.UCENTER_MEMBER_MODEL);
         }

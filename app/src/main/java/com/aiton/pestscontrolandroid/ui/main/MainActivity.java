@@ -106,8 +106,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-import cn.com.qiter.pests.PestsModel;
-import cn.com.qiter.pests.TrapModel;
+import cn.com.qiter.common.vo.PestsControlModel;
+import cn.com.qiter.common.vo.PestsTrapModel;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
@@ -759,7 +759,7 @@ public class MainActivity extends AppCompatActivity {
                     String qrcode = ((HmsScan) obj).getOriginalValue();
                     if (StrUtil.contains(qrcode,"trap")){
                         Intent intent = new Intent(MainActivity.this, TrapActivity.class);
-                        TrapModel trap = new TrapModel();
+                        PestsTrapModel trap = new PestsTrapModel();
                         String resultQrcode = StrUtil.subAfter(qrcode, "=", true);
                         trap.setQrcode(resultQrcode);
                         HashMap<String, String> map = (HashMap<String, String>) mainViewModel.getMap();
@@ -768,7 +768,7 @@ public class MainActivity extends AppCompatActivity {
                         startActivity(intent);
                     } else {
                         Intent intent = new Intent(MainActivity.this, PestsActivity.class);
-                        PestsModel pests = new PestsModel();
+                        PestsControlModel pests = new PestsControlModel();
                         String resultQrcode = StrUtil.subAfter(qrcode, "=", true);
                         pests.setQrcode(resultQrcode);
                         HashMap<String, String> map = (HashMap<String, String>) mainViewModel.getMap();

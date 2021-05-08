@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import cn.com.qiter.common.Result;
-import cn.com.qiter.pests.PestsModel;
+import cn.com.qiter.common.vo.PestsControlModel;
 import cn.hutool.core.date.DateTime;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.disposables.Disposable;
@@ -58,12 +58,12 @@ public class MainViewModel extends AndroidViewModel {
         this.loadedShp = loadedShp;
     }
 
-    private MutableLiveData<PestsModel> pestsModelMutableLiveData;
+    private MutableLiveData<PestsControlModel> pestsModelMutableLiveData;
     SavedStateHandle handle;
 
     private MutableLiveData<HashMap<String, Object>> selectedFeatureAttribute;
 
-    public MutableLiveData<PestsModel> getPestsModelMutableLiveData() {
+    public MutableLiveData<PestsControlModel> getPestsModelMutableLiveData() {
         return pestsModelMutableLiveData;
     }
 
@@ -89,11 +89,11 @@ public class MainViewModel extends AndroidViewModel {
         pestsModelMutableLiveData = new MutableLiveData<>();
     }
 
-    public void setPests2Handle(PestsModel pestsModel) {
+    public void setPests2Handle(PestsControlModel pestsModel) {
         handle.set(PESTS_HANDLE, pestsModel);
     }
 
-    public PestsModel getPests2Handle() {
+    public PestsControlModel getPests2Handle() {
         if (handle.contains(PESTS_HANDLE)) {
             return handle.get(PESTS_HANDLE);
         } else {

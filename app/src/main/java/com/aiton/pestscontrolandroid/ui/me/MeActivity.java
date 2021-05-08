@@ -35,7 +35,7 @@ import com.bumptech.glide.request.RequestOptions;
 
 import java.util.List;
 
-import cn.com.qiter.pests.UcenterMemberModel;
+import cn.com.qiter.common.ordervo.UcenterMemberOrder;
 import jp.wasabeef.glide.transformations.BlurTransformation;
 import jp.wasabeef.glide.transformations.CropCircleTransformation;
 import jp.wasabeef.glide.transformations.GrayscaleTransformation;
@@ -100,9 +100,9 @@ public class MeActivity extends AppCompatActivity {
                 logout();
             }
         });
-        meViewModel.getMutableLiveData().observe(this, new Observer<UcenterMemberModel>() {
+        meViewModel.getMutableLiveData().observe(this, new Observer<UcenterMemberOrder>() {
             @Override
-            public void onChanged(UcenterMemberModel model) {
+            public void onChanged(UcenterMemberOrder model) {
                 if (model != null)
                     initMember(model);
             }
@@ -137,7 +137,7 @@ public class MeActivity extends AppCompatActivity {
                     Log.e("PESTS", "onClick: " + op );
                 }
 
-                UcenterMemberModel loggedInUser = SPUtil.builder(getApplicationContext(), AppConstance.APP_SP).getData(AppConstance.UCENTER_MEMBER_MODEL, UcenterMemberModel.class);
+                UcenterMemberOrder loggedInUser = SPUtil.builder(getApplicationContext(), AppConstance.APP_SP).getData(AppConstance.UCENTER_MEMBER_MODEL, UcenterMemberOrder.class);
                 if (loggedInUser != null){
                     Log.e(AppConstance.TAG_ME, "UcenterMemberModel: " + loggedInUser.toString() );
                     Toast.makeText(getApplicationContext(),loggedInUser.toString(),Toast.LENGTH_LONG).show();
@@ -164,7 +164,7 @@ public class MeActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private void initMember(UcenterMemberModel umm) {
+    private void initMember(UcenterMemberOrder umm) {
         RequestOptions options = new RequestOptions()
                 .circleCrop();
         RequestOptions backOptions = new RequestOptions()
