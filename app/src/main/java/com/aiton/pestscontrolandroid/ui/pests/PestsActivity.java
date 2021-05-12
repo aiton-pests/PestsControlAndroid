@@ -369,7 +369,7 @@ public class PestsActivity extends AppCompatActivity {
         if (operators != null){
             return operators;
         }else{
-            String name = "lrh鲁仁华";
+            String name = "鲁仁华";
             List<String> list = new ArrayList<>();
             list.add(name);
             setDataSource(name);
@@ -433,7 +433,7 @@ public class PestsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pests);
-        etPestsCodeInt = findViewById(R.id.et_pests_code_int_it);
+        etQrcode = findViewById(R.id.et_pests_qrcode);
         pestsViewModel = new ViewModelProvider(this).get(PestsViewModel.class);
         ivAddOperator = findViewById(R.id.iv_add_operator);
         acOperator = findViewById(R.id.ac_operator);
@@ -447,7 +447,7 @@ public class PestsActivity extends AppCompatActivity {
         ibFellPic = findViewById(R.id.ib_fell_pic);
         ibStumpPic = findViewById(R.id.ib_stump_pic);
         ibFinishPic = findViewById(R.id.ib_finish_pic);
-        etQrcode = findViewById(R.id.et_qrcode);
+        etPestsCodeInt = findViewById(R.id.et_code_int);
         etVillage = findViewById(R.id.et_village);
         etTown = findViewById(R.id.et_town);
         etDb = findViewById(R.id.et_db);
@@ -479,24 +479,24 @@ public class PestsActivity extends AppCompatActivity {
                 }
             }
         });
-//        pestsViewModel.getCodeInt().observe(this, new Observer<Integer>() {
-//            @Override
-//            public void onChanged(Integer integer) {
-//                if (integer != null){
-//                    if (integer.compareTo(0) ==0){
-//                        Toast.makeText(getApplicationContext(),"二维码不存在，请联系管理员！",Toast.LENGTH_SHORT).show();
-//                    }else {
-//                        etPestsCodeInt.setText(String.valueOf(integer));
-//                    }
-//
-//                }
-//            }
-//        });
+        pestsViewModel.getCodeInt().observe(this, new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer integer) {
+                if (integer != null){
+                    if (integer.compareTo(0) ==0){
+                        Toast.makeText(getApplicationContext(),"二维码不存在，请联系管理员！",Toast.LENGTH_SHORT).show();
+                    }else {
+                        etPestsCodeInt.setText(String.valueOf(integer));
+                    }
+
+                }
+            }
+        });
         PestsControlModel pestsModel = (PestsControlModel) getIntent().getSerializableExtra(AppConstance.PESTSMODEL);
         etQrcode.setText(pestsModel.getQrcode());
-//        if (!StrUtil.isNullOrUndefined(pestsModel.getQrcode()) && !StrUtil.isEmpty(pestsModel.getQrcode())){
-//            pestsViewModel.updateCodeInt(pestsModel.getQrcode());
-//        }
+        if (!StrUtil.isNullOrUndefined(pestsModel.getQrcode()) && !StrUtil.isEmpty(pestsModel.getQrcode())){
+            pestsViewModel.updateCodeInt(pestsModel.getQrcode());
+        }
         HashMap<String,String> fam = (HashMap<String, String>) getIntent().getSerializableExtra(AppConstance.FEATURE_ATTRIBUTE_MAP);
         etDb.setText(fam.get(AppConstance.DBH));
         etXb.setText(fam.get(AppConstance.XBH));

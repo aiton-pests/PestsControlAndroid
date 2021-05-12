@@ -29,16 +29,10 @@ import com.aiton.pestscontrolandroid.ui.main.MainActivity;
 import com.aiton.pestscontrolandroid.ui.main.MainViewModel;
 import com.aiton.pestscontrolandroid.ui.pests.PestsViewModel;
 import com.aiton.pestscontrolandroid.utils.SPUtil;
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.bitmap.CenterCrop;
-import com.bumptech.glide.request.RequestOptions;
 
 import java.util.List;
 
 import cn.com.qiter.common.ordervo.UcenterMemberOrder;
-import jp.wasabeef.glide.transformations.BlurTransformation;
-import jp.wasabeef.glide.transformations.CropCircleTransformation;
-import jp.wasabeef.glide.transformations.GrayscaleTransformation;
 
 public class MeActivity extends AppCompatActivity {
     MeViewModel meViewModel ;
@@ -54,12 +48,11 @@ public class MeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_me);
-        blurImageView = findViewById(R.id.h_back);
         avatarImageView = findViewById(R.id.h_head);
         swTiandi = findViewById(R.id.sw_tiandi);
         swDisabled = findViewById(R.id.sw_disabled);
         swAbout = findViewById(R.id.sw_about);
-        tvMobile = findViewById(R.id.user_val);
+        tvMobile = findViewById(R.id.mobile);
         tvNickname = findViewById(R.id.user_name);
         swTest = findViewById(R.id.sw_test);
         btnLogout = findViewById(R.id.btn_logout);
@@ -165,17 +158,17 @@ public class MeActivity extends AppCompatActivity {
     }
 
     private void initMember(UcenterMemberOrder umm) {
-        RequestOptions options = new RequestOptions()
-                .circleCrop();
-        RequestOptions backOptions = new RequestOptions()
-                .transforms(new BlurTransformation(), new GrayscaleTransformation());
-        Glide.with(this).load("https://pestscontrol.oss-cn-hangzhou.aliyuncs.com/sys/blurImageView.jpg")
-                .apply(backOptions)
-                .into(blurImageView);
-
-        Glide.with(this).load(umm.getAvatar())
-                .apply(options)
-                .into(avatarImageView);
+//        RequestOptions options = new RequestOptions()
+//                .circleCrop();
+//        RequestOptions backOptions = new RequestOptions()
+//                .transforms(new BlurTransformation(), new GrayscaleTransformation());
+//        Glide.with(this).load("https://pestscontrol.oss-cn-hangzhou.aliyuncs.com/sys/blurImageView.jpg")
+//                .apply(backOptions)
+//                .into(blurImageView);
+//
+//        Glide.with(this).load(umm.getAvatar())
+//                .apply(options)
+//                .into(avatarImageView);
         tvMobile.setText(umm.getMobile());
         tvNickname.setText(umm.getNickname());
 //        etNickname.setText(umm.getNickname());

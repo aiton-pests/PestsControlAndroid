@@ -7,42 +7,39 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.app.ProgressDialog;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.aiton.pestscontrolandroid.AppConstance;
 import com.aiton.pestscontrolandroid.R;
-import com.aiton.pestscontrolandroid.data.model.ShpFile;
+import com.aiton.pestscontrolandroid.data.model.PestsParcelable;
 import com.aiton.pestscontrolandroid.data.persistence.Pests;
+import com.aiton.pestscontrolandroid.data.persistence.Trap;
 import com.aiton.pestscontrolandroid.service.OssService;
 import com.aiton.pestscontrolandroid.service.RetrofitUtil;
+import com.aiton.pestscontrolandroid.service.UploadPestsService;
 import com.aiton.pestscontrolandroid.ui.pests.PestsViewModel;
-import com.aiton.pestscontrolandroid.ui.setting.ShpAdapter;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import cn.com.qiter.common.Result;
 import cn.com.qiter.common.vo.PestsControlModel;
 import cn.hutool.core.date.DateTime;
-import cn.hutool.core.date.DateUtil;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
+import kotlinx.coroutines.Job;
 
 public class MyJobActivity extends AppCompatActivity {
     private static final String TAG = "MyJobActivity";
@@ -55,6 +52,7 @@ public class MyJobActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_job);
+        initOss();
 //        registerReceiver(mHomeKeyEventReceiver, new IntentFilter(Intent.ACTION_CLOSE_SYSTEM_DIALOGS));
         pestsUpdate = findViewById(R.id.pests_update);
         pestsUpdateAgain = findViewById(R.id.pests_update_again);
@@ -80,6 +78,12 @@ public class MyJobActivity extends AppCompatActivity {
                     if (pests.size() != temp) {
                         adapter.notifyDataSetChanged();
                     }
+//                    for (Pests p :
+//                            pests) {
+//                        if (!p.isUpdateServer()) {
+//                            adapter.notifyDataSetChanged();
+//                        }
+//                    }
                 }
             }
         });
@@ -97,6 +101,7 @@ public class MyJobActivity extends AppCompatActivity {
         pestsUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 RetrofitUtil.getInstance().getPestsService().aLive()
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
@@ -131,50 +136,60 @@ public class MyJobActivity extends AppCompatActivity {
         pestsUpdateAgain.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                RetrofitUtil.getInstance().getPestsService().aLive()
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new io.reactivex.rxjava3.core.Observer<Result>() {
-                            Disposable disposable;
-                            @Override
-                            public void onSubscribe(@NonNull Disposable d) {
-                                disposable = d;
-                            }
+                Pests[] traps1 = pestsViewModel.findAllObject();
+                for (Pests t :
+                        traps1) {
+                    Log.e(TAG, "onClick: " + t.toString());
+                }
 
-                            @Override
-                            public void onNext(@NonNull Result result) {
-                                if (result.getSuccess())
-                                    updateServer(true);
-                            }
-
-                            @Override
-                            public void onError(@NonNull Throwable e) {
-
-                                disposable.dispose();
-                                Toast.makeText(getApplicationContext(),"网络异常无法连接服务器！",Toast.LENGTH_SHORT).show();
-                            }
-
-                            @Override
-                            public void onComplete() {
-
-                            }
-                        });
+//                RetrofitUtil.getInstance().getPestsService().aLive()
+//                        .subscribeOn(Schedulers.io())
+//                        .observeOn(AndroidSchedulers.mainThread())
+//                        .subscribe(new io.reactivex.rxjava3.core.Observer<Result>() {
+//                            Disposable disposable;
+//                            @Override
+//                            public void onSubscribe(@NonNull Disposable d) {
+//                                disposable = d;
+//                            }
+//
+//                            @Override
+//                            public void onNext(@NonNull Result result) {
+//                                if (result.getSuccess())
+//                                    updateServer(true);
+//                            }
+//
+//                            @Override
+//                            public void onError(@NonNull Throwable e) {
+//
+//                                disposable.dispose();
+//                                Toast.makeText(getApplicationContext(),"网络异常无法连接服务器！",Toast.LENGTH_SHORT).show();
+//                            }
+//
+//                            @Override
+//                            public void onComplete() {
+//
+//                            }
+//                        });
 
             }
         });
         pestsDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                stopService(new Intent(MyJobActivity.this, UploadPestsService.class));
                 deletePestsByUpdate(true);
             }
         });
     }
-
-    public String ossUpload(File file) {
+    OssService ossService;
+    public void initOss(){
         //初始化OssService类，参数分别是Content，accessKeyId，accessKeySecret，endpoint，bucketName（后4个参数是您自己阿里云Oss中参数）
-        OssService ossService = new OssService(getApplication(), AppConstance.ACCESS_KEY_ID, AppConstance.ACCESS_KEY_SECRET, AppConstance.ENDPOINT, AppConstance.BUCKETNAME);
+        ossService = new OssService(getApplication(), AppConstance.ACCESS_KEY_ID, AppConstance.ACCESS_KEY_SECRET, AppConstance.ENDPOINT, AppConstance.BUCKETNAME);
 //初始化OSSClient
         ossService.initOSSClient();
+    }
+    public String ossUpload(File file) {
+
         String filePath = new DateTime().toString("yyyy/MM/dd");
         String appPath = "app/pests/" + filePath;
         String appFilePath = appPath + "/" + file.getName();
@@ -188,7 +203,7 @@ public class MyJobActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         progressBar2.setProgress((int)progress,true);
-                        Log.e(TAG, "run: " + progress);
+//                        Log.e(TAG, "run: " + progress);
                     }
                 });
             }
@@ -204,54 +219,43 @@ public class MyJobActivity extends AppCompatActivity {
     }
     private void updateServer(boolean isUpdate) {
         Pests[] pests = pestsViewModel.findAllObject(isUpdate);
+        Intent work  = new Intent();
+        ArrayList<PestsParcelable> list = new ArrayList();
+
         for (Pests p :
                 pests) {
+            // UploadPestsService    server side save a new record
+            PestsParcelable parcelable = new PestsParcelable();
+            parcelable.setBagNumber(p.getBagNumber());
+            parcelable.setCodeInt(p.getCodeInt());
+            parcelable.setDb(p.getDb());
+            parcelable.setDeviceId(p.getDeviceId());
+            parcelable.setFellPic(p.getFellPic());
+            parcelable.setFinishPic(p.getFinishPic());
+            parcelable.setId(p.getId());
+            parcelable.setLatitude(p.getLatitude());
+            parcelable.setLongitude(p.getLongitude());
+            parcelable.setOperator(p.getOperator());
+            parcelable.setPestsType(p.getPestsType());
+            parcelable.setPositionError(p.getPositionError());
+            parcelable.setQrcode(p.getQrcode());
+            parcelable.setStime(p.getStime());
+            parcelable.setStumpPic(p.getStumpPic());
+            parcelable.setTown(p.getTown());
+            parcelable.setTreeWalk(p.getTreeWalk());
+            parcelable.setUpdateServer(p.isUpdateServer());
+            parcelable.setUserId(p.getUserId());
+            parcelable.setVillage(p.getVillage());
+            parcelable.setXb(p.getXb());
+            list.add(parcelable);
+//            pestsViewModel.uploadServer(pestsModel);
             p.setUpdateServer(true);
             pestsViewModel.update(p);
-
-            Log.e(TAG, "服务器数据上传一条: " + pests.toString());
-            PestsControlModel pestsModel = new PestsControlModel();
-            pestsModel.setQrcode(p.getQrcode());
-            pestsModel.setAppId(p.getId());
-            pestsModel.setBagNumber(p.getBagNumber());
-            pestsModel.setDb(p.getDb());
-            pestsModel.setXb(p.getXb());
-            pestsModel.setDeviceId(p.getDeviceId());
-            if (p.getFellPic() != null) {
-                File fellpic = new File(p.getFellPic());
-                String filepath = ossUpload(fellpic);
-                pestsModel.setFellPic("http://" + AppConstance.BUCKETNAME + "." + AppConstance.ENDPOINT + "/" + filepath);
-            } else {
-                pestsModel.setFellPic("");
-            }
-
-            if (p.getStumpPic() != null) {
-                File stumpPic = new File(p.getStumpPic());
-                String filepath = ossUpload(stumpPic);
-                pestsModel.setStumpPic("http://" + AppConstance.BUCKETNAME + "." + AppConstance.ENDPOINT + "/" + filepath);
-            } else {
-                pestsModel.setStumpPic("");
-            }
-            if (p.getFinishPic() != null) {
-                File finishPic = new File(p.getFinishPic());
-                String filepath = ossUpload(finishPic);
-                pestsModel.setFinishPic("http://" + AppConstance.BUCKETNAME + "." + AppConstance.ENDPOINT + "/" + filepath);
-            } else {
-                pestsModel.setFinishPic("");
-            }
-            pestsModel.setLatitude(p.getLatitude());
-            pestsModel.setLongitude(p.getLongitude());
-            pestsModel.setOperator(p.getOperator());
-            pestsModel.setPestsType(p.getPestsType());
-            pestsModel.setPositionError(p.getPositionError());
-            pestsModel.setTown(p.getTown());
-            pestsModel.setTreeWalk(p.getTreeWalk());
-            pestsModel.setUserId(p.getUserId());
-            pestsModel.setVillage(p.getVillage());
-            pestsModel.setStime(p.getStime());
-            pestsViewModel.uploadServer(pestsModel);
             Log.e(TAG, "updateServer: " + p.toString());
         }
+        work.putParcelableArrayListExtra("parcelable",list);
+        UploadPestsService.enqueueWork(getApplicationContext(), work);
+        adapter.notifyDataSetChanged();
     }
 
 

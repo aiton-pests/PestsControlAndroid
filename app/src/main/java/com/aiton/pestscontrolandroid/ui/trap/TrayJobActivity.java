@@ -23,6 +23,7 @@ import com.aiton.pestscontrolandroid.service.OssService;
 import com.aiton.pestscontrolandroid.service.RetrofitUtil;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import cn.com.qiter.common.Result;
@@ -117,35 +118,40 @@ public class TrayJobActivity extends AppCompatActivity {
         trapUpdateAgain.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                RetrofitUtil.getInstance().getPestsService().aLive()
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new io.reactivex.rxjava3.core.Observer<Result>() {
-                            Disposable disposable;
-                            @Override
-                            public void onSubscribe(@NonNull Disposable d) {
-                                disposable = d;
-                            }
-
-                            @Override
-                            public void onNext(@NonNull Result result) {
-                                if (result.getSuccess()){
-                                    updateServer(true);
-                                }
-
-                            }
-
-                            @Override
-                            public void onError(@NonNull Throwable e) {
-                                disposable.dispose();
-                                Toast.makeText(getApplicationContext(),"网络异常无法连接服务器！",Toast.LENGTH_SHORT).show();
-                            }
-
-                            @Override
-                            public void onComplete() {
-
-                            }
-                        });
+                Trap[] traps1 = trapViewModel.findAllObject();
+                for (Trap t :
+                        traps1) {
+                    Log.e(TAG, "onClick: " + t.toString());
+                }
+//                RetrofitUtil.getInstance().getPestsService().aLive()
+//                        .subscribeOn(Schedulers.io())
+//                        .observeOn(AndroidSchedulers.mainThread())
+//                        .subscribe(new io.reactivex.rxjava3.core.Observer<Result>() {
+//                            Disposable disposable;
+//                            @Override
+//                            public void onSubscribe(@NonNull Disposable d) {
+//                                disposable = d;
+//                            }
+//
+//                            @Override
+//                            public void onNext(@NonNull Result result) {
+//                                if (result.getSuccess()){
+//                                    updateServer(true);
+//                                }
+//
+//                            }
+//
+//                            @Override
+//                            public void onError(@NonNull Throwable e) {
+//                                disposable.dispose();
+//                                Toast.makeText(getApplicationContext(),"网络异常无法连接服务器！",Toast.LENGTH_SHORT).show();
+//                            }
+//
+//                            @Override
+//                            public void onComplete() {
+//
+//                            }
+//                        });
             }
         });
         trapDelete.setOnClickListener(new View.OnClickListener() {
@@ -174,7 +180,7 @@ public class TrayJobActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         progressBar.setProgress((int)progress,true);
-                        Log.e(TAG, "run: " + progress);
+//                        Log.e(TAG, "run: " + progress);
                     }
                 });
             }
@@ -189,13 +195,17 @@ public class TrayJobActivity extends AppCompatActivity {
         }
     }
     private void updateServer(boolean isUpdate) {
-        Trap[] traps1 = trapViewModel.findAllObject();
-        Trap[] traps = trapViewModel.findAllObject(isUpdate);
-        int size = traps.length;
+        Trap[] traps1 = trapViewModel.findAllObject(isUpdate);
+        List<Trap> traps = new ArrayList<>();
+//        for (int i=1;i<1000;i++){
+//            traps.add(traps1[0]);
+//        }
+//        Log.e(TAG, "#######################: "+traps1.size());
+
 //        progressBar.setMax(size);
         int count = 0;
         for (Trap p :
-                traps) {
+                traps1) {
             count ++;
             Log.e(TAG, "服务器数据上传一条: " + p.toString());
             PestsTrapModel model = new PestsTrapModel();
@@ -237,6 +247,7 @@ public class TrayJobActivity extends AppCompatActivity {
             Log.e(TAG, "updateServer: " + p.toString());
 //            progressBar.setProgress(count,true);
         }
+        Log.e(TAG, "**********************"+count);
     }
 
 

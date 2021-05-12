@@ -54,15 +54,6 @@ android {
 }
 
 dependencies {
-    implementation 'org.conscrypt:conscrypt-openjdk-uber:1.1.3'
-
-    implementation 'jp.wasabeef:glide-transformations:4.3.0'
-    // If you want to use the GPU Filters
-    implementation 'jp.co.cyberagent.android:gpuimage:2.1.0'
-    //图片
-    implementation 'com.github.bumptech.glide:glide:4.12.0'
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.12.0'
-
     implementation 'cn.hutool:hutool-all:5.5.8'
     // CameraX core library using the camera2 implementation
     def camerax_version = "1.0.0-rc01"
@@ -76,53 +67,50 @@ dependencies {
     // If you want to additionally use the CameraX Extensions library
     implementation "androidx.camera:camera-extensions:1.0.0-alpha20"
 
-    implementation 'com.huawei.hms:scan:1.3.0.300'
     def room_version = "2.2.6"
-
     implementation "androidx.room:room-runtime:$room_version"
     annotationProcessor "androidx.room:room-compiler:$room_version"
-
     // optional - RxJava support for Room
     implementation "androidx.room:room-rxjava2:$room_version"
-
     // optional - Guava support for Room, including Optional and ListenableFuture
     implementation "androidx.room:room-guava:$room_version"
-
     // optional - Test helpers
     testImplementation "androidx.room:room-testing:$room_version"
-    implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
     // Because RxAndroid releases are few and far between, it is recommended you also
     // explicitly depend on RxJava's latest version for bug fixes and new features.
     // (see https://github.com/ReactiveX/RxJava/releases for latest 3.x.x version)
     implementation 'io.reactivex.rxjava3:rxjava:3.0.0'
+    implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
     // 文件选择器
     implementation 'com.leon:lfilepickerlibrary:1.8.0'
     implementation 'com.aliyun.dpa:oss-android-sdk:2.9.5'
     // 华为
     implementation 'com.huawei.agconnect:agconnect-core:1.4.2.301'
-    implementation  'com.huawei.agconnect:agconnect-crash:1.4.2.301'
+    implementation 'com.huawei.agconnect:agconnect-crash:1.4.2.301'
     // add the Analytics Kit for Huawei Analytics
     implementation 'com.huawei.hms:hianalytics:5.1.0.300'
+    implementation 'com.huawei.hms:scan:1.3.0.300'
+    implementation 'com.huawei.hms:location:5.0.4.300'
+
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
-    implementation("io.reactivex.rxjava3:rxjava:3.0.4")
-    implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.2.0'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0'
+
     implementation 'com.squareup.retrofit2:adapter-rxjava3:2.9.0'
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:4.7.2'
     // Qiter
+    implementation 'cn.com.qiter:common:1.0-20210507.015520-11'
     implementation 'com.esri.arcgisruntime:arcgis-android:100.8.0'
+
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'com.google.android.material:material:1.1.0'
     implementation 'androidx.annotation:annotation:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.2.0'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0'
-    implementation 'cn.com.qiter:common:1.0-20210507.015520-11'
 
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
-    implementation 'com.huawei.hms:location:5.0.4.300'
 }

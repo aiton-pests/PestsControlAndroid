@@ -4,6 +4,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -41,11 +42,22 @@ public class PestsAdapter  extends RecyclerView.Adapter<PestsAdapter.PestsViewHo
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View view = inflater.inflate(R.layout.activity_my_job_card,parent,false);
         final PestsAdapter.PestsViewHolder viewHolder = new PestsAdapter.PestsViewHolder(view);
+        viewHolder.swUpdate.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked){
+
+                }
+            }
+        });
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Pests p = (Pests) view.getTag();
-
+                boolean isup = p.isUpdateServer();
+                p.setUpdateServer(!isup);
+                viewHolder.swUpdate.setChecked(!isup);
+                pestsViewModel.update(p);
                 Log.e(TAG, "onClick: " + p.toString() );
             }
         });
@@ -72,6 +84,7 @@ public class PestsAdapter  extends RecyclerView.Adapter<PestsAdapter.PestsViewHo
 //        holder.tv_longitude.setText(String.valueOf(p.getLongitude()));
         holder.swUpdate.setChecked(p.isUpdateServer());
         holder.tvPestsCodeInt.setText(p.getCodeInt());
+        holder.myjobCardQrcode.setText(p.getQrcode());
         holder.itemView.setTag(p);
     }
 
@@ -81,7 +94,7 @@ public class PestsAdapter  extends RecyclerView.Adapter<PestsAdapter.PestsViewHo
     }
 
     public class PestsViewHolder extends RecyclerView.ViewHolder {
-        private TextView tvDeviceId,tv_treeWalk,tv_town,tv_village,tv_operator,tv_db,tv_xb,tv_position_error,tv_bag_number,tv_pests_type,tv_stime,tv_longitude,tv_latitude,tvPestsCodeInt;
+        private TextView myjobCardQrcode,tvDeviceId,tv_treeWalk,tv_town,tv_village,tv_operator,tv_db,tv_xb,tv_position_error,tv_bag_number,tv_pests_type,tv_stime,tv_longitude,tv_latitude,tvPestsCodeInt;
         private Switch swUpdate;
 
         public PestsViewHolder(@NonNull View itemView) {
@@ -101,6 +114,7 @@ public class PestsAdapter  extends RecyclerView.Adapter<PestsAdapter.PestsViewHo
 //            this.tv_longitude = itemView.findViewById(R.id.myjob_card_longitude);
 //            this.tv_latitude = itemView.findViewById(R.id.myjob_card_latitude);
             this.tvPestsCodeInt = itemView.findViewById(R.id.tv_pests_code_int);
+            this.myjobCardQrcode = itemView.findViewById(R.id.myjob_card_qrcode);
         }
     }
 }

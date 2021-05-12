@@ -92,6 +92,7 @@ public class PestsViewModel extends AndroidViewModel {
                     public void onNext(@io.reactivex.rxjava3.annotations.NonNull Result result) {
                         if (result.getSuccess()) {
                             progress.setValue(100);
+
                             Log.e(AppConstance.TAG, "onNext: " + result.toString());
                         }
                     }

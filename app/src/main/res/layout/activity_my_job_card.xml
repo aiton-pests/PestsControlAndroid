@@ -63,7 +63,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                app:layout_constraintGuide_percent="0.5" />
+                app:layout_constraintGuide_percent="0.33" />
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guideline14"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintGuide_percent="0.66" />
 
             <TextView
                 android:id="@+id/myjob_card_count"
@@ -90,7 +97,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:text="鲁仁华"
-                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/guideline14"
                 app:layout_constraintStart_toStartOf="@+id/guideline23"
                 app:layout_constraintTop_toTopOf="@+id/guideline16" />
 
@@ -110,7 +117,7 @@
                 android:layout_height="wrap_content"
                 android:text="2021-2-27 23:05:40"
                 android:visibility="visible"
-                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/guideline14"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/guideline16" />
 
@@ -138,9 +145,18 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="8535"
-                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/guideline14"
                 app:layout_constraintEnd_toStartOf="@+id/guideline23"
                 app:layout_constraintTop_toTopOf="@+id/guideline16" />
+
+            <TextView
+                android:id="@+id/myjob_card_qrcode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="dfadfadfdfafdfadsfadfafa"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/guideline14" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

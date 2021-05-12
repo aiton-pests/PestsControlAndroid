@@ -4,6 +4,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -44,11 +45,19 @@ public class TrapAdapter extends RecyclerView.Adapter<TrapAdapter.TrapViewHolder
             @Override
             public void onClick(View view) {
                 Trap p = (Trap) view.getTag();
-
+                boolean isup = p.isUpdateServer();
+                p.setUpdateServer(!isup);
+                viewHolder.trap_card_update.setChecked(!isup);
+                trapViewModel.update(p);
                 Log.e(TAG, "onClick: " + p.toString() );
             }
         });
+        viewHolder.trap_card_update.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
+            }
+        });
         return viewHolder;
     }
 
@@ -64,6 +73,7 @@ public class TrapAdapter extends RecyclerView.Adapter<TrapAdapter.TrapViewHolder
 //        holder.trap_card_xb.setText(String.valueOf(p.getXb()));
 //        holder.trap_card_position_error.setText(String.valueOf(p.getPositionError()));
         holder.trap_card_remark.setText(p.getRemark());
+        holder.trap_card_qrcode.setText(p.getQrcode());
         if (p.getLureReplaced() == 1){
             holder.trap_card_lure_replace.setText("已换芯");
         }else{
@@ -83,11 +93,12 @@ public class TrapAdapter extends RecyclerView.Adapter<TrapAdapter.TrapViewHolder
     }
 
     public class TrapViewHolder extends RecyclerView.ViewHolder {
-        private TextView trap_card_deviceId,trap_card_count,trap_card_town,trap_card_village,trap_card_operator,trap_card_db,trap_card_xb,trap_card_position_error,trap_card_remark,trap_card_lure_replace,trap_card_stime,trap_card_longitude,trap_card_latitude,codeInt;
+        private TextView trap_card_qrcode,trap_card_deviceId,trap_card_count,trap_card_town,trap_card_village,trap_card_operator,trap_card_db,trap_card_xb,trap_card_position_error,trap_card_remark,trap_card_lure_replace,trap_card_stime,trap_card_longitude,trap_card_latitude,codeInt;
         private Switch trap_card_update;
 
         public TrapViewHolder(@NonNull View itemView) {
             super(itemView);
+            this.trap_card_qrcode = itemView.findViewById(R.id.tvqrcode);
             this.codeInt = itemView.findViewById(R.id.tv_trap_code_int);
             this.trap_card_update = itemView.findViewById(R.id.trap_card_update);
             this.trap_card_deviceId = itemView.findViewById(R.id.trap_card_deviceId);

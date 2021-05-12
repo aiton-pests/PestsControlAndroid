@@ -156,21 +156,21 @@ public class TrapActivity extends AppCompatActivity {
         });
         PestsTrapModel model = (PestsTrapModel) getIntent().getSerializableExtra(AppConstance.TRAPMODEL);
         etQrcode.setText(model.getQrcode());
-//        trapViewModel.getCodeInt().observe(this, new Observer<Integer>() {
-//            @Override
-//            public void onChanged(Integer integer) {
-//                if (integer != null){
-//                    if (integer.compareTo(0) == 0){
-//                        Toast.makeText(getApplicationContext(),"二维码不存在，请联系管理员！",Toast.LENGTH_SHORT).show();
-//                    } else {
-//                        etTrapCodeInt.setText(String.valueOf(integer));
-//                    }
-//
-//                }
-//            }
-//        });
+        trapViewModel.getCodeInt().observe(this, new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer integer) {
+                if (integer != null){
+                    if (integer.compareTo(0) == 0){
+                        Toast.makeText(getApplicationContext(),"二维码不存在，请联系管理员！",Toast.LENGTH_SHORT).show();
+                    } else {
+                        etTrapCodeInt.setText(String.valueOf(integer));
+                    }
+
+                }
+            }
+        });
         if (!StrUtil.isNullOrUndefined(model.getQrcode()) && !StrUtil.isEmpty(model.getQrcode())){
-//            trapViewModel.updateCodeInt(model.getQrcode());
+            trapViewModel.updateCodeInt(model.getQrcode());
             trapViewModel.countTrap(model.getQrcode());
         }
         HashMap<String,String> fam = (HashMap<String, String>) getIntent().getSerializableExtra(AppConstance.FEATURE_ATTRIBUTE_MAP);

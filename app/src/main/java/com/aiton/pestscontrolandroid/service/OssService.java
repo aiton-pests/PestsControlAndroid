@@ -75,7 +75,7 @@ public class OssService {
         put.setProgressCallback(new OSSProgressCallback<PutObjectRequest>() {
             @Override
             public void onProgress(PutObjectRequest request, long currentSize, long totalSize) {
-                Log.d(AppConstance.TAG,"currentSize: " + currentSize + " totalSize: " + totalSize);
+//                Log.d(AppConstance.TAG,"currentSize: " + currentSize + " totalSize: " + totalSize);
                 double progress = currentSize * 1.0 / totalSize * 100.f;
 
                 if (progressCallback != null) {
@@ -121,7 +121,6 @@ public class OssService {
         //task.waitUntilFinished(); // 可以等待直到任务完成
 
     }
-
 
     public ProgressCallback getProgressCallback() {
         return progressCallback;
