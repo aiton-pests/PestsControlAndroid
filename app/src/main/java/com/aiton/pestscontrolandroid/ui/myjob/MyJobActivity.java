@@ -26,6 +26,7 @@ import com.aiton.pestscontrolandroid.service.OssService;
 import com.aiton.pestscontrolandroid.service.RetrofitUtil;
 import com.aiton.pestscontrolandroid.service.UploadPestsService;
 import com.aiton.pestscontrolandroid.ui.pests.PestsViewModel;
+import com.meituan.robust.patch.annotaion.Add;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -48,6 +49,13 @@ public class MyJobActivity extends AppCompatActivity {
     PestsAdapter adapter;
     ProgressBar progressBar2;
     private Button pestsUpdate,pestsUpdateAgain,pestsDelete;
+    //add method
+    @Add
+    public String getString() {
+        return "Robust";
+    }
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,12 +86,6 @@ public class MyJobActivity extends AppCompatActivity {
                     if (pests.size() != temp) {
                         adapter.notifyDataSetChanged();
                     }
-//                    for (Pests p :
-//                            pests) {
-//                        if (!p.isUpdateServer()) {
-//                            adapter.notifyDataSetChanged();
-//                        }
-//                    }
                 }
             }
         });
@@ -248,7 +250,6 @@ public class MyJobActivity extends AppCompatActivity {
             parcelable.setVillage(p.getVillage());
             parcelable.setXb(p.getXb());
             list.add(parcelable);
-//            pestsViewModel.uploadServer(pestsModel);
             p.setUpdateServer(true);
             pestsViewModel.update(p);
             Log.e(TAG, "updateServer: " + p.toString());

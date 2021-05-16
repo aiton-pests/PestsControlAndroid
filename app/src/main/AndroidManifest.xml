@@ -23,6 +23,7 @@
         android:required="true" />
 
     <application
+        android:name="com.aiton.pestscontrolandroid.BaseApplication"
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -32,12 +33,18 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PestsControlAndroid"
         tools:replace="android:allowBackup">
+
         <service
             android:name=".service.UploadPestsService"
             android:enabled="true"
             android:permission="android.permission.BIND_JOB_SERVICE"
             android:exported="true"></service>
 
+        <service
+            android:name=".service.UploadTrapService"
+            android:enabled="true"
+            android:permission="android.permission.BIND_JOB_SERVICE"
+            android:exported="true"></service>
         <activity android:name=".ui.trap.TrayJobActivity" />
         <activity android:name=".ui.trap.TrapActivity" />
         <activity android:name=".ui.myjob.MyJobActivity" />

@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -18,9 +19,14 @@ import android.widget.Toast;
 
 import com.aiton.pestscontrolandroid.AppConstance;
 import com.aiton.pestscontrolandroid.R;
+import com.aiton.pestscontrolandroid.data.model.PestsParcelable;
+import com.aiton.pestscontrolandroid.data.model.TrapParcelable;
+import com.aiton.pestscontrolandroid.data.persistence.Pests;
 import com.aiton.pestscontrolandroid.data.persistence.Trap;
 import com.aiton.pestscontrolandroid.service.OssService;
 import com.aiton.pestscontrolandroid.service.RetrofitUtil;
+import com.aiton.pestscontrolandroid.service.UploadPestsService;
+import com.aiton.pestscontrolandroid.service.UploadTrapService;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -65,7 +71,6 @@ public class TrayJobActivity extends AppCompatActivity {
             public void onChanged(Integer integer) {
                 if (integer.compareTo(100) == 0){
                     Toast.makeText(getApplicationContext(),"上传完成",Toast.LENGTH_SHORT).show();
-
                     adapter.notifyDataSetChanged();
                 }
             }
@@ -195,59 +200,45 @@ public class TrayJobActivity extends AppCompatActivity {
         }
     }
     private void updateServer(boolean isUpdate) {
-        Trap[] traps1 = trapViewModel.findAllObject(isUpdate);
-        List<Trap> traps = new ArrayList<>();
-//        for (int i=1;i<1000;i++){
-//            traps.add(traps1[0]);
-//        }
-//        Log.e(TAG, "#######################: "+traps1.size());
+        Trap[] pests = trapViewModel.findAllObject(isUpdate);
+        Intent work  = new Intent();
+        ArrayList<TrapParcelable> list = new ArrayList();
 
-//        progressBar.setMax(size);
-        int count = 0;
         for (Trap p :
-                traps1) {
-            count ++;
-            Log.e(TAG, "服务器数据上传一条: " + p.toString());
-            PestsTrapModel model = new PestsTrapModel();
-            model.setQrcode(p.getQrcode());
-            model.setAppId(p.getId());
-            model.setLureReplaced(p.getLureReplaced());
-            model.setDb(p.getDb());
-            model.setXb(p.getXb());
-            model.setDeviceId(p.getDeviceId());
-            if (p.getPic1() != null) {
-                File pic1 = new File(p.getPic1());
-                String filepath = ossUpload(pic1);
-                model.setPic1("http://" + AppConstance.BUCKETNAME + "." + AppConstance.ENDPOINT + "/" + filepath);
-            } else {
-                model.setPic1("");
-            }
-            if (p.getPic2() != null) {
-                File pic2 = new File(p.getPic2());
-                String filepath = ossUpload(pic2);
-                model.setPic2("http://" + AppConstance.BUCKETNAME + "." + AppConstance.ENDPOINT + "/" + filepath);
-            } else {
-                model.setPic2("");
-            }
-            model.setLatitude(p.getLatitude());
-            model.setLongitude(p.getLongitude());
-            model.setOperator(p.getOperator());
-            model.setRemark(p.getRemark());
-            model.setPositionError(p.getPositionError());
-            model.setTown(p.getTown());
-            model.setScount(p.getScount());
-            model.setUserId(p.getUserId());
-            model.setVillage(p.getVillage());
-            model.setStime(p.getStime());
-
-            trapViewModel.uploadServer(model);
-
+                pests) {
+            //  server side save a new record
+            TrapParcelable parcelable = new TrapParcelable();
+            parcelable.setCodeInt(p.getCodeInt());
+            parcelable.setDb(p.getDb());
+            parcelable.setDeviceId(p.getDeviceId());
+            parcelable.setIsChecked(p.getIsChecked());
+            parcelable.setLatitude(p.getLatitude());
+            parcelable.setLongitude(p.getLongitude());
+            parcelable.setId(p.getId());
+            parcelable.setLureReplaced(p.getLureReplaced());
+            parcelable.setOperator(p.getOperator());
+            parcelable.setPic1(p.getPic1());
+            parcelable.setPic2(p.getPic2());
+            parcelable.setPositionError(p.getPositionError());
+            parcelable.setProjectId(p.getProjectId());
+            parcelable.setQrcode(p.getQrcode());
+            parcelable.setRemark(p.getRemark());
+            parcelable.setScount(p.getScount());
+            parcelable.setStime(p.getStime());
+            parcelable.setTown(p.getTown());
+            parcelable.setUpdateServer(p.isUpdateServer());
+            parcelable.setUserId(p.getUserId());
+            parcelable.setVillage(p.getVillage());
+            parcelable.setXb(p.getXb());
+            list.add(parcelable);
             p.setUpdateServer(true);
             trapViewModel.update(p);
             Log.e(TAG, "updateServer: " + p.toString());
-//            progressBar.setProgress(count,true);
+           // adapter.notifyDataSetChanged();
         }
-        Log.e(TAG, "**********************"+count);
+        work.putParcelableArrayListExtra("parcelable",list);
+        UploadTrapService.enqueueWork(getApplicationContext(), work);
+        adapter.notifyDataSetChanged();
     }
 
 

@@ -43,7 +43,7 @@ public class MeActivity extends AppCompatActivity {
     private ImageView avatarImageView;
     private Switch swDisabled,swTest,swAbout,swTiandi;
     TextView tvMobile,tvNickname;
-    Button btnLogout,btnDisplayTest;
+    Button btnLogout;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,7 +56,6 @@ public class MeActivity extends AppCompatActivity {
         tvNickname = findViewById(R.id.user_name);
         swTest = findViewById(R.id.sw_test);
         btnLogout = findViewById(R.id.btn_logout);
-        btnDisplayTest = findViewById(R.id.btn_display_test);
         swTiandi.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -81,12 +80,6 @@ public class MeActivity extends AppCompatActivity {
             }
         });
 
-        btnDisplayTest.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
         btnLogout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

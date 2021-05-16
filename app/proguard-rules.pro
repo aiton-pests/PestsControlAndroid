@@ -34,17 +34,7 @@
 -dontwarn okio.**
 -dontwarn org.apache.commons.codec.binary.**
 
--keep public class * implements com.bumptech.glide.module.GlideModule
--keep class * extends com.bumptech.glide.module.AppGlideModule {
- <init>(...);
-}
--keep public enum com.bumptech.glide.load.ImageHeaderParser$** {
-  **[] $VALUES;
-  public *;
-}
--keep class com.bumptech.glide.load.data.ParcelFileDescriptorRewinder$InternalRewinder {
-  *** rewind();
-}
+
 #org.conscrypt
 -dontwarn org.conscrypt.**
 -keep class org.conscrypt.** { *; }
@@ -54,5 +44,6 @@
 
 -keep class com.huawei.hms.**{*;}
 
-
-
+-keepclassmembers class **{
+public static com.meituan.robust.ChangeQuickRedirect *;
+}
