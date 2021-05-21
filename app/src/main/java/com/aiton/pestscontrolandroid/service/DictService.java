@@ -1,8 +1,8 @@
 package com.aiton.pestscontrolandroid.service;
 
 import com.aiton.pestscontrolandroid.AppConstance;
+import com.aiton.pestscontrolandroid.data.model.Result;
 
-import cn.com.qiter.common.Result;
 import io.reactivex.rxjava3.core.Observable;
 import retrofit2.http.GET;
 import retrofit2.http.Header;

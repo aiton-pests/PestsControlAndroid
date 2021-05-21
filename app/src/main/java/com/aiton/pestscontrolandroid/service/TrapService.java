@@ -1,9 +1,9 @@
 package com.aiton.pestscontrolandroid.service;
 
 import com.aiton.pestscontrolandroid.AppConstance;
+import com.aiton.pestscontrolandroid.data.model.PestsTrapModel;
+import com.aiton.pestscontrolandroid.data.model.Result;
 
-import cn.com.qiter.common.Result;
-import cn.com.qiter.common.vo.PestsTrapModel;
 import io.reactivex.rxjava3.core.Observable;
 import okhttp3.ResponseBody;
 import retrofit2.Call;

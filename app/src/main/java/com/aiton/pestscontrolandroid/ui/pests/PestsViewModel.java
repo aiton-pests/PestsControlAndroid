@@ -12,6 +12,8 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.SavedStateHandle;
 
 import com.aiton.pestscontrolandroid.AppConstance;
+import com.aiton.pestscontrolandroid.data.model.PestsControlModel;
+import com.aiton.pestscontrolandroid.data.model.Result;
 import com.aiton.pestscontrolandroid.data.persistence.Pests;
 import com.aiton.pestscontrolandroid.data.persistence.PestsRepository;
 import com.aiton.pestscontrolandroid.service.RetrofitUtil;
@@ -19,9 +21,6 @@ import com.google.gson.internal.LinkedTreeMap;
 
 import java.util.List;
 import java.util.Map;
-
-import cn.com.qiter.common.Result;
-import cn.com.qiter.common.vo.PestsControlModel;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;

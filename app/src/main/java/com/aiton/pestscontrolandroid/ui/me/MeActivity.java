@@ -22,6 +22,7 @@ import com.aiton.pestscontrolandroid.AppConstance;
 import com.aiton.pestscontrolandroid.R;
 import com.aiton.pestscontrolandroid.data.model.SettingModel;
 import com.aiton.pestscontrolandroid.data.model.ShpFile;
+import com.aiton.pestscontrolandroid.data.model.UcenterMemberOrder;
 import com.aiton.pestscontrolandroid.data.persistence.Pests;
 import com.aiton.pestscontrolandroid.ui.login.LoginActivity;
 import com.aiton.pestscontrolandroid.ui.login.LoginViewModel;
@@ -32,7 +33,6 @@ import com.aiton.pestscontrolandroid.utils.SPUtil;
 
 import java.util.List;
 
-import cn.com.qiter.common.ordervo.UcenterMemberOrder;
 
 public class MeActivity extends AppCompatActivity {
     MeViewModel meViewModel ;
@@ -168,7 +168,7 @@ public class MeActivity extends AppCompatActivity {
 //        etMobile.setText(umm.getMobile());
 //        etPassword.setText(umm.getPassword());
 //        etGmtModified.setText(umm.getGmtModified());
-        swDisabled.setChecked(umm.getIsDisabled());
+        swDisabled.setChecked(umm.getDeleted());
 
     }
 

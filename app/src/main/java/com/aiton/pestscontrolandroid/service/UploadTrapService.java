@@ -9,6 +9,8 @@ import androidx.core.app.JobIntentService;
 
 import com.aiton.pestscontrolandroid.AppConstance;
 import com.aiton.pestscontrolandroid.data.model.PestsParcelable;
+import com.aiton.pestscontrolandroid.data.model.PestsTrapModel;
+import com.aiton.pestscontrolandroid.data.model.Result;
 import com.aiton.pestscontrolandroid.data.model.TrapParcelable;
 
 import org.jetbrains.annotations.NotNull;
@@ -16,9 +18,6 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.util.ArrayList;
 
-import cn.com.qiter.common.Result;
-import cn.com.qiter.common.vo.PestsControlModel;
-import cn.com.qiter.common.vo.PestsTrapModel;
 import cn.hutool.core.date.DateTime;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.disposables.Disposable;

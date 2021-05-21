@@ -1,7 +1,6 @@
 package com.aiton.pestscontrolandroid.ui.main;
 
 import android.app.Application;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -10,21 +9,11 @@ import androidx.lifecycle.SavedStateHandle;
 
 
 import com.aiton.pestscontrolandroid.AppConstance;
-import com.aiton.pestscontrolandroid.data.persistence.Pests;
-import com.aiton.pestscontrolandroid.service.OssService;
-import com.aiton.pestscontrolandroid.service.RetrofitUtil;
+import com.aiton.pestscontrolandroid.data.model.PestsControlModel;
 
-import java.io.File;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import cn.com.qiter.common.Result;
-import cn.com.qiter.common.vo.PestsControlModel;
-import cn.hutool.core.date.DateTime;
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.disposables.Disposable;
-import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class MainViewModel extends AndroidViewModel {
     public final static String PESTS_HANDLE = "PESTS_HANDLE";

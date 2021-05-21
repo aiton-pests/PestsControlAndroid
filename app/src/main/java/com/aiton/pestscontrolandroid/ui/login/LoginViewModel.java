@@ -10,14 +10,14 @@ import android.util.Log;
 import android.util.Patterns;
 
 import com.aiton.pestscontrolandroid.AppConstance;
+import com.aiton.pestscontrolandroid.data.model.Result;
+import com.aiton.pestscontrolandroid.data.model.UcenterMemberOrder;
 import com.aiton.pestscontrolandroid.service.RetrofitUtil;
 import com.aiton.pestscontrolandroid.utils.SPUtil;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.internal.LinkedTreeMap;
 
-import cn.com.qiter.common.Result;
-import cn.com.qiter.common.ordervo.UcenterMemberOrder;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.Disposable;

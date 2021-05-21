@@ -36,6 +36,8 @@ import android.widget.Toast;
 
 import com.aiton.pestscontrolandroid.AppConstance;
 import com.aiton.pestscontrolandroid.R;
+import com.aiton.pestscontrolandroid.data.model.PestsTrapModel;
+import com.aiton.pestscontrolandroid.data.model.UcenterMemberOrder;
 import com.aiton.pestscontrolandroid.data.persistence.Trap;
 import com.aiton.pestscontrolandroid.ui.main.MainActivity;
 import com.aiton.pestscontrolandroid.utils.SPUtil;
@@ -53,8 +55,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 
-import cn.com.qiter.common.ordervo.UcenterMemberOrder;
-import cn.com.qiter.common.vo.PestsTrapModel;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 
@@ -89,7 +89,7 @@ public class TrapActivity extends AppCompatActivity {
         trapViewModel = new ViewModelProvider(this).get(TrapViewModel.class);
 
         initRemarkDataSource();
-        etTrapCodeInt = findViewById(R.id.et_trap_code_int);
+        etTrapCodeInt = findViewById(R.id.etCodeInt);
         etQrcode = findViewById(R.id.etQrcode);
         swLureReplace = findViewById(R.id.sw_lure_replace);
         operatorAdd = findViewById(R.id.trap_operator_add);

@@ -75,27 +75,30 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.49" />
+        app:layout_constraintGuide_percent="0.51" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline32"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.56" />
+        app:layout_constraintGuide_percent="0.58" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline33"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.64" />
+        app:layout_constraintGuide_percent="0.65" />
 
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView5"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginBottom="4dp"
         app:layout_constraintBottom_toTopOf="@+id/guideline25"
         app:layout_constraintEnd_toEndOf="parent"
@@ -110,7 +113,6 @@
                 android:id="@+id/textView20"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
                 android:text="@string/operator"
                 app:layout_constraintBottom_toBottomOf="@+id/trap_operator_add"
                 app:layout_constraintStart_toStartOf="parent"
@@ -120,7 +122,6 @@
                 android:id="@+id/trap_operator"
                 android:layout_width="210dp"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
                 android:text="@string/operator_man"
                 android:textAlignment="textStart"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -144,6 +145,8 @@
         android:id="@+id/cardView6"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginBottom="4dp"
         app:layout_constraintBottom_toTopOf="@+id/guideline26"
         app:layout_constraintEnd_toEndOf="parent"
@@ -158,8 +161,6 @@
                 android:id="@+id/trap_card_count"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="16dp"
                 android:ems="10"
                 android:inputType="number"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -172,40 +173,14 @@
                 android:id="@+id/textView12"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
                 android:text="@string/scount"
                 app:layout_constraintBottom_toBottomOf="@+id/trap_card_count"
                 app:layout_constraintEnd_toStartOf="@+id/trap_card_count"
                 app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toEndOf="@+id/et_trap_code_int"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/trap_card_count" />
 
-            <TextView
-                android:id="@+id/textView21"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:text="@string/code_int"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="@+id/et_trap_code_int"
-                app:layout_constraintEnd_toStartOf="@+id/et_trap_code_int"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/et_trap_code_int" />
 
-            <EditText
-                android:id="@+id/et_trap_code_int"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:ems="10"
-                android:inputType="number"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="@+id/textView12"
-                app:layout_constraintEnd_toStartOf="@+id/textView12"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toEndOf="@+id/textView21"
-                app:layout_constraintTop_toTopOf="@+id/textView12" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 
@@ -213,6 +188,8 @@
         android:id="@+id/cardView10"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginBottom="4dp"
         app:layout_constraintBottom_toTopOf="@+id/guideline27"
         app:layout_constraintEnd_toEndOf="parent"
@@ -227,7 +204,6 @@
                 android:id="@+id/textView13"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
                 android:text="@string/remark"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -237,7 +213,6 @@
                 android:id="@+id/trap_remark"
                 android:layout_width="210dp"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -259,6 +234,8 @@
         android:id="@+id/cardView9"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginBottom="4dp"
         app:layout_constraintBottom_toTopOf="@+id/guideline28"
         app:layout_constraintEnd_toEndOf="parent"
@@ -283,7 +260,6 @@
                 android:id="@+id/trap_first"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
                 app:layout_constraintBottom_toBottomOf="@+id/textView14"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/textView14"
@@ -293,7 +269,6 @@
                 android:id="@+id/textView14"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
                 android:text="@string/first"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -304,6 +279,8 @@
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginBottom="4dp"
         app:layout_constraintBottom_toTopOf="@+id/guideline30"
         app:layout_constraintEnd_toEndOf="parent"
@@ -318,7 +295,6 @@
                 android:id="@+id/textView15"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
                 android:text="@string/second"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -338,7 +314,6 @@
                 android:id="@+id/trap_second"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
                 app:layout_constraintBottom_toBottomOf="@+id/trap_iv_second"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/trap_iv_second"
@@ -350,6 +325,8 @@
         android:id="@+id/cardView7"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginBottom="4dp"
         app:layout_constraintBottom_toTopOf="@+id/guideline31"
         app:layout_constraintEnd_toEndOf="parent"
@@ -364,7 +341,6 @@
                 android:id="@+id/textView16"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
                 android:text="@string/tv_town"
                 app:layout_constraintBottom_toBottomOf="@+id/trap_town"
                 app:layout_constraintStart_toStartOf="parent"
@@ -374,7 +350,6 @@
                 android:id="@+id/trap_town"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
                 android:ems="10"
                 android:enabled="false"
                 android:inputType="textPersonName"
@@ -388,6 +363,8 @@
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginBottom="4dp"
         app:layout_constraintBottom_toTopOf="@+id/guideline32"
         app:layout_constraintEnd_toEndOf="parent"
@@ -402,7 +379,6 @@
                 android:id="@+id/trap_village"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
                 android:ems="10"
                 android:enabled="false"
                 android:inputType="textPersonName"
@@ -415,7 +391,6 @@
                 android:id="@+id/textView17"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
                 android:text="@string/village"
                 app:layout_constraintBottom_toBottomOf="@+id/trap_village"
                 app:layout_constraintStart_toStartOf="parent"
@@ -427,6 +402,8 @@
         android:id="@+id/cardView8"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginBottom="4dp"
         app:layout_constraintBottom_toTopOf="@+id/guideline33"
         app:layout_constraintEnd_toEndOf="parent"
@@ -441,7 +418,6 @@
                 android:id="@+id/trap_db"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
                 android:ems="10"
                 android:enabled="false"
                 android:inputType="textPersonName"
@@ -454,7 +430,6 @@
                 android:id="@+id/textView18"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
                 android:text="@string/db"
                 app:layout_constraintBottom_toBottomOf="@+id/trap_db"
                 app:layout_constraintStart_toStartOf="parent"
@@ -465,6 +440,8 @@
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginBottom="4dp"
         app:layout_constraintBottom_toTopOf="@+id/guideline29"
         app:layout_constraintEnd_toEndOf="parent"
@@ -479,7 +456,6 @@
                 android:id="@+id/textView19"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
                 android:text="@string/xb"
                 app:layout_constraintBottom_toBottomOf="@+id/trap_xb"
                 app:layout_constraintStart_toStartOf="parent"
@@ -489,7 +465,6 @@
                 android:id="@+id/trap_xb"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
                 android:ems="10"
                 android:enabled="false"
                 android:inputType="textPersonName"
@@ -510,6 +485,8 @@
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginBottom="4dp"
         app:layout_constraintBottom_toTopOf="@+id/guideline35"
         app:layout_constraintEnd_toEndOf="parent"
@@ -524,8 +501,6 @@
                 android:id="@+id/sw_lure_replace"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
                 android:text="@string/lure_replace"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -542,8 +517,10 @@
         app:layout_constraintGuide_percent="0.8" />
 
     <androidx.cardview.widget.CardView
-        android:layout_width="409dp"
+        android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginBottom="4dp"
         app:layout_constraintBottom_toTopOf="@+id/guideline15"
         app:layout_constraintEnd_toEndOf="parent"
@@ -561,36 +538,30 @@
                 android:ems="10"
                 android:enabled="false"
                 android:inputType="textPersonName"
+                android:text="e496ee02765549d0bd359ec7d649f42d"
                 android:textSize="10sp"
                 android:visibility="visible"
-                app:layout_constraintBottom_toBottomOf="@+id/textView23"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/etCodeInt"
                 app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toEndOf="@+id/textView23"
-                app:layout_constraintTop_toTopOf="@+id/textView23" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <EditText
                 android:id="@+id/etCodeInt"
                 android:layout_width="50dp"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
                 android:ems="10"
                 android:enabled="false"
                 android:inputType="textPersonName"
+                android:text="888888"
                 android:textSize="10sp"
                 app:layout_constraintBottom_toBottomOf="@+id/etQrcode"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/etQrcode"
                 app:layout_constraintTop_toTopOf="@+id/etQrcode" />
 
-            <TextView
-                android:id="@+id/textView23"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:text="@string/qrcode"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 

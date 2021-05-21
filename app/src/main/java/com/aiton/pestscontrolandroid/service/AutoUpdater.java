@@ -33,7 +33,7 @@ import java.util.regex.Pattern;
 
 public class AutoUpdater {
     // 下载安装包的网络路径
-    private String apkUrl = "http://qingshanboke.com/uploadfiles/***/rc.***.blog/";
+    private String apkUrl = "https://qiter.com.cn/update/";
     protected String checkUrl = apkUrl + "output-metadata.json";
 
     // 保存APK的文件名
@@ -83,6 +83,7 @@ public class AutoUpdater {
 
     private void ShowDownloadDialog() {
         AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
+
         dialog.setTitle("软件版本更新");
         LayoutInflater inflater = LayoutInflater.from(mContext);
         View v = inflater.inflate(R.layout.progress, null);
@@ -95,6 +96,7 @@ public class AutoUpdater {
                 intercept = true;
             }
         });
+        dialog.setCancelable(false);
         dialog.show();
         DownloadApk();
     }
@@ -197,7 +199,7 @@ public class AutoUpdater {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {//判断版本大于等于7.0
                 //如果SDK版本>=24，即：Build.VERSION.SDK_INT >= 24，使用FileProvider兼容安装apk
                 String packageName = mContext.getApplicationContext().getPackageName();
-                String authority = new StringBuilder(packageName).append(".fileprovider").toString();
+                String authority = new StringBuilder(packageName).append(".provider").toString();
                 Uri apkUri = FileProvider.getUriForFile(mContext, authority, apkFile);
                 intent.setDataAndType(apkUri, "application/vnd.android.package-archive");
             } else {
@@ -208,6 +210,7 @@ public class AutoUpdater {
 
 
         } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

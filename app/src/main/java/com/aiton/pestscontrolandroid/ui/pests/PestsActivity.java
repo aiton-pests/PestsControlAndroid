@@ -39,6 +39,9 @@ import android.widget.Toast;
 
 import com.aiton.pestscontrolandroid.AppConstance;
 import com.aiton.pestscontrolandroid.R;
+import com.aiton.pestscontrolandroid.data.model.PestsControlModel;
+import com.aiton.pestscontrolandroid.data.model.Result;
+import com.aiton.pestscontrolandroid.data.model.UcenterMemberOrder;
 import com.aiton.pestscontrolandroid.data.persistence.Pests;
 import com.aiton.pestscontrolandroid.service.RetrofitUtil;
 import com.aiton.pestscontrolandroid.ui.main.MainActivity;
@@ -57,11 +60,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
-
-import cn.com.qiter.common.Result;
-
-import cn.com.qiter.common.ordervo.UcenterMemberOrder;
-import cn.com.qiter.common.vo.PestsControlModel;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;

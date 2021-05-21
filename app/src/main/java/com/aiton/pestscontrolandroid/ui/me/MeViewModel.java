@@ -8,9 +8,9 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
 import com.aiton.pestscontrolandroid.AppConstance;
+import com.aiton.pestscontrolandroid.data.model.UcenterMemberOrder;
 import com.aiton.pestscontrolandroid.utils.SPUtil;
 
-import cn.com.qiter.common.ordervo.UcenterMemberOrder;
 
 
 public class MeViewModel extends AndroidViewModel {

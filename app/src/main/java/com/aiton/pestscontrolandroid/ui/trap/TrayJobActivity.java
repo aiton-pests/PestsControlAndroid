@@ -20,6 +20,7 @@ import android.widget.Toast;
 import com.aiton.pestscontrolandroid.AppConstance;
 import com.aiton.pestscontrolandroid.R;
 import com.aiton.pestscontrolandroid.data.model.PestsParcelable;
+import com.aiton.pestscontrolandroid.data.model.Result;
 import com.aiton.pestscontrolandroid.data.model.TrapParcelable;
 import com.aiton.pestscontrolandroid.data.persistence.Pests;
 import com.aiton.pestscontrolandroid.data.persistence.Trap;
@@ -32,8 +33,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.com.qiter.common.Result;
-import cn.com.qiter.common.vo.PestsTrapModel;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -184,7 +183,7 @@ public class TrayJobActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        progressBar.setProgress((int)progress,true);
+//                        progressBar.setProgress((int)progress,true);
 //                        Log.e(TAG, "run: " + progress);
                     }
                 });
@@ -236,6 +235,7 @@ public class TrayJobActivity extends AppCompatActivity {
             Log.e(TAG, "updateServer: " + p.toString());
            // adapter.notifyDataSetChanged();
         }
+//        trapViewModel.getProgress().setValue(100);
         work.putParcelableArrayListExtra("parcelable",list);
         UploadTrapService.enqueueWork(getApplicationContext(), work);
         adapter.notifyDataSetChanged();

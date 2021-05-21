@@ -20,21 +20,20 @@ import android.widget.Toast;
 import com.aiton.pestscontrolandroid.AppConstance;
 import com.aiton.pestscontrolandroid.R;
 import com.aiton.pestscontrolandroid.data.model.PestsParcelable;
+import com.aiton.pestscontrolandroid.data.model.Result;
 import com.aiton.pestscontrolandroid.data.persistence.Pests;
 import com.aiton.pestscontrolandroid.data.persistence.Trap;
 import com.aiton.pestscontrolandroid.service.OssService;
 import com.aiton.pestscontrolandroid.service.RetrofitUtil;
 import com.aiton.pestscontrolandroid.service.UploadPestsService;
 import com.aiton.pestscontrolandroid.ui.pests.PestsViewModel;
-import com.meituan.robust.patch.annotaion.Add;
+
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import cn.com.qiter.common.Result;
-import cn.com.qiter.common.vo.PestsControlModel;
 import cn.hutool.core.date.DateTime;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.annotations.NonNull;
@@ -50,10 +49,6 @@ public class MyJobActivity extends AppCompatActivity {
     ProgressBar progressBar2;
     private Button pestsUpdate,pestsUpdateAgain,pestsDelete;
     //add method
-    @Add
-    public String getString() {
-        return "Robust";
-    }
 
 
     @Override
@@ -94,6 +89,11 @@ public class MyJobActivity extends AppCompatActivity {
             public void onChanged(Integer integer) {
                 if (integer.compareTo(100) == 0){
                     Toast.makeText(getApplicationContext(), "上传完成", Toast.LENGTH_SHORT).show();
+//                    Pests[] rr = pestsViewModel.findAllObject();
+//                    for (Pests pp :
+//                            rr) {
+//                        Log.e(TAG, "onChanged: "+pp.toString());
+//                    }
                     adapter.notifyDataSetChanged();
                 }else{
 
@@ -204,7 +204,7 @@ public class MyJobActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        progressBar2.setProgress((int)progress,true);
+//                        progressBar2.setProgress((int)progress,true);
 //                        Log.e(TAG, "run: " + progress);
                     }
                 });
@@ -254,6 +254,7 @@ public class MyJobActivity extends AppCompatActivity {
             pestsViewModel.update(p);
             Log.e(TAG, "updateServer: " + p.toString());
         }
+//        pestsViewModel.getProgress().setValue(100);
         work.putParcelableArrayListExtra("parcelable",list);
         UploadPestsService.enqueueWork(getApplicationContext(), work);
         adapter.notifyDataSetChanged();

@@ -7,14 +7,18 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.Manifest;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.location.Address;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -27,8 +31,11 @@ import android.widget.ZoomControls;
 
 import com.aiton.pestscontrolandroid.AppConstance;
 import com.aiton.pestscontrolandroid.R;
+import com.aiton.pestscontrolandroid.data.model.PestsControlModel;
+import com.aiton.pestscontrolandroid.data.model.PestsTrapModel;
 import com.aiton.pestscontrolandroid.data.model.ShpFile;
 import com.aiton.pestscontrolandroid.data.persistence.Pests;
+import com.aiton.pestscontrolandroid.service.AutoUpdater;
 import com.aiton.pestscontrolandroid.service.OssService;
 import com.aiton.pestscontrolandroid.service.RetrofitUtil;
 import com.aiton.pestscontrolandroid.ui.login.LoginActivity;
@@ -106,14 +113,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-import cn.com.qiter.common.vo.PestsControlModel;
-import cn.com.qiter.common.vo.PestsTrapModel;
-import cn.hutool.core.date.DateTime;
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.disposables.Disposable;
-import io.reactivex.rxjava3.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "PestsControl";
@@ -733,7 +733,22 @@ public class MainActivity extends AppCompatActivity {
             //start ScankitActivity for scanning barcode
             ScanUtil.startScan(MainActivity.this, REQUEST_CODE_SCAN, new HmsScanAnalyzerOptions.Creator().setHmsScanTypes(HmsScan.ALL_SCAN_TYPE).create());
         }
-
+        boolean haspermission = false;
+        if (100 == requestCode) {
+            for (int i = 0; i < grantResults.length; i++) {
+                if (grantResults[i] == -1) {
+                    haspermission = true;
+                }
+            }
+            if (haspermission) {
+                //跳转到系统设置权限页面，或者直接关闭页面，不让他继续访问
+                permissionDialog();
+            } else {
+                //全部权限通过，可以进行下一步操作
+                AutoUpdater manager = new AutoUpdater(MainActivity.this);
+                manager.CheckUpdate();
+            }
+        }
     }
 
     /**
@@ -790,6 +805,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         SPUtil.builder(getApplication().getApplicationContext(), AppConstance.APP_SP).setData(AppConstance.ISTEST, 1);
         ArcGISRuntimeEnvironment.setLicense(AppConstance.API_KEY);
         settingViewModel = new ViewModelProvider(this).get(SettingViewModel.class);
@@ -875,6 +891,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
+        checkUpdate();
     }
 
 
@@ -1112,5 +1130,91 @@ public class MainActivity extends AppCompatActivity {
         } else {
             return super.dispatchKeyEvent(event);
         }
+    }
+
+
+    private void checkUpdate(){
+        //检查更新
+        try {
+            //6.0才用动态权限
+            if (Build.VERSION.SDK_INT >= 23) {
+                String[] permissions = {
+                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        Manifest.permission.ACCESS_WIFI_STATE,
+                        Manifest.permission.INTERNET};
+                List<String> permissionList = new ArrayList<>();
+                for (int i = 0; i < permissions.length; i++) {
+                    if (ActivityCompat.checkSelfPermission(this, permissions[i]) != PackageManager.PERMISSION_GRANTED) {
+                        permissionList.add(permissions[i]);
+                    }
+                }
+                if (permissionList.size() <= 0) {
+                    //说明权限都已经通过，可以做你想做的事情去
+                    //自动更新
+                    AutoUpdater manager = new AutoUpdater(MainActivity.this);
+                    manager.CheckUpdate();
+                } else {
+                    //存在未允许的权限
+                    ActivityCompat.requestPermissions(this, permissions, 100);
+                }
+            }
+        } catch (Exception ex) {
+            Toast.makeText(MainActivity.this, "自动更新异常：" + ex.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
+//    @Override
+//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+//        boolean haspermission = false;
+//        if (100 == requestCode) {
+//            for (int i = 0; i < grantResults.length; i++) {
+//                if (grantResults[i] == -1) {
+//                    haspermission = true;
+//                }
+//            }
+//            if (haspermission) {
+//                //跳转到系统设置权限页面，或者直接关闭页面，不让他继续访问
+//                permissionDialog();
+//            } else {
+//                //全部权限通过，可以进行下一步操作
+//                AutoUpdater manager = new AutoUpdater(MainActivity.this);
+//                manager.CheckUpdate();
+//            }
+//        }
+//    }
+
+    AlertDialog alertDialog;
+
+    //打开手动设置应用权限
+    private void permissionDialog() {
+        if (alertDialog == null) {
+            alertDialog = new AlertDialog.Builder(this)
+                    .setTitle("提示信息")
+                    .setMessage("当前应用缺少必要权限，该功能暂时无法使用。如若需要，请单击【确定】按钮前往设置中心进行权限授权。")
+                    .setPositiveButton("设置", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            cancelPermissionDialog();
+                            Uri packageURI = Uri.parse("package:" + getPackageName());
+                            Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, packageURI);
+                            startActivity(intent);
+                        }
+                    })
+                    .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            cancelPermissionDialog();
+                        }
+                    })
+                    .create();
+        }
+        alertDialog.show();
+    }
+
+    private void cancelPermissionDialog() {
+        alertDialog.cancel();
     }
 }
