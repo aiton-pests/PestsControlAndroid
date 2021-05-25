@@ -9,10 +9,11 @@ import androidx.lifecycle.SavedStateHandle;
 
 
 import com.aiton.pestscontrolandroid.AppConstance;
-import com.aiton.pestscontrolandroid.data.model.PestsControlModel;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import cn.com.qiter.common.vo.PestsControlModel;
 
 
 public class MainViewModel extends AndroidViewModel {

@@ -36,7 +36,6 @@ import android.widget.Toast;
 
 import com.aiton.pestscontrolandroid.AppConstance;
 import com.aiton.pestscontrolandroid.R;
-import com.aiton.pestscontrolandroid.data.model.PestsTrapModel;
 import com.aiton.pestscontrolandroid.data.model.UcenterMemberOrder;
 import com.aiton.pestscontrolandroid.data.persistence.Trap;
 import com.aiton.pestscontrolandroid.ui.main.MainActivity;
@@ -55,6 +54,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 
+import cn.com.qiter.common.vo.PestsTrapModel;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 

@@ -8,6 +8,13 @@ import androidx.core.content.FileProvider;
 import androidx.core.os.EnvironmentCompat;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.work.Constraints;
+import androidx.work.Data;
+import androidx.work.NetworkType;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkInfo;
+import androidx.work.WorkManager;
 
 import android.Manifest;
 import android.app.Activity;
@@ -39,13 +46,17 @@ import android.widget.Toast;
 
 import com.aiton.pestscontrolandroid.AppConstance;
 import com.aiton.pestscontrolandroid.R;
-import com.aiton.pestscontrolandroid.data.model.PestsControlModel;
 import com.aiton.pestscontrolandroid.data.model.Result;
 import com.aiton.pestscontrolandroid.data.model.UcenterMemberOrder;
 import com.aiton.pestscontrolandroid.data.persistence.Pests;
+import com.aiton.pestscontrolandroid.service.PestsOnceWork;
+import com.aiton.pestscontrolandroid.service.PestsWork;
 import com.aiton.pestscontrolandroid.service.RetrofitUtil;
 import com.aiton.pestscontrolandroid.ui.main.MainActivity;
+import com.aiton.pestscontrolandroid.ui.myjob.MyJobActivity;
 import com.aiton.pestscontrolandroid.utils.SPUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.internal.LinkedTreeMap;
 
@@ -60,6 +71,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
+
+import cn.com.qiter.common.vo.PestsControlModel;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -96,6 +110,7 @@ public class PestsActivity extends AppCompatActivity {
     private static final int PERMISSION_CAMERA_REQUEST_CODE_FINISH = 0x00000014;
 
 
+    WorkManager workmanager;
 
     /**
      * 检查权限并拍照。
@@ -431,6 +446,8 @@ public class PestsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pests);
+        workmanager = WorkManager.getInstance(this);
+
         etQrcode = findViewById(R.id.et_pests_qrcode);
         pestsViewModel = new ViewModelProvider(this).get(PestsViewModel.class);
         ivAddOperator = findViewById(R.id.iv_add_operator);
@@ -586,6 +603,7 @@ public class PestsActivity extends AppCompatActivity {
 
                 pests.setUpdateServer(false);
                 pestsViewModel.insert(pests);
+                //设置默认操作员
                 setDefaultOper(pests.getOperator());
                 Intent intent = new Intent(PestsActivity.this, MainActivity.class);
                 startActivity(intent);
@@ -615,7 +633,41 @@ public class PestsActivity extends AppCompatActivity {
         getDict();
         displayDefaultOperator();
     }
+    private static ObjectMapper mapper = new ObjectMapper();
+    private void workManagerUpload(Pests pests){
+        PestsControlModel pestsControlModel = new PestsControlModel();
+        try {
+            String pcmStr = mapper.writeValueAsString(pestsControlModel);
+            // 数据
+            Data data = new Data.Builder().putString("key", pcmStr).build();
+            Constraints constraints = new Constraints.Builder()
+                    .setRequiredNetworkType(NetworkType.CONNECTED)
+                    .build();
+            OneTimeWorkRequest oneTimeWorkRequest = new OneTimeWorkRequest.Builder(PestsOnceWork.class)
+                    .setInputData(data) // 数据的携带
+                    .setConstraints(constraints)
+                    .build();
 
+// 【状态机】  为什么一直都是 ENQUEUE，因为 你是轮询的任务，所以你看不到 SUCCESS     [如果你是单个任务，就会看到SUCCESS]
+            // 监听状态
+            workmanager.getWorkInfoByIdLiveData(oneTimeWorkRequest.getId())
+                    .observe(PestsActivity.this, new Observer<WorkInfo>() {
+                        @Override
+                        public void onChanged(WorkInfo workInfo) {
+                            Log.d(AppConstance.TAG, "状态：" + workInfo.getState().name()); // ENQUEEN   SUCCESS
+                            if (workInfo.getState().isFinished()) {
+                                Log.d(AppConstance.TAG, "状态：isFinished=true 注意：后台任务已经完成了...");
+                            }
+                        }
+                    });
+            workmanager.enqueue(oneTimeWorkRequest);
+
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
+
+    }
     /**
      * 禁用返回键
      * @param event

@@ -20,7 +20,11 @@ public class PestsRepository {
         this.dao = db.getPestsDao();
         all = dao.findAll();
     }
+    public Pests findById(int id){
+        Pests pests =  dao.findById(id);
+        return pests;
 
+    }
     public Pests[] findAllObject(boolean update){
         Pests[] pests =  dao.findAllObject(update);
         return pests;

@@ -1,24 +1,21 @@
 package com.aiton.pestscontrolandroid.service;
 
-import android.app.IntentService;
-import android.app.Service;
 import android.content.Context;
-import android.content.Intent;
-import android.os.IBinder;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.app.JobIntentService;
+import androidx.work.Data;
+import androidx.work.Worker;
+import androidx.work.WorkerParameters;
 
 import com.aiton.pestscontrolandroid.AppConstance;
-import com.aiton.pestscontrolandroid.data.model.PestsParcelable;
-import com.aiton.pestscontrolandroid.data.model.Result;
+import com.aiton.pestscontrolandroid.data.persistence.Pests;
+import com.aiton.pestscontrolandroid.data.persistence.PestsRepository;
+import com.google.gson.internal.LinkedTreeMap;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.util.ArrayList;
 
 import cn.com.qiter.common.vo.PestsControlModel;
 import cn.hutool.core.date.DateTime;
@@ -28,67 +25,30 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 
 import static com.aiton.pestscontrolandroid.AppConstance.TAG;
 
-public class UploadPestsService extends JobIntentService {
-    public UploadPestsService() {
+public class PestsAllOnceWork extends Worker {
+    PestsRepository repository;
+    private WorkerParameters workerParams;
+    private Context context;
+  // PestsViewModel pestsViewModel;
 
-    }
-    /**
-     * 这个Service 唯一的id
-     */
-    static final int JOB_ID = 10111;
-    /**
-     * Convenience method for enqueuing work in to this service.
-     */
-
-    Context context;
-    public static void enqueueWork(Context context, Intent work) {
+    public PestsAllOnceWork(@NonNull @NotNull Context context, @NonNull @NotNull WorkerParameters workerParams) {
+        super(context, workerParams);
+        this.context = context;
+        this.repository = new PestsRepository(context);
+        //pestsViewModel = new ViewModelProvider(context.getApplicationContext()).get(PestsViewModel.class);
+        this.workerParams = workerParams;
         initOss(context);
-        enqueueWork(context, UploadPestsService.class, JOB_ID, work);
     }
 
-    public void uploadServer(PestsControlModel pestsModel) {
-        RetrofitUtil.getInstance().getPestsService().savePests(pestsModel)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new io.reactivex.rxjava3.core.Observer<Result>() {
-                    Disposable disposable;
-
-                    @Override
-                    public void onSubscribe(@io.reactivex.rxjava3.annotations.NonNull Disposable d) {
-                        disposable = d;
-                    }
-
-                    @Override
-                    public void onNext(@io.reactivex.rxjava3.annotations.NonNull Result result) {
-                        if (result.getSuccess()) {
-                            Log.e(AppConstance.TAG, "111111111111111111111111111111" + result.toString());
-                        }
-                    }
-
-                    @Override
-                    public void onError(@io.reactivex.rxjava3.annotations.NonNull Throwable e) {
-                        disposable.dispose();
-                        Log.e(AppConstance.TAG, "------------------------------- " + e.toString());
-                    }
-
-                    @Override
-                    public void onComplete() {
-
-                        Log.e(AppConstance.TAG, "============================== ");
-                    }
-                });
-    }
+    @NonNull
+    @NotNull
     @Override
-    protected void onHandleWork(@NonNull @NotNull Intent intent) {
-        ArrayList<PestsParcelable> parcelable = intent.getParcelableArrayListExtra("parcelable");
-//        for (int i=0 ; i <1000; i++){
-//            parcelable.add(parcelable.get(0));
-//        }
-        Log.e(TAG, "onHandleWork: "+parcelable.size());
-        for (PestsParcelable p :
-                parcelable) {
-            Log.e(TAG, "服务器数据上传一条: " + p.toString());
-            // app side update data
+    public Result doWork() {
+        String dataString = workerParams.getInputData().getString("key");
+        Pests[] pests = repository.findAllObject(false);
+        for (Pests p :
+                pests) {
+            Log.e(TAG, "doWork: " + p.toString());
             PestsControlModel pestsModel = new PestsControlModel();
             pestsModel.setQrcode(p.getQrcode());
             pestsModel.setAppId(p.getId());
@@ -129,12 +89,54 @@ public class UploadPestsService extends JobIntentService {
             pestsModel.setVillage(p.getVillage());
             pestsModel.setStime(p.getStime());
             uploadServer(pestsModel);
-            Log.d("MyJobIntentService所在线程", Thread.currentThread().getId() + "");
         }
+        Log.e(TAG, "doWork: =======================" + dataString);
+        // 反馈数据 给 MainActivity
+        // 把任务中的数据回传到activity中
+        Data outputData = new Data.Builder().putString("success", "ok").build();
+        Result success = Result.success(outputData);
+        return success;
+    }
 
-        Log.d("MyJobIntentService服务#", "开始工作了"+parcelable.toString());
 
+    public void uploadServer(PestsControlModel pestsModel) {
+        RetrofitUtil.getInstance().getPestsService().savePests(pestsModel)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new io.reactivex.rxjava3.core.Observer<com.aiton.pestscontrolandroid.data.model.Result>() {
+                    Disposable disposable;
 
+                    @Override
+                    public void onSubscribe(@io.reactivex.rxjava3.annotations.NonNull Disposable d) {
+                        disposable = d;
+                    }
+
+                    @Override
+                    public void onNext(@io.reactivex.rxjava3.annotations.NonNull com.aiton.pestscontrolandroid.data.model.Result result) {
+                        if (result.getSuccess()) {
+                            Log.e(AppConstance.TAG, "onNext: " + result.toString());
+                           // repository.update();
+                            try {
+                                Double id = (Double) ((LinkedTreeMap)result.getData().get("row")).get("appId");
+                                Pests p = repository.findById(id.intValue());
+                                p.setUpdateServer(true);
+                                repository.update(p);
+                            }catch (Exception e){
+                                Log.e(TAG, "onNext: " + e.toString() );
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onError(@io.reactivex.rxjava3.annotations.NonNull Throwable e) {
+                        disposable.dispose();
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
     }
     public static OssService ossService;
     public static void initOss(Context ctx){
@@ -151,7 +153,7 @@ public class UploadPestsService extends JobIntentService {
         String appFilePath = appPath + "/" + file.getName();
         Log.e(TAG, "ossUpload: "+appFilePath);
 //开始上传，参数分别为content，上传的文件名filename，上传的文件路径filePath
-        ossService.beginupload(getApplication().getApplicationContext(), appFilePath, file.getAbsolutePath());
+        ossService.beginupload(context.getApplicationContext(), appFilePath, file.getAbsolutePath());
 //上传的进度回调
         ossService.setProgressCallback(new OssService.ProgressCallback() {
             @Override

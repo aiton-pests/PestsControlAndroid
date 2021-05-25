@@ -1,21 +1,21 @@
 package com.aiton.pestscontrolandroid.service;
 
 import android.content.Context;
-import android.content.Intent;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.core.app.JobIntentService;
+import androidx.work.Data;
+import androidx.work.Worker;
+import androidx.work.WorkerParameters;
 
 import com.aiton.pestscontrolandroid.AppConstance;
-import com.aiton.pestscontrolandroid.data.model.PestsParcelable;
-import com.aiton.pestscontrolandroid.data.model.Result;
-import com.aiton.pestscontrolandroid.data.model.TrapParcelable;
+import com.aiton.pestscontrolandroid.data.persistence.Trap;
+import com.aiton.pestscontrolandroid.data.persistence.TrapRepository;
+import com.google.gson.internal.LinkedTreeMap;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.util.ArrayList;
 
 import cn.com.qiter.common.vo.PestsTrapModel;
 import cn.hutool.core.date.DateTime;
@@ -25,34 +25,33 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 
 import static com.aiton.pestscontrolandroid.AppConstance.TAG;
 
-public class UploadTrapService  extends JobIntentService {
-    /**
-     * 这个Service 唯一的id
-     */
-    static final int JOB_ID = 10112;
-    /**
-     * Convenience method for enqueuing work in to this service.
-     */
+public class TrapOnceWork extends Worker {
+    TrapRepository repository;
+    private WorkerParameters workerParams;
+    private Context context;
+  // PestsViewModel pestsViewModel;
 
-    Context context;
-    public static void enqueueWork(Context context, Intent work) {
+    public TrapOnceWork(@NonNull @NotNull Context context, @NonNull @NotNull WorkerParameters workerParams) {
+        super(context, workerParams);
+        this.context = context;
+        this.repository = new TrapRepository(context);
+        //pestsViewModel = new ViewModelProvider(context.getApplicationContext()).get(PestsViewModel.class);
+        this.workerParams = workerParams;
         initOss(context);
-        enqueueWork(context, UploadTrapService.class, JOB_ID, work);
     }
 
+    @NonNull
+    @NotNull
     @Override
-    protected void onHandleWork(@NonNull @NotNull Intent intent) {
-        ArrayList<TrapParcelable> parcelable = intent.getParcelableArrayListExtra("parcelable");
-//        for (int i=0 ; i <1000; i++){
-//            parcelable.add(parcelable.get(0));
-//        }
-        Log.e(TAG, "onHandleWork: "+parcelable.size());
-        for (TrapParcelable p :
-                parcelable) {
-            Log.e(TAG, "服务器数据上传一条: " + p.toString());
-            // app side update data
+    public Result doWork() {
+        String dataString = workerParams.getInputData().getString("key");
+        Trap[] pests = repository.findAllObject(false);
+        for (Trap p :
+                pests) {
+            Log.e(TAG, "doWork: " + p.toString());
             PestsTrapModel pestsModel = new PestsTrapModel();
             pestsModel.setDb(p.getDb());
+            pestsModel.setAppId(p.getId());
             pestsModel.setDeviceId(p.getDeviceId());
             pestsModel.setIsChecked(p.isChecked());
             pestsModel.setLatitude(p.getLatitude());
@@ -85,18 +84,20 @@ public class UploadTrapService  extends JobIntentService {
             pestsModel.setVillage(p.getVillage());
             pestsModel.setXb(p.getXb());
             uploadServer(pestsModel);
-            Log.d("MyJobIntentService所在线程", Thread.currentThread().getId() + "");
         }
-
-        Log.d("MyJobIntentService服务#", "开始工作了"+parcelable.toString());
-
+        Log.e(TAG, "doWork: =======================");
+        // 反馈数据 给 MainActivity
+        // 把任务中的数据回传到activity中
+        Data outputData = new Data.Builder().putString("success", "ok").build();
+        Result success = Result.success(outputData);
+        return success;
     }
 
     public void uploadServer(PestsTrapModel pestsModel) {
         RetrofitUtil.getInstance().getTrapService().save(pestsModel)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new io.reactivex.rxjava3.core.Observer<Result>() {
+                .subscribe(new io.reactivex.rxjava3.core.Observer<com.aiton.pestscontrolandroid.data.model.Result>() {
                     Disposable disposable;
 
                     @Override
@@ -105,9 +106,18 @@ public class UploadTrapService  extends JobIntentService {
                     }
 
                     @Override
-                    public void onNext(@io.reactivex.rxjava3.annotations.NonNull Result result) {
+                    public void onNext(@io.reactivex.rxjava3.annotations.NonNull com.aiton.pestscontrolandroid.data.model.Result result) {
                         if (result.getSuccess()) {
-                            Log.e(AppConstance.TAG, "111111111111111111111111111111" + result.toString());
+                            Log.e(AppConstance.TAG, "onNext: " + result.toString());
+                            // repository.update();
+                            try {
+                                Double id = (Double) ((LinkedTreeMap)result.getData().get("row")).get("appId");
+                                Trap p = repository.findById(id.intValue());
+                                p.setUpdateServer(true);
+                                repository.update(p);
+                            }catch (Exception e){
+                                Log.e(TAG, "onNext: " + e.toString() );
+                            }
                         }
                     }
 
@@ -140,7 +150,7 @@ public class UploadTrapService  extends JobIntentService {
         String appFilePath = appPath + "/" + file.getName();
         Log.e(TAG, "ossUpload: "+appFilePath);
 //开始上传，参数分别为content，上传的文件名filename，上传的文件路径filePath
-        ossService.beginupload(getApplication().getApplicationContext(), appFilePath, file.getAbsolutePath());
+        ossService.beginupload(context, appFilePath, file.getAbsolutePath());
 //上传的进度回调
         ossService.setProgressCallback(new OssService.ProgressCallback() {
             @Override

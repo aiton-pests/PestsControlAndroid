@@ -31,8 +31,6 @@ import android.widget.ZoomControls;
 
 import com.aiton.pestscontrolandroid.AppConstance;
 import com.aiton.pestscontrolandroid.R;
-import com.aiton.pestscontrolandroid.data.model.PestsControlModel;
-import com.aiton.pestscontrolandroid.data.model.PestsTrapModel;
 import com.aiton.pestscontrolandroid.data.model.ShpFile;
 import com.aiton.pestscontrolandroid.data.persistence.Pests;
 import com.aiton.pestscontrolandroid.service.AutoUpdater;
@@ -113,6 +111,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
+import cn.com.qiter.common.vo.PestsControlModel;
+import cn.com.qiter.common.vo.PestsTrapModel;
 import cn.hutool.core.util.StrUtil;
 
 public class MainActivity extends AppCompatActivity {

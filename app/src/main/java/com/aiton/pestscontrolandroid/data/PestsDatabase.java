@@ -11,7 +11,7 @@ import com.aiton.pestscontrolandroid.data.persistence.PestsDao;
 import com.aiton.pestscontrolandroid.data.persistence.Trap;
 import com.aiton.pestscontrolandroid.data.persistence.TrapDao;
 
-@Database(entities = {Pests.class, Trap.class}, version = 8, exportSchema = false)
+@Database(entities = {Pests.class, Trap.class}, version = 9, exportSchema = false)
 public abstract class PestsDatabase extends RoomDatabase {
     private static PestsDatabase INSTALL;
 

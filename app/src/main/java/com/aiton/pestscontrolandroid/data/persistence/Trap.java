@@ -54,9 +54,34 @@ public class Trap {
     @ColumnInfo(name = "projectId")
     private String projectId;
     @ColumnInfo(name = "isChecked")
-    private Integer isChecked;
+    private boolean isChecked;
     @Ignore
     public Trap() {
+    }
+
+    public Trap(int id, String deviceId, String stime, double longitude, double latitude, String positionError, String town, String village, String operator, String xb, String db, String qrcode, String codeInt, String userId, boolean updateServer, Integer scount, String pic1, String pic2, String remark, Integer lureReplaced, String projectId, boolean isChecked) {
+        this.id = id;
+        this.deviceId = deviceId;
+        this.stime = stime;
+        this.longitude = longitude;
+        this.latitude = latitude;
+        this.positionError = positionError;
+        this.town = town;
+        this.village = village;
+        this.operator = operator;
+        this.xb = xb;
+        this.db = db;
+        this.qrcode = qrcode;
+        this.codeInt = codeInt;
+        this.userId = userId;
+        this.updateServer = updateServer;
+        this.scount = scount;
+        this.pic1 = pic1;
+        this.pic2 = pic2;
+        this.remark = remark;
+        this.lureReplaced = lureReplaced;
+        this.projectId = projectId;
+        this.isChecked = isChecked;
     }
 
     @Override
@@ -85,39 +110,6 @@ public class Trap {
                 ", projectId='" + projectId + '\'' +
                 ", isChecked=" + isChecked +
                 '}';
-    }
-
-    public Trap(int id, String deviceId, String stime, double longitude, double latitude, String positionError, String town, String village, String operator, String xb, String db, String qrcode, String codeInt, String userId, boolean updateServer, Integer scount, String pic1, String pic2, String remark, Integer lureReplaced, String projectId, Integer isChecked) {
-        this.id = id;
-        this.deviceId = deviceId;
-        this.stime = stime;
-        this.longitude = longitude;
-        this.latitude = latitude;
-        this.positionError = positionError;
-        this.town = town;
-        this.village = village;
-        this.operator = operator;
-        this.xb = xb;
-        this.db = db;
-        this.qrcode = qrcode;
-        this.codeInt = codeInt;
-        this.userId = userId;
-        this.updateServer = updateServer;
-        this.scount = scount;
-        this.pic1 = pic1;
-        this.pic2 = pic2;
-        this.remark = remark;
-        this.lureReplaced = lureReplaced;
-        this.projectId = projectId;
-        this.isChecked = isChecked;
-    }
-
-    public String getCodeInt() {
-        return codeInt;
-    }
-
-    public void setCodeInt(String codeInt) {
-        this.codeInt = codeInt;
     }
 
     public int getId() {
@@ -216,6 +208,14 @@ public class Trap {
         this.qrcode = qrcode;
     }
 
+    public String getCodeInt() {
+        return codeInt;
+    }
+
+    public void setCodeInt(String codeInt) {
+        this.codeInt = codeInt;
+    }
+
     public String getUserId() {
         return userId;
     }
@@ -280,11 +280,11 @@ public class Trap {
         this.projectId = projectId;
     }
 
-    public Integer getIsChecked() {
+    public boolean isChecked() {
         return isChecked;
     }
 
-    public void setIsChecked(Integer isChecked) {
-        this.isChecked = isChecked;
+    public void setChecked(boolean checked) {
+        isChecked = checked;
     }
 }

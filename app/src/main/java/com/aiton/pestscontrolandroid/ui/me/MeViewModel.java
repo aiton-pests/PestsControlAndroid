@@ -16,7 +16,8 @@ import com.aiton.pestscontrolandroid.utils.SPUtil;
 public class MeViewModel extends AndroidViewModel {
     private MutableLiveData<UcenterMemberOrder> mutableLiveData;
     private MutableLiveData<Boolean> isTest;
-
+    private MutableLiveData<Boolean> isAutoUpload;
+    private MutableLiveData<Boolean> isAutoUploadTrap;
     ///天地图或ArcGIS地图
     private MutableLiveData<Boolean> tiandiMap;
     public MeViewModel(@NonNull Application application) {
@@ -70,5 +71,31 @@ public class MeViewModel extends AndroidViewModel {
     public void loadTest(){
         Boolean test = SPUtil.builder(getApplication(), AppConstance.APP_SP).getData(AppConstance.ISTEST, Boolean.class);
         isTest.setValue(test);
+    }
+
+    public MutableLiveData<Boolean> getIsAutoUpload() {
+        return isAutoUpload;
+    }
+
+    public void setIsAutoUpload(Boolean test){
+        SPUtil.builder(getApplication(), AppConstance.APP_SP).setData(AppConstance.AUTO_UPLOAD, test);
+    }
+
+    public void loadAutoUpload(){
+        Boolean test = SPUtil.builder(getApplication(), AppConstance.APP_SP).getData(AppConstance.AUTO_UPLOAD, Boolean.class);
+        isAutoUpload.setValue(test);
+    }
+
+    public MutableLiveData<Boolean> getIsAutoUploadTrap() {
+        return isAutoUploadTrap;
+    }
+
+    public void setIsAutoUploadTrap(Boolean isAutoUploadTrap) {
+        SPUtil.builder(getApplication(), AppConstance.APP_SP).setData(AppConstance.AUTO_UPLOAD_TRAP, isAutoUploadTrap);
+    }
+
+    public void loadAutoUploadTrap(){
+        Boolean test = SPUtil.builder(getApplication(), AppConstance.APP_SP).getData(AppConstance.AUTO_UPLOAD_TRAP, Boolean.class);
+        isAutoUploadTrap.setValue(test);
     }
 }

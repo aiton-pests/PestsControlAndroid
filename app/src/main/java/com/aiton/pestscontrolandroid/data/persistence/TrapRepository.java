@@ -19,7 +19,11 @@ public class TrapRepository {
         this.dao = db.getTrapDao();
         all = dao.findAll();
     }
+    public Trap findById(int id){
+        Trap pests =  dao.findById(id);
+        return pests;
 
+    }
     public Trap[] findAllObject(boolean update){
         Trap[] pests =  dao.findAllObject(update);
         return pests;

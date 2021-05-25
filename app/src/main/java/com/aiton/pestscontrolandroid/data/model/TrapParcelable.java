@@ -50,105 +50,10 @@ public class TrapParcelable  implements Parcelable {
 //    @ColumnInfo(name = "projectId")
     private String projectId;
 //    @ColumnInfo(name = "isChecked")
-    private Integer isChecked;
+    private boolean isChecked;
 
     public TrapParcelable() {
     }
-
-    protected TrapParcelable(Parcel in) {
-        id = in.readInt();
-        deviceId = in.readString();
-        stime = in.readString();
-        longitude = in.readDouble();
-        latitude = in.readDouble();
-        positionError = in.readString();
-        town = in.readString();
-        village = in.readString();
-        operator = in.readString();
-        xb = in.readString();
-        db = in.readString();
-        qrcode = in.readString();
-        codeInt = in.readString();
-        userId = in.readString();
-        updateServer = in.readByte() != 0;
-        if (in.readByte() == 0) {
-            scount = null;
-        } else {
-            scount = in.readInt();
-        }
-        pic1 = in.readString();
-        pic2 = in.readString();
-        remark = in.readString();
-        if (in.readByte() == 0) {
-            lureReplaced = null;
-        } else {
-            lureReplaced = in.readInt();
-        }
-        projectId = in.readString();
-        if (in.readByte() == 0) {
-            isChecked = null;
-        } else {
-            isChecked = in.readInt();
-        }
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(id);
-        dest.writeString(deviceId);
-        dest.writeString(stime);
-        dest.writeDouble(longitude);
-        dest.writeDouble(latitude);
-        dest.writeString(positionError);
-        dest.writeString(town);
-        dest.writeString(village);
-        dest.writeString(operator);
-        dest.writeString(xb);
-        dest.writeString(db);
-        dest.writeString(qrcode);
-        dest.writeString(codeInt);
-        dest.writeString(userId);
-        dest.writeByte((byte) (updateServer ? 1 : 0));
-        if (scount == null) {
-            dest.writeByte((byte) 0);
-        } else {
-            dest.writeByte((byte) 1);
-            dest.writeInt(scount);
-        }
-        dest.writeString(pic1);
-        dest.writeString(pic2);
-        dest.writeString(remark);
-        if (lureReplaced == null) {
-            dest.writeByte((byte) 0);
-        } else {
-            dest.writeByte((byte) 1);
-            dest.writeInt(lureReplaced);
-        }
-        dest.writeString(projectId);
-        if (isChecked == null) {
-            dest.writeByte((byte) 0);
-        } else {
-            dest.writeByte((byte) 1);
-            dest.writeInt(isChecked);
-        }
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    public static final Creator<TrapParcelable> CREATOR = new Creator<TrapParcelable>() {
-        @Override
-        public TrapParcelable createFromParcel(Parcel in) {
-            return new TrapParcelable(in);
-        }
-
-        @Override
-        public TrapParcelable[] newArray(int size) {
-            return new TrapParcelable[size];
-        }
-    };
 
     public int getId() {
         return id;
@@ -318,11 +223,97 @@ public class TrapParcelable  implements Parcelable {
         this.projectId = projectId;
     }
 
-    public Integer getIsChecked() {
+    public boolean isChecked() {
         return isChecked;
     }
 
-    public void setIsChecked(Integer isChecked) {
-        this.isChecked = isChecked;
+    public void setChecked(boolean checked) {
+        isChecked = checked;
     }
+
+    protected TrapParcelable(Parcel in) {
+        id = in.readInt();
+        deviceId = in.readString();
+        stime = in.readString();
+        longitude = in.readDouble();
+        latitude = in.readDouble();
+        positionError = in.readString();
+        town = in.readString();
+        village = in.readString();
+        operator = in.readString();
+        xb = in.readString();
+        db = in.readString();
+        qrcode = in.readString();
+        codeInt = in.readString();
+        userId = in.readString();
+        updateServer = in.readByte() != 0;
+        if (in.readByte() == 0) {
+            scount = null;
+        } else {
+            scount = in.readInt();
+        }
+        pic1 = in.readString();
+        pic2 = in.readString();
+        remark = in.readString();
+        if (in.readByte() == 0) {
+            lureReplaced = null;
+        } else {
+            lureReplaced = in.readInt();
+        }
+        projectId = in.readString();
+        isChecked = in.readByte() != 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(id);
+        dest.writeString(deviceId);
+        dest.writeString(stime);
+        dest.writeDouble(longitude);
+        dest.writeDouble(latitude);
+        dest.writeString(positionError);
+        dest.writeString(town);
+        dest.writeString(village);
+        dest.writeString(operator);
+        dest.writeString(xb);
+        dest.writeString(db);
+        dest.writeString(qrcode);
+        dest.writeString(codeInt);
+        dest.writeString(userId);
+        dest.writeByte((byte) (updateServer ? 1 : 0));
+        if (scount == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeInt(scount);
+        }
+        dest.writeString(pic1);
+        dest.writeString(pic2);
+        dest.writeString(remark);
+        if (lureReplaced == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeInt(lureReplaced);
+        }
+        dest.writeString(projectId);
+        dest.writeByte((byte) (isChecked ? 1 : 0));
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<TrapParcelable> CREATOR = new Creator<TrapParcelable>() {
+        @Override
+        public TrapParcelable createFromParcel(Parcel in) {
+            return new TrapParcelable(in);
+        }
+
+        @Override
+        public TrapParcelable[] newArray(int size) {
+            return new TrapParcelable[size];
+        }
+    };
 }

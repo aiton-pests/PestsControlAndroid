@@ -56,74 +56,10 @@ public class PestsParcelable implements Parcelable {
 
     private boolean updateServer;
 
+    private boolean isChecked;
+
     public PestsParcelable() {
     }
-
-    protected PestsParcelable(Parcel in) {
-        id = in.readInt();
-        deviceId = in.readString();
-        stime = in.readString();
-        longitude = in.readDouble();
-        latitude = in.readDouble();
-        positionError = in.readString();
-        treeWalk = in.readString();
-        fellPic = in.readString();
-        stumpPic = in.readString();
-        finishPic = in.readString();
-        town = in.readString();
-        village = in.readString();
-        operator = in.readString();
-        xb = in.readString();
-        db = in.readString();
-        qrcode = in.readString();
-        codeInt = in.readString();
-        userId = in.readString();
-        bagNumber = in.readString();
-        pestsType = in.readString();
-        updateServer = in.readByte() != 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(id);
-        dest.writeString(deviceId);
-        dest.writeString(stime);
-        dest.writeDouble(longitude);
-        dest.writeDouble(latitude);
-        dest.writeString(positionError);
-        dest.writeString(treeWalk);
-        dest.writeString(fellPic);
-        dest.writeString(stumpPic);
-        dest.writeString(finishPic);
-        dest.writeString(town);
-        dest.writeString(village);
-        dest.writeString(operator);
-        dest.writeString(xb);
-        dest.writeString(db);
-        dest.writeString(qrcode);
-        dest.writeString(codeInt);
-        dest.writeString(userId);
-        dest.writeString(bagNumber);
-        dest.writeString(pestsType);
-        dest.writeByte((byte) (updateServer ? 1 : 0));
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    public static final Creator<PestsParcelable> CREATOR = new Creator<PestsParcelable>() {
-        @Override
-        public PestsParcelable createFromParcel(Parcel in) {
-            return new PestsParcelable(in);
-        }
-
-        @Override
-        public PestsParcelable[] newArray(int size) {
-            return new PestsParcelable[size];
-        }
-    };
 
     public int getId() {
         return id;
@@ -292,4 +228,80 @@ public class PestsParcelable implements Parcelable {
     public void setUpdateServer(boolean updateServer) {
         this.updateServer = updateServer;
     }
+
+    public boolean isChecked() {
+        return isChecked;
+    }
+
+    public void setChecked(boolean checked) {
+        isChecked = checked;
+    }
+
+    protected PestsParcelable(Parcel in) {
+        id = in.readInt();
+        deviceId = in.readString();
+        stime = in.readString();
+        longitude = in.readDouble();
+        latitude = in.readDouble();
+        positionError = in.readString();
+        treeWalk = in.readString();
+        fellPic = in.readString();
+        stumpPic = in.readString();
+        finishPic = in.readString();
+        town = in.readString();
+        village = in.readString();
+        operator = in.readString();
+        xb = in.readString();
+        db = in.readString();
+        qrcode = in.readString();
+        codeInt = in.readString();
+        userId = in.readString();
+        bagNumber = in.readString();
+        pestsType = in.readString();
+        updateServer = in.readByte() != 0;
+        isChecked = in.readByte() != 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(id);
+        dest.writeString(deviceId);
+        dest.writeString(stime);
+        dest.writeDouble(longitude);
+        dest.writeDouble(latitude);
+        dest.writeString(positionError);
+        dest.writeString(treeWalk);
+        dest.writeString(fellPic);
+        dest.writeString(stumpPic);
+        dest.writeString(finishPic);
+        dest.writeString(town);
+        dest.writeString(village);
+        dest.writeString(operator);
+        dest.writeString(xb);
+        dest.writeString(db);
+        dest.writeString(qrcode);
+        dest.writeString(codeInt);
+        dest.writeString(userId);
+        dest.writeString(bagNumber);
+        dest.writeString(pestsType);
+        dest.writeByte((byte) (updateServer ? 1 : 0));
+        dest.writeByte((byte) (isChecked ? 1 : 0));
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<PestsParcelable> CREATOR = new Creator<PestsParcelable>() {
+        @Override
+        public PestsParcelable createFromParcel(Parcel in) {
+            return new PestsParcelable(in);
+        }
+
+        @Override
+        public PestsParcelable[] newArray(int size) {
+            return new PestsParcelable[size];
+        }
+    };
 }

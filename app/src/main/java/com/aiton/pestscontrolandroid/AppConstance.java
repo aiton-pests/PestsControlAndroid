@@ -51,8 +51,8 @@ public class AppConstance {
     public static final String LATIDUTE = "LATIDUTE";
 
     // https://8222.qiter.com.cn/
-    //https://peststest.cn.utools.club
-    public static final String URL_APP = "https://8222.qiter.com.cn/";
+    //https://peststest.cn.utools.club/
+    public static final String URL_APP = "https://peststest.cn.utools.club/";
     public static final String URL_PESTS_SAVE = "educenter/pests/addPestsControl";
     public static final String URL_PESTS_FINDALL_CALL = "educenter/pests/findAll/call";
     public static final String URL_PESTS_FINDALL = "educenter/pests/findAll";
@@ -78,4 +78,6 @@ public class AppConstance {
     public static final String DICT_NAME_PESTS_TYPE = "pests.pests.type";
     public static final String TRAP_REMARK = "TRAP_REMARK";
     public static final String URL_TRAP_GET_QRCODE = "educenter/trap/getByQrcode/{qrcode}";
+    public static final String AUTO_UPLOAD = "AUTO_UPLOAD";             //是否允许自动上传
+    public static final String AUTO_UPLOAD_TRAP = "AUTO_UPLOAD_TRAP";
 }

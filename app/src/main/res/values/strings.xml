@@ -83,4 +83,7 @@
     <string name="trap_operator_8">第八次收虫</string>
     <string name="trap_operator_9">第九次收虫</string>
     <string name="trap_operator_10">第十次收虫</string>
+    <string name="auto_update">自动上传</string>
+    <string name="sw_auto_upload_trap">自动上传诱捕器</string>
+    <string name="sw_auto_upload_pests">自动上传其它作业</string>
 </resources>

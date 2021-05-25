@@ -30,6 +30,9 @@ public interface TrapDao {
     @Query("SELECT * FROM TRAP")
     Trap[] findAllObject();
 
+    @Query("SELECT * from TRAP where id = :id LIMIT 1")
+    Trap findById(int id);
+
     @Query("SELECT * FROM TRAP WHERE UPDATE_SERVER =:update ORDER BY ID")
     LiveData<List<Trap>> findAll(boolean update);
 

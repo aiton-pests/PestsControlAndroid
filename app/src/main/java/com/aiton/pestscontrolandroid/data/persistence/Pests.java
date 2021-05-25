@@ -56,8 +56,35 @@ public class Pests {
     @ColumnInfo(name = "update_server")
     private boolean updateServer;
 
+    @ColumnInfo(name = "isChecked")
+    private boolean isChecked;
     @Ignore
     public Pests() {
+    }
+
+    public Pests(int id, String deviceId, String stime, double longitude, double latitude, String positionError, String treeWalk, String fellPic, String stumpPic, String finishPic, String town, String village, String operator, String xb, String db, String qrcode, String codeInt, String userId, String bagNumber, String pestsType, boolean updateServer, boolean isChecked) {
+        this.id = id;
+        this.deviceId = deviceId;
+        this.stime = stime;
+        this.longitude = longitude;
+        this.latitude = latitude;
+        this.positionError = positionError;
+        this.treeWalk = treeWalk;
+        this.fellPic = fellPic;
+        this.stumpPic = stumpPic;
+        this.finishPic = finishPic;
+        this.town = town;
+        this.village = village;
+        this.operator = operator;
+        this.xb = xb;
+        this.db = db;
+        this.qrcode = qrcode;
+        this.codeInt = codeInt;
+        this.userId = userId;
+        this.bagNumber = bagNumber;
+        this.pestsType = pestsType;
+        this.updateServer = updateServer;
+        this.isChecked = isChecked;
     }
 
     @Override
@@ -84,47 +111,8 @@ public class Pests {
                 ", bagNumber='" + bagNumber + '\'' +
                 ", pestsType='" + pestsType + '\'' +
                 ", updateServer=" + updateServer +
+                ", isChecked=" + isChecked +
                 '}';
-    }
-
-    public Pests(int id, String deviceId, String stime, double longitude, double latitude, String positionError, String treeWalk, String fellPic, String stumpPic, String finishPic, String town, String village, String operator, String xb, String db, String qrcode, String codeInt, String userId, String bagNumber, String pestsType, boolean updateServer) {
-        this.id = id;
-        this.deviceId = deviceId;
-        this.stime = stime;
-        this.longitude = longitude;
-        this.latitude = latitude;
-        this.positionError = positionError;
-        this.treeWalk = treeWalk;
-        this.fellPic = fellPic;
-        this.stumpPic = stumpPic;
-        this.finishPic = finishPic;
-        this.town = town;
-        this.village = village;
-        this.operator = operator;
-        this.xb = xb;
-        this.db = db;
-        this.qrcode = qrcode;
-        this.codeInt = codeInt;
-        this.userId = userId;
-        this.bagNumber = bagNumber;
-        this.pestsType = pestsType;
-        this.updateServer = updateServer;
-    }
-
-    public String getCodeInt() {
-        return codeInt;
-    }
-
-    public void setCodeInt(String codeInt) {
-        this.codeInt = codeInt;
-    }
-
-    public boolean isUpdateServer() {
-        return updateServer;
-    }
-
-    public void setUpdateServer(boolean updateServer) {
-        this.updateServer = updateServer;
     }
 
     public int getId() {
@@ -255,6 +243,14 @@ public class Pests {
         this.qrcode = qrcode;
     }
 
+    public String getCodeInt() {
+        return codeInt;
+    }
+
+    public void setCodeInt(String codeInt) {
+        this.codeInt = codeInt;
+    }
+
     public String getUserId() {
         return userId;
     }
@@ -277,5 +273,21 @@ public class Pests {
 
     public void setPestsType(String pestsType) {
         this.pestsType = pestsType;
+    }
+
+    public boolean isUpdateServer() {
+        return updateServer;
+    }
+
+    public void setUpdateServer(boolean updateServer) {
+        this.updateServer = updateServer;
+    }
+
+    public boolean isChecked() {
+        return isChecked;
+    }
+
+    public void setChecked(boolean checked) {
+        isChecked = checked;
     }
 }

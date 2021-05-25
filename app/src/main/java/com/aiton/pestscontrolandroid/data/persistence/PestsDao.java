@@ -30,6 +30,9 @@ public interface PestsDao {
     @Query("SELECT * FROM PESTS")
     Pests[] findAllObject();
 
+    @Query("SELECT * from PESTS where id = :id LIMIT 1")
+    Pests findById(int id);
+
     @Query("SELECT * FROM PESTS WHERE UPDATE_SERVER =:update ORDER BY ID")
     LiveData<List<Pests>> findAll(boolean update);
 

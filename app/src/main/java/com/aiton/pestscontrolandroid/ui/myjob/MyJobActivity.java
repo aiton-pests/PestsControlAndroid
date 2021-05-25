@@ -6,6 +6,14 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.work.Constraints;
+import androidx.work.Data;
+import androidx.work.NetworkType;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkInfo;
+import androidx.work.WorkManager;
+import androidx.work.WorkRequest;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -24,6 +32,7 @@ import com.aiton.pestscontrolandroid.data.model.Result;
 import com.aiton.pestscontrolandroid.data.persistence.Pests;
 import com.aiton.pestscontrolandroid.data.persistence.Trap;
 import com.aiton.pestscontrolandroid.service.OssService;
+import com.aiton.pestscontrolandroid.service.PestsWork;
 import com.aiton.pestscontrolandroid.service.RetrofitUtil;
 import com.aiton.pestscontrolandroid.service.UploadPestsService;
 import com.aiton.pestscontrolandroid.ui.pests.PestsViewModel;
@@ -33,6 +42,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import cn.hutool.core.date.DateTime;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -49,12 +59,13 @@ public class MyJobActivity extends AppCompatActivity {
     ProgressBar progressBar2;
     private Button pestsUpdate,pestsUpdateAgain,pestsDelete;
     //add method
-
-
+    WorkManager workmanager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_job);
+
+        workmanager = WorkManager.getInstance(this);
         initOss();
 //        registerReceiver(mHomeKeyEventReceiver, new IntentFilter(Intent.ACTION_CLOSE_SYSTEM_DIALOGS));
         pestsUpdate = findViewById(R.id.pests_update);
@@ -103,35 +114,57 @@ public class MyJobActivity extends AppCompatActivity {
         pestsUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                RetrofitUtil.getInstance().getPestsService().aLive()
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new io.reactivex.rxjava3.core.Observer<Result>() {
-                            Disposable disposable;
+                // 数据
+                Data data = new Data.Builder().putString("key", "数据传递").build();
+                Constraints constraints = new Constraints.Builder()
+                        .setRequiredNetworkType(NetworkType.CONNECTED)
+                        .build();
+                PeriodicWorkRequest periodicWorkRequest = new PeriodicWorkRequest
+                        .Builder(PestsWork.class,3, TimeUnit.SECONDS)
+                        .setConstraints(constraints)
+                        .setInputData(data)
+                        .build();
+// 【状态机】  为什么一直都是 ENQUEUE，因为 你是轮询的任务，所以你看不到 SUCCESS     [如果你是单个任务，就会看到SUCCESS]
+                // 监听状态
+                workmanager.getWorkInfoByIdLiveData(periodicWorkRequest.getId())
+                        .observe(MyJobActivity.this, new Observer<WorkInfo>() {
                             @Override
-                            public void onSubscribe(@NonNull Disposable d) {
-                                disposable = d;
-                            }
-
-                            @Override
-                            public void onNext(@NonNull Result result) {
-                                if (result.getSuccess())
-                                    updateServer(false);
-                            }
-
-                            @Override
-                            public void onError(@NonNull Throwable e) {
-
-                                disposable.dispose();
-                                Toast.makeText(getApplicationContext(),"网络异常无法连接服务器！",Toast.LENGTH_SHORT).show();
-                            }
-
-                            @Override
-                            public void onComplete() {
-
+                            public void onChanged(WorkInfo workInfo) {
+                                Log.d(AppConstance.TAG, "状态：" + workInfo.getState().name()); // ENQUEEN   SUCCESS
+                                if (workInfo.getState().isFinished()) {
+                                    Log.d(AppConstance.TAG, "状态：isFinished=true 注意：后台任务已经完成了...");
+                                }
                             }
                         });
+                workmanager.enqueue(periodicWorkRequest);
+//                RetrofitUtil.getInstance().getPestsService().aLive()
+//                        .subscribeOn(Schedulers.io())
+//                        .observeOn(AndroidSchedulers.mainThread())
+//                        .subscribe(new io.reactivex.rxjava3.core.Observer<Result>() {
+//                            Disposable disposable;
+//                            @Override
+//                            public void onSubscribe(@NonNull Disposable d) {
+//                                disposable = d;
+//                            }
+//
+//                            @Override
+//                            public void onNext(@NonNull Result result) {
+//                                if (result.getSuccess())
+//                                    updateServer(false);
+//                            }
+//
+//                            @Override
+//                            public void onError(@NonNull Throwable e) {
+//
+//                                disposable.dispose();
+//                                Toast.makeText(getApplicationContext(),"网络异常无法连接服务器！",Toast.LENGTH_SHORT).show();
+//                            }
+//
+//                            @Override
+//                            public void onComplete() {
+//
+//                            }
+//                        });
 
             }
         });
