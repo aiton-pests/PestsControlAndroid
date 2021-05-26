@@ -25,6 +25,11 @@ public class PestsRepository {
         return pests;
 
     }
+    public Pests findByLatLonAndUserIdAndStime(Double lat,Double lon, String stime,String userId,String qrcode){
+        Pests pests =  dao.findByLatLonAndUserIdAndStime(lat,lon,stime,userId,qrcode);
+        return pests;
+
+    }
     public Pests[] findAllObject(boolean update){
         Pests[] pests =  dao.findAllObject(update);
         return pests;

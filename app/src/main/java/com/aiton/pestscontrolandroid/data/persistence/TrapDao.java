@@ -33,6 +33,9 @@ public interface TrapDao {
     @Query("SELECT * from TRAP where id = :id LIMIT 1")
     Trap findById(int id);
 
+    @Query("SELECT * from TRAP where LATITUDE = :lat AND LONGITUDE= :lon AND STIME= :stime AND USER_ID= :userId AND QRCODE= :qrcode LIMIT 1")
+    Trap findByLatLonAndUserIdAndStime(Double lat,Double lon, String stime,String userId,String qrcode);
+
     @Query("SELECT * FROM TRAP WHERE UPDATE_SERVER =:update ORDER BY ID")
     LiveData<List<Trap>> findAll(boolean update);
 

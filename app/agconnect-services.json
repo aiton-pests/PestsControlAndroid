@@ -25,6 +25,14 @@
 		"api_key":"CgB6e3x9xYyHmkioswnpQ8SHPvy6Lw2zfDrasGzVzDgvQ3aSEg1sK4VpQouQ9gL28unQFw6KcvTxKEb0gQFgYcB9",
 		"package_name":"com.aiton.pestscontrolandroid"
 	},
+	"oauth_client":{
+		"client_id":"103747029",
+		"client_type":1
+	},
+	"app_info":{
+		"app_id":"103747029",
+		"package_name":"com.aiton.pestscontrolandroid"
+	},
 	"service":{
 		"analytics":{
 			"collector_url":"datacollector-drcn.dt.hicloud.com,datacollector-drcn.dt.dbankcloud.cn",
@@ -42,11 +50,21 @@
 		}
 	},
 	"region":"CN",
-	"configuration_version":"2.0",
+	"configuration_version":"3.0",
 	"appInfos":[
 		{
 			"package_name":"com.aiton.pestscontrolandroid",
-			"app_id":"103747029"
+			"client":{
+				"app_id":"103747029"
+			},
+			"app_info":{
+				"package_name":"com.aiton.pestscontrolandroid",
+				"app_id":"103747029"
+			},
+			"oauth_client":{
+				"client_type":1,
+				"client_id":"103747029"
+			}
 		}
 	]
 }

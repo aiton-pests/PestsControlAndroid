@@ -111,8 +111,20 @@ dependencies {
     implementation 'com.leon:lfilepickerlibrary:1.8.0'
     implementation 'com.aliyun.dpa:oss-android-sdk:2.9.5'
     // 华为
-    implementation 'com.huawei.agconnect:agconnect-core:1.4.2.301'
-    implementation 'com.huawei.agconnect:agconnect-crash:1.4.2.301'
+    implementation 'com.huawei.agconnect:agconnect-core:1.5.2.300'
+    implementation  'com.huawei.agconnect:agconnect-auth:1.5.2.300'
+    implementation  'com.huawei.agconnect:agconnect-crash:1.5.2.300'
+    implementation 'com.huawei.agconnect:agconnect-apms:1.5.1.303'
+    implementation 'com.huawei.agconnect:agconnect-storage:1.3.1.200'
+    implementation  'com.huawei.agconnect:agconnect-applinking:1.5.2.300'
+    implementation  'com.huawei.agconnect:agconnect-cloud-database:1.4.7.300'
+    implementation  'com.huawei.agconnect:agconnect-function:1.5.2.300'
+    implementation 'com.huawei.agconnect:agconnect-appmessaging:1.5.2.300'
+    implementation  'com.huawei.agconnect:agconnect-remoteconfig:1.5.2.300'
+
+    implementation 'io.github.jeremyliao:live-event-bus-x:1.8.0'
+
+
     // add the Analytics Kit for Huawei Analytics
     implementation 'com.huawei.hms:hianalytics:5.1.0.300'
     implementation 'com.huawei.hms:scan:1.3.0.300'

@@ -9,12 +9,10 @@ import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
 import com.aiton.pestscontrolandroid.AppConstance;
-import com.aiton.pestscontrolandroid.data.model.Result;
-import com.aiton.pestscontrolandroid.data.persistence.Pests;
-import com.aiton.pestscontrolandroid.data.persistence.PestsRepository;
 import com.aiton.pestscontrolandroid.data.persistence.Trap;
 import com.aiton.pestscontrolandroid.data.persistence.TrapRepository;
 import com.google.gson.internal.LinkedTreeMap;
+import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -28,13 +26,13 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 
 import static com.aiton.pestscontrolandroid.AppConstance.TAG;
 
-public class TrapWork extends Worker {
+public class TrapAllOnceWork extends Worker {
     TrapRepository repository;
     private WorkerParameters workerParams;
     private Context context;
   // PestsViewModel pestsViewModel;
 
-    public TrapWork(@NonNull @NotNull Context context, @NonNull @NotNull WorkerParameters workerParams) {
+    public TrapAllOnceWork(@NonNull @NotNull Context context, @NonNull @NotNull WorkerParameters workerParams) {
         super(context, workerParams);
         this.context = context;
         this.repository = new TrapRepository(context);
@@ -88,7 +86,7 @@ public class TrapWork extends Worker {
             pestsModel.setXb(p.getXb());
             uploadServer(pestsModel);
         }
-        Log.e(TAG, "doWork: =======================TrapWork");
+        Log.e(TAG, "doWork: =======================TrapAllOnceWork");
         // 反馈数据 给 MainActivity
         // 把任务中的数据回传到activity中
         Data outputData = new Data.Builder().putString(AppConstance.WORKMANAGER_KEY, "ok").build();
@@ -118,6 +116,7 @@ public class TrapWork extends Worker {
                                 Trap p = repository.findById(id.intValue());
                                 p.setUpdateServer(true);
                                 repository.update(p);
+                                LiveEventBus.get(AppConstance.TRAP_ALL_ONCE_WORK_NOTIFICATION).postDelay(AppConstance.OK,3000);
                             }catch (Exception e){
                                 Log.e(TAG, "onNext: " + e.toString() );
                             }

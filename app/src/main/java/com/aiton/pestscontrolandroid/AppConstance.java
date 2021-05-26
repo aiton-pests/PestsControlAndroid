@@ -1,5 +1,7 @@
 package com.aiton.pestscontrolandroid;
 
+import com.jeremyliao.liveeventbus.core.LiveEvent;
+
 public class AppConstance {
     public static final String NEWS_URL = "";
     public static final String APP_HTTP = "";
@@ -80,4 +82,8 @@ public class AppConstance {
     public static final String URL_TRAP_GET_QRCODE = "educenter/trap/getByQrcode/{qrcode}";
     public static final String AUTO_UPLOAD = "AUTO_UPLOAD";             //是否允许自动上传
     public static final String AUTO_UPLOAD_TRAP = "AUTO_UPLOAD_TRAP";
+    public static final String WORKMANAGER_KEY = "WORKMANAGER_KEY";
+    public static final String PESTS_ALL_ONCE_WORK_NOTIFICATION = "PESTS_ALL_ONCE_WORK_NOTIFICATION";
+    public static final String OK = "OK";
+    public static final String TRAP_ALL_ONCE_WORK_NOTIFICATION = "TRAP_ALL_ONCE_WORK_NOTIFICATION";
 }

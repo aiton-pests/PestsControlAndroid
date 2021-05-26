@@ -99,6 +99,7 @@ import com.esri.arcgisruntime.util.ListenableList;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.huawei.agconnect.crash.AGConnectCrash;
+import com.huawei.agconnect.remoteconfig.AGConnectConfig;
 import com.huawei.hms.hmsscankit.ScanUtil;
 import com.huawei.hms.ml.scan.HmsScan;
 import com.huawei.hms.ml.scan.HmsScanAnalyzerOptions;
@@ -147,6 +148,10 @@ public class MainActivity extends AppCompatActivity {
 
     ZoomControls zoomControls;
     private boolean isSelect = false;
+
+    private static final String APP_NAME = "APP_NAME";
+//    private static final String SET_BOLD_KEY = "SET_BOLD_KEY";
+    private AGConnectConfig config;
 
     /**
      * 增加图层
@@ -805,8 +810,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        config = AGConnectConfig.getInstance();
+        config.applyDefault(R.xml.remote_config);
 
-        SPUtil.builder(getApplication().getApplicationContext(), AppConstance.APP_SP).setData(AppConstance.ISTEST, 1);
+//        SPUtil.builder(getApplication().getApplicationContext(), AppConstance.APP_SP).setData(AppConstance.ISTEST, 1);
         ArcGISRuntimeEnvironment.setLicense(AppConstance.API_KEY);
         settingViewModel = new ViewModelProvider(this).get(SettingViewModel.class);
         pestsViewModel = new ViewModelProvider(this).get(PestsViewModel.class);

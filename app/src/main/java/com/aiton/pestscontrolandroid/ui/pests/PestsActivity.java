@@ -603,6 +603,9 @@ public class PestsActivity extends AppCompatActivity {
 
                 pests.setUpdateServer(false);
                 pestsViewModel.insert(pests);
+
+                workManagerUpload(pests);
+
                 //设置默认操作员
                 setDefaultOper(pests.getOperator());
                 Intent intent = new Intent(PestsActivity.this, MainActivity.class);
@@ -637,9 +640,30 @@ public class PestsActivity extends AppCompatActivity {
     private void workManagerUpload(Pests pests){
         PestsControlModel pestsControlModel = new PestsControlModel();
         try {
+            pestsControlModel.setAppId(pests.getId());
+            pestsControlModel.setBagNumber(pests.getBagNumber());
+            pestsControlModel.setDb(pests.getDb());
+            pestsControlModel.setDeviceId(pests.getDeviceId());
+            pestsControlModel.setFellPic(pests.getFellPic());
+            pestsControlModel.setFinishPic(pests.getFinishPic());
+            pestsControlModel.setIsChecked(pests.isChecked());
+            pestsControlModel.setLatitude(pests.getLatitude());
+            pestsControlModel.setLongitude(pests.getLongitude());
+            pestsControlModel.setOperator(pests.getOperator());
+            pestsControlModel.setPestsType(pests.getPestsType());
+            pestsControlModel.setPositionError(pests.getPositionError());
+            pestsControlModel.setQrcode(pests.getQrcode());
+            pestsControlModel.setStime(pests.getStime());
+            pestsControlModel.setStumpPic(pests.getStumpPic());
+            pestsControlModel.setTown(pests.getTown());
+            pestsControlModel.setTreeWalk(pests.getTreeWalk());
+            pestsControlModel.setUserId(pests.getUserId());
+            pestsControlModel.setVillage(pests.getVillage());
+            pestsControlModel.setXb(pests.getXb());
+
             String pcmStr = mapper.writeValueAsString(pestsControlModel);
             // 数据
-            Data data = new Data.Builder().putString("key", pcmStr).build();
+            Data data = new Data.Builder().putString(AppConstance.WORKMANAGER_KEY, pcmStr).build();
             Constraints constraints = new Constraints.Builder()
                     .setRequiredNetworkType(NetworkType.CONNECTED)
                     .build();
@@ -656,7 +680,7 @@ public class PestsActivity extends AppCompatActivity {
                         public void onChanged(WorkInfo workInfo) {
                             Log.d(AppConstance.TAG, "状态：" + workInfo.getState().name()); // ENQUEEN   SUCCESS
                             if (workInfo.getState().isFinished()) {
-                                Log.d(AppConstance.TAG, "状态：isFinished=true 注意：后台任务已经完成了...");
+                                Log.d(AppConstance.TAG, "状态：isFinished=true 注意：后台任务已经完成了..."+workInfo.getOutputData().getString(AppConstance.WORKMANAGER_KEY));
                             }
                         }
                     });

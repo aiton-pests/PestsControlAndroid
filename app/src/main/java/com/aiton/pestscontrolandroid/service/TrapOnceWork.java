@@ -9,16 +9,21 @@ import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
 import com.aiton.pestscontrolandroid.AppConstance;
+import com.aiton.pestscontrolandroid.data.persistence.Pests;
 import com.aiton.pestscontrolandroid.data.persistence.Trap;
 import com.aiton.pestscontrolandroid.data.persistence.TrapRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.internal.LinkedTreeMap;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.io.IOException;
 
+import cn.com.qiter.common.vo.PestsControlModel;
 import cn.com.qiter.common.vo.PestsTrapModel;
 import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
@@ -40,55 +45,39 @@ public class TrapOnceWork extends Worker {
         initOss(context);
     }
 
+    private static ObjectMapper mapper = new ObjectMapper();
     @NonNull
     @NotNull
     @Override
     public Result doWork() {
-        String dataString = workerParams.getInputData().getString("key");
-        Trap[] pests = repository.findAllObject(false);
-        for (Trap p :
-                pests) {
-            Log.e(TAG, "doWork: " + p.toString());
-            PestsTrapModel pestsModel = new PestsTrapModel();
-            pestsModel.setDb(p.getDb());
-            pestsModel.setAppId(p.getId());
-            pestsModel.setDeviceId(p.getDeviceId());
-            pestsModel.setIsChecked(p.isChecked());
-            pestsModel.setLatitude(p.getLatitude());
-            pestsModel.setLongitude(p.getLongitude());
-            pestsModel.setLureReplaced(p.getLureReplaced());
-            if (p.getPic1() != null) {
-                File fellpic = new File(p.getPic1());
+        String dataString = workerParams.getInputData().getString(AppConstance.WORKMANAGER_KEY);
+        try {
+            PestsTrapModel pestsTrapModel = mapper.readValue(dataString,PestsTrapModel.class);
+            if (pestsTrapModel.getPic1() != null) {
+                File fellpic = new File(pestsTrapModel.getPic1());
                 String filepath = ossUpload(fellpic);
-                pestsModel.setPic1("http://" + AppConstance.BUCKETNAME + "." + AppConstance.ENDPOINT + "/" + filepath);
+                pestsTrapModel.setPic1("http://" + AppConstance.BUCKETNAME + "." + AppConstance.ENDPOINT + "/" + filepath);
             } else {
-                pestsModel.setPic1("");
+                pestsTrapModel.setPic1("");
             }
 
-            if (p.getPic2() != null) {
-                File stumpPic = new File(p.getPic2());
+            if (pestsTrapModel.getPic2() != null) {
+                File stumpPic = new File(pestsTrapModel.getPic2());
                 String filepath = ossUpload(stumpPic);
-                pestsModel.setPic2("http://" + AppConstance.BUCKETNAME + "." + AppConstance.ENDPOINT + "/" + filepath);
+                pestsTrapModel.setPic2("http://" + AppConstance.BUCKETNAME + "." + AppConstance.ENDPOINT + "/" + filepath);
             } else {
-                pestsModel.setPic2("");
+                pestsTrapModel.setPic2("");
             }
-            pestsModel.setOperator(p.getOperator());
-            pestsModel.setPositionError(p.getPositionError());
-            pestsModel.setProjectId(p.getProjectId());
-            pestsModel.setQrcode(p.getQrcode());
-            pestsModel.setRemark(p.getRemark());
-            pestsModel.setScount(p.getScount());
-            pestsModel.setStime(p.getStime());
-            pestsModel.setTown(p.getTown());
-            pestsModel.setUserId(p.getUserId());
-            pestsModel.setVillage(p.getVillage());
-            pestsModel.setXb(p.getXb());
-            uploadServer(pestsModel);
+
+            uploadServer(pestsTrapModel);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        Log.e(TAG, "doWork: =======================");
+
+        Log.e(TAG, "doWork: =======================TrapOnceWork");
         // 反馈数据 给 MainActivity
         // 把任务中的数据回传到activity中
-        Data outputData = new Data.Builder().putString("success", "ok").build();
+        Data outputData = new Data.Builder().putString(AppConstance.WORKMANAGER_KEY, "ok").build();
         Result success = Result.success(outputData);
         return success;
     }
@@ -111,8 +100,14 @@ public class TrapOnceWork extends Worker {
                             Log.e(AppConstance.TAG, "onNext: " + result.toString());
                             // repository.update();
                             try {
-                                Double id = (Double) ((LinkedTreeMap)result.getData().get("row")).get("appId");
-                                Trap p = repository.findById(id.intValue());
+                                Double longitude = (Double) ((LinkedTreeMap)result.getData().get("row")).get("longitude");
+                                Double latitude = (Double) ((LinkedTreeMap)result.getData().get("row")).get("latitude");
+                                String userId = (String) ((LinkedTreeMap)result.getData().get("row")).get("userId");
+                                String qrcode = (String) ((LinkedTreeMap)result.getData().get("row")).get("qrcode");
+                                Double stime = (Double) ((LinkedTreeMap)result.getData().get("row")).get("stime");
+                                DateTime ddd = DateUtil.date(stime.longValue());
+                                String time = DateUtil.format( ddd,"yyyy-MM-dd HH:mm:ss");
+                                Trap p = repository.findByLatLonAndUserIdAndStime(latitude,longitude,time,userId,qrcode);
                                 p.setUpdateServer(true);
                                 repository.update(p);
                             }catch (Exception e){

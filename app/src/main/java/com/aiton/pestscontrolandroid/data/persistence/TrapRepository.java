@@ -24,6 +24,11 @@ public class TrapRepository {
         return pests;
 
     }
+    public Trap findByLatLonAndUserIdAndStime(Double lat,Double lon, String stime,String userId,String qrcode){
+        Trap pests =  dao.findByLatLonAndUserIdAndStime(lat,lon,  stime, userId,qrcode);
+        return pests;
+
+    }
     public Trap[] findAllObject(boolean update){
         Trap[] pests =  dao.findAllObject(update);
         return pests;

@@ -1,5 +1,6 @@
 package com.aiton.pestscontrolandroid.ui.myjob;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
@@ -32,10 +33,13 @@ import com.aiton.pestscontrolandroid.data.model.Result;
 import com.aiton.pestscontrolandroid.data.persistence.Pests;
 import com.aiton.pestscontrolandroid.data.persistence.Trap;
 import com.aiton.pestscontrolandroid.service.OssService;
+import com.aiton.pestscontrolandroid.service.PestsAllOnceWork;
+import com.aiton.pestscontrolandroid.service.PestsOnceWork;
 import com.aiton.pestscontrolandroid.service.PestsWork;
 import com.aiton.pestscontrolandroid.service.RetrofitUtil;
 import com.aiton.pestscontrolandroid.service.UploadPestsService;
 import com.aiton.pestscontrolandroid.ui.pests.PestsViewModel;
+import com.jeremyliao.liveeventbus.LiveEventBus;
 
 
 import java.io.File;
@@ -111,32 +115,47 @@ public class MyJobActivity extends AppCompatActivity {
                 }
             }
         });
+        LiveEventBus
+                .get(AppConstance.PESTS_ALL_ONCE_WORK_NOTIFICATION, String.class)
+                .observe(this, new Observer<String>() {
+                    @Override
+                    public void onChanged(@Nullable String s) {
+                        Log.e(TAG, "onChanged: " + s);
+                        adapter.notifyDataSetChanged();
+                    }
+                });
+
         pestsUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // 数据
-                Data data = new Data.Builder().putString("key", "数据传递").build();
+                Data data = new Data.Builder().putString(AppConstance.WORKMANAGER_KEY, "数据传递").build();
                 Constraints constraints = new Constraints.Builder()
                         .setRequiredNetworkType(NetworkType.CONNECTED)
                         .build();
-                PeriodicWorkRequest periodicWorkRequest = new PeriodicWorkRequest
-                        .Builder(PestsWork.class,3, TimeUnit.SECONDS)
+//                PeriodicWorkRequest periodicWorkRequest = new PeriodicWorkRequest
+//                        .Builder(PestsWork.class,3, TimeUnit.SECONDS)
+//                        .setConstraints(constraints)
+//                        .setInputData(data)
+//                        .build();
+                OneTimeWorkRequest oneTimeWorkRequest = new OneTimeWorkRequest.Builder(PestsAllOnceWork.class)
+                        .setInputData(data) // 数据的携带
                         .setConstraints(constraints)
-                        .setInputData(data)
                         .build();
 // 【状态机】  为什么一直都是 ENQUEUE，因为 你是轮询的任务，所以你看不到 SUCCESS     [如果你是单个任务，就会看到SUCCESS]
                 // 监听状态
-                workmanager.getWorkInfoByIdLiveData(periodicWorkRequest.getId())
+                workmanager.getWorkInfoByIdLiveData(oneTimeWorkRequest.getId())
                         .observe(MyJobActivity.this, new Observer<WorkInfo>() {
                             @Override
                             public void onChanged(WorkInfo workInfo) {
                                 Log.d(AppConstance.TAG, "状态：" + workInfo.getState().name()); // ENQUEEN   SUCCESS
                                 if (workInfo.getState().isFinished()) {
                                     Log.d(AppConstance.TAG, "状态：isFinished=true 注意：后台任务已经完成了...");
+                                   // adapter.notifyDataSetChanged();
                                 }
                             }
                         });
-                workmanager.enqueue(periodicWorkRequest);
+                workmanager.enqueue(oneTimeWorkRequest);
 //                RetrofitUtil.getInstance().getPestsService().aLive()
 //                        .subscribeOn(Schedulers.io())
 //                        .observeOn(AndroidSchedulers.mainThread())

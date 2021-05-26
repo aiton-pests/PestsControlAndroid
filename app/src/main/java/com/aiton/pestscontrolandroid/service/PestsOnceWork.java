@@ -11,14 +11,17 @@ import androidx.work.WorkerParameters;
 import com.aiton.pestscontrolandroid.AppConstance;
 import com.aiton.pestscontrolandroid.data.persistence.Pests;
 import com.aiton.pestscontrolandroid.data.persistence.PestsRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.internal.LinkedTreeMap;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.io.IOException;
 
 import cn.com.qiter.common.vo.PestsControlModel;
 import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
@@ -40,60 +43,44 @@ public class PestsOnceWork extends Worker {
         initOss(context);
     }
 
+    private static ObjectMapper mapper = new ObjectMapper();
     @NonNull
     @NotNull
     @Override
     public Result doWork() {
-        String dataString = workerParams.getInputData().getString("key");
-        Pests[] pests = repository.findAllObject(false);
-        for (Pests p :
-                pests) {
-            Log.e(TAG, "doWork: " + p.toString());
-            PestsControlModel pestsModel = new PestsControlModel();
-            pestsModel.setQrcode(p.getQrcode());
-            pestsModel.setAppId(p.getId());
-            pestsModel.setBagNumber(p.getBagNumber());
-            pestsModel.setDb(p.getDb());
-            pestsModel.setXb(p.getXb());
-            pestsModel.setDeviceId(p.getDeviceId());
-            if (p.getFellPic() != null) {
-                File fellpic = new File(p.getFellPic());
+        String dataString = workerParams.getInputData().getString(AppConstance.WORKMANAGER_KEY);
+        try {
+            PestsControlModel pestsControlModel = mapper.readValue(dataString,PestsControlModel.class);
+            if (pestsControlModel.getFellPic() != null) {
+                File fellpic = new File(pestsControlModel.getFellPic());
                 String filepath = ossUpload(fellpic);
-                pestsModel.setFellPic("http://" + AppConstance.BUCKETNAME + "." + AppConstance.ENDPOINT + "/" + filepath);
+                pestsControlModel.setFellPic("http://" + AppConstance.BUCKETNAME + "." + AppConstance.ENDPOINT + "/" + filepath);
             } else {
-                pestsModel.setFellPic("");
+                pestsControlModel.setFellPic("");
             }
 
-            if (p.getStumpPic() != null) {
-                File stumpPic = new File(p.getStumpPic());
+            if (pestsControlModel.getStumpPic() != null) {
+                File stumpPic = new File(pestsControlModel.getStumpPic());
                 String filepath = ossUpload(stumpPic);
-                pestsModel.setStumpPic("http://" + AppConstance.BUCKETNAME + "." + AppConstance.ENDPOINT + "/" + filepath);
+                pestsControlModel.setStumpPic("http://" + AppConstance.BUCKETNAME + "." + AppConstance.ENDPOINT + "/" + filepath);
             } else {
-                pestsModel.setStumpPic("");
+                pestsControlModel.setStumpPic("");
             }
-            if (p.getFinishPic() != null) {
-                File finishPic = new File(p.getFinishPic());
+            if (pestsControlModel.getFinishPic() != null) {
+                File finishPic = new File(pestsControlModel.getFinishPic());
                 String filepath = ossUpload(finishPic);
-                pestsModel.setFinishPic("http://" + AppConstance.BUCKETNAME + "." + AppConstance.ENDPOINT + "/" + filepath);
+                pestsControlModel.setFinishPic("http://" + AppConstance.BUCKETNAME + "." + AppConstance.ENDPOINT + "/" + filepath);
             } else {
-                pestsModel.setFinishPic("");
+                pestsControlModel.setFinishPic("");
             }
-            pestsModel.setLatitude(p.getLatitude());
-            pestsModel.setLongitude(p.getLongitude());
-            pestsModel.setOperator(p.getOperator());
-            pestsModel.setPestsType(p.getPestsType());
-            pestsModel.setPositionError(p.getPositionError());
-            pestsModel.setTown(p.getTown());
-            pestsModel.setTreeWalk(p.getTreeWalk());
-            pestsModel.setUserId(p.getUserId());
-            pestsModel.setVillage(p.getVillage());
-            pestsModel.setStime(p.getStime());
-            uploadServer(pestsModel);
+            uploadServer(pestsControlModel);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        Log.e(TAG, "doWork: =======================" + dataString);
+        Log.e(TAG, "doWork: =======================PestsOnceWork " + dataString);
         // 反馈数据 给 MainActivity
         // 把任务中的数据回传到activity中
-        Data outputData = new Data.Builder().putString("success", "ok").build();
+        Data outputData = new Data.Builder().putString(AppConstance.WORKMANAGER_KEY, "ok").build();
         Result success = Result.success(outputData);
         return success;
     }
@@ -117,8 +104,14 @@ public class PestsOnceWork extends Worker {
                             Log.e(AppConstance.TAG, "onNext: " + result.toString());
                            // repository.update();
                             try {
-                                Double id = (Double) ((LinkedTreeMap)result.getData().get("row")).get("appId");
-                                Pests p = repository.findById(id.intValue());
+                                Double longitude = (Double) ((LinkedTreeMap)result.getData().get("row")).get("longitude");
+                                Double latitude = (Double) ((LinkedTreeMap)result.getData().get("row")).get("latitude");
+                                String userId = (String) ((LinkedTreeMap)result.getData().get("row")).get("userId");
+                                String qrcode = (String) ((LinkedTreeMap)result.getData().get("row")).get("qrcode");
+                                Double stime = (Double) ((LinkedTreeMap)result.getData().get("row")).get("stime");
+                                DateTime ddd = DateUtil.date(stime.longValue());
+                                String time = DateUtil.format( ddd,"yyyy-MM-dd HH:mm:ss");
+                                Pests p = repository.findByLatLonAndUserIdAndStime(latitude,longitude,time,userId,qrcode);
                                 p.setUpdateServer(true);
                                 repository.update(p);
                             }catch (Exception e){

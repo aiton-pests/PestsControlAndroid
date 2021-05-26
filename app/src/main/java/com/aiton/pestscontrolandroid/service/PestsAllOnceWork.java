@@ -12,6 +12,7 @@ import com.aiton.pestscontrolandroid.AppConstance;
 import com.aiton.pestscontrolandroid.data.persistence.Pests;
 import com.aiton.pestscontrolandroid.data.persistence.PestsRepository;
 import com.google.gson.internal.LinkedTreeMap;
+import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -44,7 +45,7 @@ public class PestsAllOnceWork extends Worker {
     @NotNull
     @Override
     public Result doWork() {
-        String dataString = workerParams.getInputData().getString("key");
+        String dataString = workerParams.getInputData().getString(AppConstance.WORKMANAGER_KEY);
         Pests[] pests = repository.findAllObject(false);
         for (Pests p :
                 pests) {
@@ -90,10 +91,10 @@ public class PestsAllOnceWork extends Worker {
             pestsModel.setStime(p.getStime());
             uploadServer(pestsModel);
         }
-        Log.e(TAG, "doWork: =======================" + dataString);
+        Log.e(TAG, "doWork: =======================PestsAllOnceWork" + dataString);
         // 反馈数据 给 MainActivity
         // 把任务中的数据回传到activity中
-        Data outputData = new Data.Builder().putString("success", "ok").build();
+        Data outputData = new Data.Builder().putString(AppConstance.WORKMANAGER_KEY, "ok").build();
         Result success = Result.success(outputData);
         return success;
     }
@@ -121,6 +122,8 @@ public class PestsAllOnceWork extends Worker {
                                 Pests p = repository.findById(id.intValue());
                                 p.setUpdateServer(true);
                                 repository.update(p);
+                                LiveEventBus.get(AppConstance.PESTS_ALL_ONCE_WORK_NOTIFICATION).postDelay(AppConstance.OK,3000);
+
                             }catch (Exception e){
                                 Log.e(TAG, "onNext: " + e.toString() );
                             }

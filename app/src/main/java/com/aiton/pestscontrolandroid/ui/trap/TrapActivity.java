@@ -8,6 +8,12 @@ import androidx.core.content.FileProvider;
 import androidx.core.os.EnvironmentCompat;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.work.Constraints;
+import androidx.work.Data;
+import androidx.work.NetworkType;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkInfo;
+import androidx.work.WorkManager;
 
 import android.Manifest;
 import android.content.ContentResolver;
@@ -38,8 +44,13 @@ import com.aiton.pestscontrolandroid.AppConstance;
 import com.aiton.pestscontrolandroid.R;
 import com.aiton.pestscontrolandroid.data.model.UcenterMemberOrder;
 import com.aiton.pestscontrolandroid.data.persistence.Trap;
+import com.aiton.pestscontrolandroid.service.PestsOnceWork;
+import com.aiton.pestscontrolandroid.service.TrapOnceWork;
 import com.aiton.pestscontrolandroid.ui.main.MainActivity;
+import com.aiton.pestscontrolandroid.ui.pests.PestsActivity;
 import com.aiton.pestscontrolandroid.utils.SPUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.io.File;
@@ -54,6 +65,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 
+import cn.com.qiter.common.vo.PestsControlModel;
 import cn.com.qiter.common.vo.PestsTrapModel;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
@@ -88,6 +100,7 @@ public class TrapActivity extends AppCompatActivity {
         setContentView(R.layout.activity_trap);
         trapViewModel = new ViewModelProvider(this).get(TrapViewModel.class);
 
+        workmanager = WorkManager.getInstance(this);
         initRemarkDataSource();
         etTrapCodeInt = findViewById(R.id.etCodeInt);
         etQrcode = findViewById(R.id.etQrcode);
@@ -255,6 +268,7 @@ public class TrapActivity extends AppCompatActivity {
 
                 trap.setUpdateServer(false);
                 trapViewModel.insert(trap);
+                workmanagerUpload(trap);
                 setDefaultOper(trap.getOperator());
                 Intent intent = new Intent(TrapActivity.this, MainActivity.class);
                 startActivity(intent);
@@ -263,6 +277,63 @@ public class TrapActivity extends AppCompatActivity {
         displayDefaultOperator();
     }
 
+    WorkManager workmanager;
+    private static ObjectMapper mapper = new ObjectMapper();
+    private void workmanagerUpload(Trap pests){
+        PestsTrapModel pestsTrapModel = new PestsTrapModel();
+        try {
+            pestsTrapModel.setAppId(pests.getId());
+            pestsTrapModel.setDb(pests.getDb());
+            pestsTrapModel.setDeviceId(pests.getDeviceId());
+            pestsTrapModel.setIsChecked(pests.isChecked());
+            pestsTrapModel.setLatitude(pests.getLatitude());
+            pestsTrapModel.setLongitude(pests.getLongitude());
+            pestsTrapModel.setLureReplaced(pests.getLureReplaced());
+            pestsTrapModel.setOperator(pests.getOperator());
+            pestsTrapModel.setPic1(pests.getPic1());
+            pestsTrapModel.setPic2(pests.getPic2());
+            pestsTrapModel.setPositionError(pests.getPositionError());
+            pestsTrapModel.setProjectId(pests.getProjectId());
+            pestsTrapModel.setQrcode(pests.getQrcode());
+            pestsTrapModel.setStime(pests.getStime());
+            pestsTrapModel.setRemark(pests.getRemark());
+            pestsTrapModel.setTown(pests.getTown());
+            pestsTrapModel.setScount(pests.getScount());
+            pestsTrapModel.setUserId(pests.getUserId());
+            pestsTrapModel.setVillage(pests.getVillage());
+            pestsTrapModel.setXb(pests.getXb());
+
+            String pcmStr = mapper.writeValueAsString(pestsTrapModel);
+            // 数据
+            Data data = new Data.Builder().putString(AppConstance.WORKMANAGER_KEY, pcmStr).build();
+            Constraints constraints = new Constraints.Builder()
+                    .setRequiredNetworkType(NetworkType.CONNECTED)
+                    .build();
+            OneTimeWorkRequest oneTimeWorkRequest = new OneTimeWorkRequest.Builder(TrapOnceWork.class)
+                    .setInputData(data) // 数据的携带
+                    .setConstraints(constraints)
+                    .build();
+
+// 【状态机】  为什么一直都是 ENQUEUE，因为 你是轮询的任务，所以你看不到 SUCCESS     [如果你是单个任务，就会看到SUCCESS]
+            // 监听状态
+            workmanager.getWorkInfoByIdLiveData(oneTimeWorkRequest.getId())
+                    .observe(TrapActivity.this, new Observer<WorkInfo>() {
+                        @Override
+                        public void onChanged(WorkInfo workInfo) {
+                            Log.d(AppConstance.TAG, "状态：" + workInfo.getState().name()); // ENQUEEN   SUCCESS
+                            if (workInfo.getState().isFinished()) {
+                                Log.d(AppConstance.TAG, "状态：isFinished=true 注意：后台任务已经完成了..."+workInfo.getOutputData().getString(AppConstance.WORKMANAGER_KEY));
+                            }
+                        }
+                    });
+            workmanager.enqueue(oneTimeWorkRequest);
+
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
+
+    }
     private void setDefaultOper(String operator) {
         SPUtil.builder(getApplicationContext(),AppConstance.APP_SP).setData(AppConstance.OPERATOR_DEFAULT,operator);
     }

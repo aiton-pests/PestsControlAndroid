@@ -33,6 +33,9 @@ public interface PestsDao {
     @Query("SELECT * from PESTS where id = :id LIMIT 1")
     Pests findById(int id);
 
+    @Query("SELECT * from PESTS where LATITUDE = :lat AND LONGITUDE= :lon AND STIME= :stime AND USER_ID= :userId AND QRCODE= :qrcode LIMIT 1")
+    Pests findByLatLonAndUserIdAndStime(Double lat,Double lon, String stime,String userId,String qrcode);
+
     @Query("SELECT * FROM PESTS WHERE UPDATE_SERVER =:update ORDER BY ID")
     LiveData<List<Pests>> findAll(boolean update);
 

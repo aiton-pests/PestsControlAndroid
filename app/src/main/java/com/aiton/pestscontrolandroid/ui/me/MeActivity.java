@@ -13,6 +13,7 @@ import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -42,6 +43,11 @@ import com.aiton.pestscontrolandroid.ui.myjob.MyJobActivity;
 import com.aiton.pestscontrolandroid.ui.pests.PestsViewModel;
 import com.aiton.pestscontrolandroid.utils.BugTest;
 import com.aiton.pestscontrolandroid.utils.SPUtil;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.huawei.agconnect.remoteconfig.AGConnectConfig;
+import com.huawei.agconnect.remoteconfig.ConfigValues;
+import com.huawei.hmf.tasks.OnFailureListener;
+import com.huawei.hmf.tasks.OnSuccessListener;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -53,35 +59,29 @@ public class MeActivity extends AppCompatActivity {
     private PestsViewModel pestsViewModel;
     LoginViewModel loginViewModel;
     private ImageView blurImageView;
-    private ImageView avatarImageView;
+    private ImageView avatarImageView,ivAbout;
     private Switch swDisabled,swTest,swAutoUpload,swTiandi,swAutoUploadTrap;
-    TextView tvMobile,tvNickname;
+    TextView tvMobile,tvNickname,tvMeAbout;
     CardView cardView;
     Button btnLogout;
 
+    private AGConnectConfig config;
+    private static final String UI_ME_ABOUT = "UI_ME_ABOUT";
+    private static final String SET_MEMBER_IS_TEST = "SET_MEMBER_IS_TEST";
+
     WorkManager workmanager;
-    PeriodicWorkRequest periodicWorkRequest;
-    PeriodicWorkRequest periodicWorkRequestTrap;
+    WorkManager workmanagerTrap;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_me);
         workmanager = WorkManager.getInstance(this);
-        // 数据
-        Data data = new Data.Builder().putString("key", "数据传递").build();
-        Constraints constraints = new Constraints.Builder()
-                .setRequiredNetworkType(NetworkType.CONNECTED)
-                .build();
-        periodicWorkRequest = new PeriodicWorkRequest
-                .Builder(PestsWork.class,3, TimeUnit.SECONDS)
-                .setConstraints(constraints)
-                .setInputData(data)
-                .build();
-        periodicWorkRequestTrap = new PeriodicWorkRequest
-                .Builder(TrapWork.class,3, TimeUnit.SECONDS)
-                .setConstraints(constraints)
-                .setInputData(data)
-                .build();
+        workmanagerTrap = WorkManager.getInstance(this);
+        // 华为远程配置
+        config = AGConnectConfig.getInstance();
+        config.applyDefault(R.xml.remote_config);
+
+        tvMeAbout = findViewById(R.id.tv_me_about);
         avatarImageView = findViewById(R.id.h_head);
         swTiandi = findViewById(R.id.sw_tiandi);
         swDisabled = findViewById(R.id.sw_disabled);
@@ -92,7 +92,14 @@ public class MeActivity extends AppCompatActivity {
         cardView = findViewById(R.id.aboutme);
         swTest = findViewById(R.id.sw_test);
         btnLogout = findViewById(R.id.btn_logout);
-
+        ivAbout = findViewById(R.id.iv_about);
+        ivAbout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                displayed();
+                fetchAndApply();
+            }
+        });
         cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -149,6 +156,12 @@ public class MeActivity extends AppCompatActivity {
                 swAutoUpload.setChecked(aBoolean);
             }
         });
+        meViewModel.getIsAutoUploadTrap().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                swAutoUploadTrap.setChecked(aBoolean);
+            }
+        });
         swTest.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -160,6 +173,19 @@ public class MeActivity extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 meViewModel.setIsAutoUpload(isChecked);
                 if (isChecked){
+
+                    workmanager.cancelAllWork();
+                    // 数据
+                    Data data = new Data.Builder().putString(AppConstance.WORKMANAGER_KEY, "数据传递").build();
+                    Constraints constraints = new Constraints.Builder()
+                            .setRequiredNetworkType(NetworkType.CONNECTED)
+                            .build();
+
+                    PeriodicWorkRequest periodicWorkRequest = new PeriodicWorkRequest
+                            .Builder(PestsWork.class,3, TimeUnit.SECONDS)
+                            .setConstraints(constraints)
+                            .setInputData(data)
+                            .build();
 
 // 【状态机】  为什么一直都是 ENQUEUE，因为 你是轮询的任务，所以你看不到 SUCCESS     [如果你是单个任务，就会看到SUCCESS]
                     // 监听状态
@@ -175,7 +201,7 @@ public class MeActivity extends AppCompatActivity {
                             });
                     workmanager.enqueue(periodicWorkRequest);
                 }else{
-                    workmanager.cancelWorkById(periodicWorkRequest.getId());
+                    workmanager.cancelAllWork();
                 }
             }
         });
@@ -186,7 +212,19 @@ public class MeActivity extends AppCompatActivity {
                 if (isChecked){
 // 【状态机】  为什么一直都是 ENQUEUE，因为 你是轮询的任务，所以你看不到 SUCCESS     [如果你是单个任务，就会看到SUCCESS]
                     // 监听状态
-                    workmanager.getWorkInfoByIdLiveData(periodicWorkRequestTrap.getId())
+                    workmanagerTrap.cancelAllWork();
+                    // 数据
+                    Data data = new Data.Builder().putString(AppConstance.WORKMANAGER_KEY, "数据传递").build();
+                    Constraints constraints = new Constraints.Builder()
+                            .setRequiredNetworkType(NetworkType.CONNECTED)
+                            .build();
+
+                    PeriodicWorkRequest periodicWorkRequestTrap = new PeriodicWorkRequest
+                            .Builder(TrapWork.class,3, TimeUnit.SECONDS)
+                            .setConstraints(constraints)
+                            .setInputData(data)
+                            .build();
+                    workmanagerTrap.getWorkInfoByIdLiveData(periodicWorkRequestTrap.getId())
                             .observe(MeActivity.this, new Observer<WorkInfo>() {
                                 @Override
                                 public void onChanged(WorkInfo workInfo) {
@@ -196,14 +234,50 @@ public class MeActivity extends AppCompatActivity {
                                     }
                                 }
                             });
-                    workmanager.enqueue(periodicWorkRequestTrap);
+                    workmanagerTrap.enqueue(periodicWorkRequestTrap);
                 }else{
-                    workmanager.cancelWorkById(periodicWorkRequestTrap.getId());
+                    workmanagerTrap.cancelAllWork();
                 }
             }
         });
         meViewModel.loadTest();
         meViewModel.loadAutoUpload();
+        meViewModel.loadAutoUploadTrap();
+    }
+    private void fetchAndApply(){
+        config.fetch(0).addOnSuccessListener(new OnSuccessListener<ConfigValues>() {
+            @Override
+            public void onSuccess(ConfigValues configValues) {
+                // Apply Network Config to Current Config
+                config.apply(configValues);
+                updateUI();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(Exception e) {
+                tvMeAbout.setText("fetch setting failed: ");
+            }
+        });
+    }
+
+    private void updateUI(){
+        String text = config.getValueAsString(UI_ME_ABOUT);
+//        Boolean isBold = config.getValueAsBoolean(SET_BOLD_KEY);
+        tvMeAbout.setText(text);
+//        if (isBold){
+//            tvMeAbout.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
+//        }
+    }
+
+
+    private void loadUI(){
+        config.applyDefault(R.xml.remote_config);
+        tvMeAbout.setText(config.getValueAsString(UI_ME_ABOUT));
+//        Boolean isBold = config.getValueAsBoolean(SET_BOLD_KEY);
+//        if (isBold){
+//            textView.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
+//        }
+
     }
     private void displayed(){
         Pests[] pests = pestsViewModel.findAllObject();

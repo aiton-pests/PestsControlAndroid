@@ -30,7 +30,22 @@ public class MeViewModel extends AndroidViewModel {
                 SPUtil.builder(getApplication(), AppConstance.APP_SP).setData(AppConstance.ISTEST, true);
             }
         }
-
+        if (isAutoUpload == null){
+            isAutoUpload = new MutableLiveData<>();
+            isAutoUpload.setValue(false);
+            Boolean istest = SPUtil.builder(getApplication(), AppConstance.APP_SP).getData(AppConstance.AUTO_UPLOAD, Boolean.class);
+            if (istest == null){
+                SPUtil.builder(getApplication(), AppConstance.APP_SP).setData(AppConstance.AUTO_UPLOAD, false);
+            }
+        }
+        if (isAutoUploadTrap == null){
+            isAutoUploadTrap = new MutableLiveData<>();
+            isAutoUploadTrap.setValue(false);
+            Boolean istest = SPUtil.builder(getApplication(), AppConstance.APP_SP).getData(AppConstance.AUTO_UPLOAD_TRAP, Boolean.class);
+            if (istest == null){
+                SPUtil.builder(getApplication(), AppConstance.APP_SP).setData(AppConstance.AUTO_UPLOAD_TRAP, false);
+            }
+        }
         if (tiandiMap == null){
             tiandiMap = new MutableLiveData<>();
             tiandiMap.setValue(true);

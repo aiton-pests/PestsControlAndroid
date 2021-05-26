@@ -259,7 +259,7 @@
                 android:layout_height="match_parent">
 
                 <TextView
-                    android:id="@+id/textView24"
+                    android:id="@+id/tv_me_about"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/about"
@@ -269,12 +269,12 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <ImageView
-                    android:id="@+id/imageView"
+                    android:id="@+id/iv_about"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:layout_constraintBottom_toBottomOf="@+id/textView24"
+                    app:layout_constraintBottom_toBottomOf="@+id/tv_me_about"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/textView24"
+                    app:layout_constraintTop_toTopOf="@+id/tv_me_about"
                     app:srcCompat="@drawable/ic_baseline_chevron_right_24" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
