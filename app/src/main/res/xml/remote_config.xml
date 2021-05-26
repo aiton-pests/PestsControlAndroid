@@ -1,0 +1,5 @@
+<remoteconfig>
+    <value key="APP_NAME">交日志</value>
+    <value key="UI_ME_ABOUT">关于我们</value>
+    <value key="SET_MEMBER_IS_TEST">false</value>
+</remoteconfig>
