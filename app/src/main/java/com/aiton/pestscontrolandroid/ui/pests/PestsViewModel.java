@@ -115,6 +115,10 @@ public class PestsViewModel extends AndroidViewModel {
         return ss;
     }
 
+    public Pests findByLatLonAndUserIdAndStime(Double lat,Double lon, String stime,String userId,String qrcode) {
+        Pests ss = repository.findByLatLonAndUserIdAndStime(lat,lon,stime,userId,qrcode);
+        return ss;
+    }
     public LiveData<List<Pests>> findAll(boolean update) {
         LiveData<List<Pests>> ss = repository.findAll(update);
         return ss;

@@ -1,10 +1,17 @@
 package com.aiton.pestscontrolandroid.ui.main;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.work.Constraints;
+import androidx.work.Data;
+import androidx.work.NetworkType;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkInfo;
+import androidx.work.WorkManager;
 
 import android.Manifest;
 import android.app.AlertDialog;
@@ -33,9 +40,12 @@ import com.aiton.pestscontrolandroid.AppConstance;
 import com.aiton.pestscontrolandroid.R;
 import com.aiton.pestscontrolandroid.data.model.ShpFile;
 import com.aiton.pestscontrolandroid.data.persistence.Pests;
+import com.aiton.pestscontrolandroid.data.persistence.Trap;
 import com.aiton.pestscontrolandroid.service.AutoUpdater;
 import com.aiton.pestscontrolandroid.service.OssService;
+import com.aiton.pestscontrolandroid.service.PestsWork;
 import com.aiton.pestscontrolandroid.service.RetrofitUtil;
+import com.aiton.pestscontrolandroid.service.TrapWork;
 import com.aiton.pestscontrolandroid.ui.login.LoginActivity;
 import com.aiton.pestscontrolandroid.ui.login.LoginViewModel;
 import com.aiton.pestscontrolandroid.ui.me.MeActivity;
@@ -46,6 +56,7 @@ import com.aiton.pestscontrolandroid.ui.pests.PestsViewModel;
 import com.aiton.pestscontrolandroid.ui.setting.SettingActivity;
 import com.aiton.pestscontrolandroid.ui.setting.SettingViewModel;
 import com.aiton.pestscontrolandroid.ui.trap.TrapActivity;
+import com.aiton.pestscontrolandroid.ui.trap.TrapViewModel;
 import com.aiton.pestscontrolandroid.ui.trap.TrayJobActivity;
 import com.aiton.pestscontrolandroid.utils.AMapTiledLayerClass;
 import com.aiton.pestscontrolandroid.utils.GoogleMapLayer;
@@ -103,6 +114,7 @@ import com.huawei.agconnect.remoteconfig.AGConnectConfig;
 import com.huawei.hms.hmsscankit.ScanUtil;
 import com.huawei.hms.ml.scan.HmsScan;
 import com.huawei.hms.ml.scan.HmsScanAnalyzerOptions;
+import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -111,13 +123,15 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import cn.com.qiter.common.vo.PestsControlModel;
 import cn.com.qiter.common.vo.PestsTrapModel;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 
 public class MainActivity extends AppCompatActivity {
-    private static final String TAG = "PestsControl";
+    private static final String TAG = "MainActivity";
 
     private LocationDisplay mLocationDisplay;
     private final int requestCode4Arcgis = 2;
@@ -131,6 +145,7 @@ public class MainActivity extends AppCompatActivity {
     //********* SettingViewModel ***********
     private SettingViewModel settingViewModel;
     private PestsViewModel pestsViewModel;
+    private TrapViewModel trapViewModel;
     private MainViewModel mainViewModel;
     LoginViewModel loginViewModel;
     private MeViewModel meViewModel;
@@ -149,10 +164,8 @@ public class MainActivity extends AppCompatActivity {
     ZoomControls zoomControls;
     private boolean isSelect = false;
 
-    private static final String APP_NAME = "APP_NAME";
-//    private static final String SET_BOLD_KEY = "SET_BOLD_KEY";
-    private AGConnectConfig config;
 
+    WorkManager workmanager;
     /**
      * 增加图层
      *
@@ -527,13 +540,13 @@ public class MainActivity extends AppCompatActivity {
                     Iterator<Feature> iterator = result.iterator();
                     Boolean test = SPUtil.builder(getApplication().getApplicationContext(), AppConstance.APP_SP).getData(AppConstance.ISTEST, Boolean.class);
                     // 1 表示生产环境（发布） ； 0 表示测试环境
-                    if (test) {
+                    if (!test) {
                         int counter = 0;
                         while (iterator.hasNext()) {
                             counter++;
                             mainViewModel.setSelectedFeature(counter);
                             Feature feature = iterator.next();
-
+                            //TODO 可以通过华为远程配置，对离线地图的字段与后台数据库的字段对应进行修改
                             Map<String, Object> attributes = feature.getAttributes();
                             Log.e(TAG, "run: " + attributes.toString());
                             Map<String, Object> hm = (Map<String, Object>) attributes;
@@ -569,7 +582,9 @@ public class MainActivity extends AppCompatActivity {
                             mMapView.setViewpointGeometryAsync(geometry.getExtent());
 
                         }
-
+                        if (counter == 0){
+                            Toast.makeText(MainActivity.this, "不在离线地图区域内，请确认您的定位！", Toast.LENGTH_SHORT).show();
+                        }
                     } else {
                         Map<String, String> map = new HashMap<>();
                         map.put(AppConstance.JYXZCNAME, "新店镇");
@@ -767,36 +782,58 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         //receive result after your activity finished scanning
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode != RESULT_OK || data == null) {
-            return;
+        if (requestCode == AppConstance.STARTACTIVITY_MAINACTIVITY_PESTSACTIVITY && resultCode == RESULT_OK) {
+            // SearchAddressInfo info = (SearchAddressInfo) data.getParcelableExtra("position");
+            Pests pp = (Pests) data.getSerializableExtra("data");
+            Log.e(TAG, "MainActivity - onActivityResult: " + pp.toString());
+            Pests p = pestsViewModel.findByLatLonAndUserIdAndStime(pp.getLatitude(),pp.getLongitude(),pp.getStime(),pp.getUserId(),pp.getQrcode());
+            Log.e(TAG, "MainActivity - onActivityResult: " + p.toString());
+            if (p != null){
+                Toast.makeText(this, "二维码 ["+p.getCodeInt()+"] 数据保存成功！", Toast.LENGTH_SHORT).show();
+            }
+//            mTvClockInAddress.setText(position);
+        }
+        if (requestCode == AppConstance.STARTACTIVITY_MAINACTIVITY_TRAPACTIVITY && resultCode == RESULT_OK) {
+            // SearchAddressInfo info = (SearchAddressInfo) data.getParcelableExtra("position");
+            Trap pp = (Trap) data.getSerializableExtra("data");
+            Log.e(TAG, "MainActivity - onActivityResult: " + pp.toString());
+            Trap p = trapViewModel.findByLatLonAndUserIdAndStime(pp.getLatitude(),pp.getLongitude(),pp.getStime(),pp.getUserId(),pp.getQrcode());
+            Log.e(TAG, "MainActivity - onActivityResult: " + p.toString());
+            if (p != null){
+                Toast.makeText(this, "二维码 ["+p.getCodeInt()+"] 数据保存成功！", Toast.LENGTH_SHORT).show();
+            }
+//            mTvClockInAddress.setText(position);
         }
         // Obtain the return value of HmsScan from the value returned by the onActivityResult method by using ScanUtil.RESULT as the key value.
-        if (requestCode == REQUEST_CODE_SCAN) {
+        if (requestCode == REQUEST_CODE_SCAN && resultCode == RESULT_OK && data != null) {
             Object obj = data.getParcelableExtra(ScanUtil.RESULT);
             if (obj instanceof HmsScan) {
                 if (!TextUtils.isEmpty(((HmsScan) obj).getOriginalValue())) {
                     Toast.makeText(this, ((HmsScan) obj).getOriginalValue(), Toast.LENGTH_SHORT).show();
                     String qrcode = ((HmsScan) obj).getOriginalValue();
-                    if (StrUtil.contains(qrcode,"trap")){
-                        Intent intent = new Intent(MainActivity.this, TrapActivity.class);
-                        PestsTrapModel trap = new PestsTrapModel();
-                        String resultQrcode = StrUtil.subAfter(qrcode, "=", true);
-                        trap.setQrcode(resultQrcode);
-                        HashMap<String, String> map = (HashMap<String, String>) mainViewModel.getMap();
-                        intent.putExtra(AppConstance.TRAPMODEL, trap);
-                        intent.putExtra(AppConstance.FEATURE_ATTRIBUTE_MAP, map);
-                        startActivity(intent);
-                    } else {
-                        Intent intent = new Intent(MainActivity.this, PestsActivity.class);
-                        PestsControlModel pests = new PestsControlModel();
-                        String resultQrcode = StrUtil.subAfter(qrcode, "=", true);
-                        pests.setQrcode(resultQrcode);
-                        HashMap<String, String> map = (HashMap<String, String>) mainViewModel.getMap();
-                        intent.putExtra(AppConstance.PESTSMODEL, pests);
-                        intent.putExtra(AppConstance.FEATURE_ATTRIBUTE_MAP, map);
-                        startActivity(intent);
+                    if (StrUtil.contains(qrcode,"qiter.com.cn")){
+                        if (StrUtil.contains(qrcode,"trap")){
+                            Intent intent = new Intent(MainActivity.this, TrapActivity.class);
+                            PestsTrapModel trap = new PestsTrapModel();
+                            String resultQrcode = StrUtil.subAfter(qrcode, "=", true);
+                            trap.setQrcode(resultQrcode);
+                            HashMap<String, String> map = (HashMap<String, String>) mainViewModel.getMap();
+                            intent.putExtra(AppConstance.TRAPMODEL, trap);
+                            intent.putExtra(AppConstance.FEATURE_ATTRIBUTE_MAP, map);
+                            startActivityForResult(intent,AppConstance.STARTACTIVITY_MAINACTIVITY_TRAPACTIVITY);
+                        } else {
+                            Intent intent = new Intent(MainActivity.this, PestsActivity.class);
+                            PestsControlModel pests = new PestsControlModel();
+                            String resultQrcode = StrUtil.subAfter(qrcode, "=", true);
+                            pests.setQrcode(resultQrcode);
+                            HashMap<String, String> map = (HashMap<String, String>) mainViewModel.getMap();
+                            intent.putExtra(AppConstance.PESTSMODEL, pests);
+                            intent.putExtra(AppConstance.FEATURE_ATTRIBUTE_MAP, map);
+                            startActivityForResult(intent,AppConstance.STARTACTIVITY_MAINACTIVITY_PESTSACTIVITY);
+                        }
+                    }else{
+                        Toast.makeText(this, "请扫描系统专属二维码!", Toast.LENGTH_LONG).show();
                     }
-
                 }
                 return;
             }
@@ -805,18 +842,90 @@ public class MainActivity extends AppCompatActivity {
 
     ////////////////////////华为 SCAN KIT         /////////////////// 权限 结束
     // Basemap basemap, aMapBasemap, googleBasemap, arcgisBasemap, osmBasemap, geoBasemap;
+    private void initWorkManagerForAutoUpload(){
+        Boolean test = SPUtil.builder(getApplication(), AppConstance.APP_SP).getData(AppConstance.AUTO_UPLOAD, Boolean.class);
+        if (test == null || test == false){
+            Log.e(TAG, "initWorkManagerForAutoUpload: 未配置自己上传功能");
+            workmanager.cancelAllWork();
+        }else{
+            workmanager.cancelAllWork();
 
+            // 数据
+            Data data = new Data.Builder().putString(AppConstance.WORKMANAGER_KEY, "数据传递").build();
+            Constraints constraints = new Constraints.Builder()
+                    .setRequiredNetworkType(NetworkType.CONNECTED)
+                    .build();
+
+            PeriodicWorkRequest periodicWorkRequest = new PeriodicWorkRequest
+                    .Builder(PestsWork.class,16, TimeUnit.MINUTES)
+                    .setConstraints(constraints)
+                    .setInputData(data)
+                    .build();
+
+// 【状态机】  为什么一直都是 ENQUEUE，因为 你是轮询的任务，所以你看不到 SUCCESS     [如果你是单个任务，就会看到SUCCESS]
+            // 监听状态
+            workmanager.getWorkInfoByIdLiveData(periodicWorkRequest.getId())
+                    .observe(MainActivity.this, new Observer<WorkInfo>() {
+                        @Override
+                        public void onChanged(WorkInfo workInfo) {
+                            Log.d(AppConstance.TAG, "状态：" + workInfo.getState().name() + DateUtil.now()); // ENQUEEN   SUCCESS
+                            if (workInfo.getState().isFinished()) {
+                                Log.d(AppConstance.TAG, "状态：isFinished=true 注意：后台任务已经完成了..."+ DateUtil.now());
+                            }
+                        }
+                    });
+
+
+            // 数据
+            Data dataTrap = new Data.Builder().putString(AppConstance.WORKMANAGER_KEY, "数据传递").build();
+            Constraints constraintsTrap = new Constraints.Builder()
+                    .setRequiredNetworkType(NetworkType.CONNECTED)
+                    .build();
+
+            PeriodicWorkRequest periodicWorkRequestTrap = new PeriodicWorkRequest
+                    .Builder(TrapWork.class,16, TimeUnit.MINUTES)
+                    .setConstraints(constraintsTrap)
+                    .setInputData(dataTrap)
+                    .build();
+            workmanager.getWorkInfoByIdLiveData(periodicWorkRequestTrap.getId())
+                    .observe(MainActivity.this, new Observer<WorkInfo>() {
+                        @Override
+                        public void onChanged(WorkInfo workInfo) {
+                            Log.d(AppConstance.TAG, "状态：" + workInfo.getState().name()); // ENQUEEN   SUCCESS
+                            if (workInfo.getState().isFinished()) {
+                                Log.d(AppConstance.TAG, "状态：isFinished=true 注意：后台任务已经完成了...");
+                            }
+                        }
+                    });
+
+            List<PeriodicWorkRequest> workRequests = new ArrayList<>();
+            workRequests.add(periodicWorkRequest);
+            workRequests.add(periodicWorkRequestTrap);
+            workmanager.enqueue(workRequests);
+        }
+
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        config = AGConnectConfig.getInstance();
-        config.applyDefault(R.xml.remote_config);
 
+        workmanager = WorkManager.getInstance(this);
+        LiveEventBus
+                .get(AppConstance.WORK_NOTIFICATION_AUTO_UPLOAD, String.class)
+                .observe(this, new Observer<String>() {
+                    @Override
+                    public void onChanged(@Nullable String s) {
+                        Log.e(TAG, "onChanged: " + s);
+                        //开启业务数据自动上传更新
+                        initWorkManagerForAutoUpload();
+                    }
+                });
 //        SPUtil.builder(getApplication().getApplicationContext(), AppConstance.APP_SP).setData(AppConstance.ISTEST, 1);
         ArcGISRuntimeEnvironment.setLicense(AppConstance.API_KEY);
         settingViewModel = new ViewModelProvider(this).get(SettingViewModel.class);
         pestsViewModel = new ViewModelProvider(this).get(PestsViewModel.class);
+        trapViewModel = new ViewModelProvider(this).get(TrapViewModel.class);
         mainViewModel = new ViewModelProvider(this).get(MainViewModel.class);
         loginViewModel = new ViewModelProvider(this).get(LoginViewModel.class);
         meViewModel = new ViewModelProvider(this).get(MeViewModel.class);
@@ -897,8 +1006,8 @@ public class MainActivity extends AppCompatActivity {
                     Log.e(TAG, "手机端数据新增加一条: " + pests.toString());
             }
         });
-
-
+        LiveEventBus.get(AppConstance.WORK_NOTIFICATION_AUTO_UPLOAD).postDelay(AppConstance.OK,3000);
+        //APP版本更新
         checkUpdate();
     }
 
@@ -926,56 +1035,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
         mMapView.setMap(arcGISMap);
-
-//        if (model.getGeoShow()) {
-//            Basemap geoBasemap = new Basemap();
-//            geoBasemap.setName(AppConstance.GEO_MAP);
-//            String theURLString = "http://map.geoq.cn/arcgis/rest/services/ChinaOnlineCommunity/MapServer";
-//            ArcGISTiledLayer mainArcGISTiledLayer = new ArcGISTiledLayer(theURLString);
-//            geoBasemap.getBaseLayers().add(mainArcGISTiledLayer);
-//            arcGISMap.setBasemap(geoBasemap);
-//        }
-//
-//        if (model.getGoogleShow()) {
-//            Basemap googleBasemap = new Basemap();
-//            googleBasemap.setName(AppConstance.GOOGLE_MAP);
-//            WebTiledLayer googleLayer = null;
-//            try {
-//                googleLayer = GoogleMapLayer.CreateGoogleLayer(GoogleMapLayer.MapType.IMAGE);
-//                googleLayer.loadAsync();
-//
-//            } catch (Exception e) {
-//                Toast.makeText(this, "Google地图加载失败，请关闭", Toast.LENGTH_SHORT).show();
-//            }
-//            // 加载谷歌地图
-//            try {
-//
-//                googleBasemap.getBaseLayers().add(googleLayer);
-////                boolean contains = arcGISMap.getBasemap().getName().equals(AppConstance.GOOGLE_MAP);
-////                if (!contains){
-//                arcGISMap.setBasemap(googleBasemap);
-////                }
-//            } catch (Exception e) {
-//                Toast.makeText(this, "Google地图加载失败，请关闭", Toast.LENGTH_SHORT).show();
-//            }
-//        }
-//        if (model.getaMapShow()) {
-//            // 加载高德地图
-//            Basemap aMapBasemap = new Basemap();
-//            aMapBasemap.setName(AppConstance.AMAP_MAP);
-//            WebTiledLayer aMap = AMapTiledLayerClass.CreateAMapTiledLayer(AMapTiledLayerClass.LayerType.AMAP_IMAGE);
-//            aMap.loadAsync();
-//            aMapBasemap.getBaseLayers().add(aMap);
-//            arcGISMap.setBasemap(aMapBasemap);
-//        }
-//        if (model.getOsmShow()) {
-//            //加载OpenStreetMap底图
-//            Basemap osmBasemap = new Basemap();
-//            osmBasemap.setName(AppConstance.OSM_MAP);
-//            OpenStreetMapLayer streetlayer = new OpenStreetMapLayer();
-//            osmBasemap.getBaseLayers().add(streetlayer);
-//            arcGISMap.setBasemap(osmBasemap);
-//        }
     }
 
     @Override
@@ -1065,39 +1124,69 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                if (mainViewModel.isLoadedShp()) {
-                    //判断GPS是否正常启动
-                    mLocationDisplay.setAutoPanMode(LocationDisplay.AutoPanMode.RECENTER);
-                    if (!mLocationDisplay.isStarted())
-                        mLocationDisplay.startAsync();
-                    LocationDataSource.Location arcgislocation = mLocationDisplay.getLocation();
-                    if (arcgislocation != null) {
-                        com.esri.arcgisruntime.geometry.Point point = arcgislocation.getPosition();
-                        queryByPointloglat(point);
-                    } else {
-                        LocationUtils.getInstance(getApplicationContext()).setAddressCallback(new LocationUtils.AddressCallback() {
-                            @Override
-                            public void onGetAddress(Address address) {
-                                String countryName = address.getCountryName();//国家
-                                String adminArea = address.getAdminArea();//省
-                                String locality = address.getLocality();//市
-                                String subLocality = address.getSubLocality();//区
-                                String featureName = address.getFeatureName();//街道
-                                Toast.makeText(getApplicationContext(), "定位地址" + countryName + adminArea + locality + subLocality + featureName, Toast.LENGTH_LONG).show();
-                            }
-
-                            @Override
-                            public void onGetLocation(double lat, double lng) {
-                                com.esri.arcgisruntime.geometry.Point point = new com.esri.arcgisruntime.geometry.Point(lng, lat);
-                                Toast.makeText(getApplicationContext(), "定位地址" + lat + ":" + lng, Toast.LENGTH_LONG).show();
+                Boolean isSCAN = SPUtil.builder(getApplication(), AppConstance.APP_SP).getData(AppConstance.IS_SCAN, Boolean.class);
+                if (isSCAN != null && isSCAN){
+                    Boolean loadSHP = SPUtil.builder(getApplication(), AppConstance.APP_SP).getData(AppConstance.LOAD_SHP, Boolean.class);
+                    if (loadSHP == null || loadSHP == false ){
+                        Map<String, String> map = new HashMap<>();
+                        map.put(AppConstance.JYXZCNAME, "无离线地图");
+                        map.put(AppConstance.CGQNAME, "无离线地图");
+                        map.put(AppConstance.DBH, "无离线地图");
+                        map.put(AppConstance.XBH, "无离线地图");
+                        map.put(AppConstance.LONGITUDE, "118.23904583");
+                        map.put(AppConstance.LATIDUTE, "24.60177837");
+                        mainViewModel.setMap(map);
+                        /////////////////华为SCAN KIT ////////////////// 调用扫码功能
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                            ActivityCompat.requestPermissions(MainActivity.this,
+                                    new String[]{Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE},
+                                    DEFAULT_VIEW);
+                        }
+                    }else {
+                        if (mainViewModel.isLoadedShp()) {
+                            //判断GPS是否正常启动
+                            mLocationDisplay.setAutoPanMode(LocationDisplay.AutoPanMode.RECENTER);
+                            if (!mLocationDisplay.isStarted())
+                                mLocationDisplay.startAsync();
+                            LocationDataSource.Location arcgislocation = mLocationDisplay.getLocation();
+                            if (arcgislocation != null) {
+                                com.esri.arcgisruntime.geometry.Point point = arcgislocation.getPosition();
                                 queryByPointloglat(point);
+                            } else {
+                                LocationUtils.getInstance(getApplicationContext()).setAddressCallback(new LocationUtils.AddressCallback() {
+                                    @Override
+                                    public void onGetAddress(Address address) {
+                                        String countryName = address.getCountryName();//国家
+                                        String adminArea = address.getAdminArea();//省
+                                        String locality = address.getLocality();//市
+                                        String subLocality = address.getSubLocality();//区
+                                        String featureName = address.getFeatureName();//街道
+                                        Toast.makeText(getApplicationContext(), "定位地址" + countryName + adminArea + locality + subLocality + featureName, Toast.LENGTH_LONG).show();
+                                    }
+
+                                    @Override
+                                    public void onGetLocation(double lat, double lng) {
+                                        com.esri.arcgisruntime.geometry.Point point = new com.esri.arcgisruntime.geometry.Point(lng, lat);
+                                        Toast.makeText(getApplicationContext(), "定位地址" + lat + ":" + lng, Toast.LENGTH_LONG).show();
+                                        queryByPointloglat(point);
+                                    }
+                                });
                             }
-                        });
+
+                            // mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, locationListener);
+                            // AGConnectCrash.getInstance().testIt(MainActivity.this);
+
+                        }else{
+                            Toast.makeText(MainActivity.this, "请加载离线地图！", Toast.LENGTH_SHORT).show();
+                        }
                     }
-
-                    // mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, locationListener);
-                    // AGConnectCrash.getInstance().testIt(MainActivity.this);
-
+                }else{
+                    Toast.makeText(MainActivity.this, "请在个人设置启动【扫码】！", Toast.LENGTH_SHORT).show();
+//                    Intent intent = new Intent(MainActivity.this, TrapActivity.class);
+//                    HashMap<String, String> map = (HashMap<String, String>) mainViewModel.getMap();
+//                    intent.putExtra(AppConstance.TRAPMODEL, trap);
+//                    intent.putExtra(AppConstance.FEATURE_ATTRIBUTE_MAP, map);
+//                    startActivityForResult(intent,AppConstance.STARTACTIVITY_MAINACTIVITY_TRAPACTIVITY);
                 }
             }
         });

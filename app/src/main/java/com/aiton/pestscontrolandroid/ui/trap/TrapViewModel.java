@@ -156,6 +156,10 @@ public class TrapViewModel extends AndroidViewModel {
         Trap[] ss = repository.findAllObject(update);
         return ss;
     }
+    public Trap findByLatLonAndUserIdAndStime(Double lat,Double lon, String stime,String userId,String qrcode){
+        Trap pests =  repository.findByLatLonAndUserIdAndStime(lat,lon,  stime, userId,qrcode);
+        return pests;
+    }
     public LiveData<List<Trap>> findAll(boolean update){
         LiveData<List<Trap>> ss = repository.findAll(update);
         return ss;

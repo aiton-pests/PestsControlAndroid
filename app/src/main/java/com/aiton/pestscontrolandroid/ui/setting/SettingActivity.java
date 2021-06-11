@@ -47,6 +47,7 @@ import java.util.regex.Pattern;
 
 
 public class SettingActivity extends AppCompatActivity {
+    private static final String TAG = "MainActivity";
     int REQUESTCODE_FROM_ACTIVITY = 1000;
     private TextView tvLoadShp, tvGalleryMap;
     private SettingViewModel settingViewModel;

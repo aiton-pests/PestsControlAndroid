@@ -20,6 +20,7 @@ import java.io.File;
 
 import cn.com.qiter.common.vo.PestsControlModel;
 import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
@@ -118,8 +119,15 @@ public class PestsAllOnceWork extends Worker {
                             Log.e(AppConstance.TAG, "onNext: " + result.toString());
                            // repository.update();
                             try {
-                                Double id = (Double) ((LinkedTreeMap)result.getData().get("row")).get("appId");
-                                Pests p = repository.findById(id.intValue());
+                                Double longitude = (Double) ((LinkedTreeMap)result.getData().get("row")).get("longitude");
+                                Double latitude = (Double) ((LinkedTreeMap)result.getData().get("row")).get("latitude");
+                                String userId = (String) ((LinkedTreeMap)result.getData().get("row")).get("userId");
+                                String qrcode = (String) ((LinkedTreeMap)result.getData().get("row")).get("qrcode");
+                                Double stime = (Double) ((LinkedTreeMap)result.getData().get("row")).get("stime");
+                                DateTime ddd = DateUtil.date(stime.longValue());
+                                DateTime dt = DateUtil.offsetHour(ddd,-8);
+                                String time = DateUtil.format( dt,"yyyy-MM-dd HH:mm:ss");
+                                Pests p = repository.findByLatLonAndUserIdAndStime(latitude,longitude,time,userId,qrcode);
                                 p.setUpdateServer(true);
                                 repository.update(p);
                                 LiveEventBus.get(AppConstance.PESTS_ALL_ONCE_WORK_NOTIFICATION).postDelay(AppConstance.OK,3000);

@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModelProvider;
@@ -30,7 +31,9 @@ import java.util.concurrent.TimeUnit;
 import cn.com.qiter.common.vo.PestsControlModel;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
@@ -56,7 +59,7 @@ public class PestsWork extends Worker {
     @Override
     public Result doWork() {
         String dataString = workerParams.getInputData().getString(AppConstance.WORKMANAGER_KEY);
-        Pests[] pests = repository.findAllObject(false);
+        Pests[] pests = repository.findAllObject();
         for (Pests p :
                 pests) {
             Log.e(TAG, "doWork: " + p.toString());
@@ -67,28 +70,31 @@ public class PestsWork extends Worker {
             pestsModel.setDb(p.getDb());
             pestsModel.setXb(p.getXb());
             pestsModel.setDeviceId(p.getDeviceId());
-            if (p.getFellPic() != null) {
-                File fellpic = new File(p.getFellPic());
-                String filepath = ossUpload(fellpic);
-                pestsModel.setFellPic("http://" + AppConstance.BUCKETNAME + "." + AppConstance.ENDPOINT + "/" + filepath);
-            } else {
-                pestsModel.setFellPic("");
-            }
-
-            if (p.getStumpPic() != null) {
-                File stumpPic = new File(p.getStumpPic());
-                String filepath = ossUpload(stumpPic);
-                pestsModel.setStumpPic("http://" + AppConstance.BUCKETNAME + "." + AppConstance.ENDPOINT + "/" + filepath);
-            } else {
-                pestsModel.setStumpPic("");
-            }
-            if (p.getFinishPic() != null) {
-                File finishPic = new File(p.getFinishPic());
-                String filepath = ossUpload(finishPic);
-                pestsModel.setFinishPic("http://" + AppConstance.BUCKETNAME + "." + AppConstance.ENDPOINT + "/" + filepath);
-            } else {
-                pestsModel.setFinishPic("");
-            }
+            pestsModel.setStumpPic(p.getStumpPic());
+            pestsModel.setFinishPic(p.getFinishPic());
+            pestsModel.setFellPic(p.getFellPic());
+//            if (p.getFellPic() != null) {
+//                File fellpic = new File(p.getFellPic());
+//                String filepath = ossUpload(fellpic);
+//                pestsModel.setFellPic("http://" + AppConstance.BUCKETNAME + "." + AppConstance.ENDPOINT + "/" + filepath);
+//            } else {
+//                pestsModel.setFellPic("");
+//            }
+//
+//            if (p.getStumpPic() != null) {
+//                File stumpPic = new File(p.getStumpPic());
+//                String filepath = ossUpload(stumpPic);
+//                pestsModel.setStumpPic("http://" + AppConstance.BUCKETNAME + "." + AppConstance.ENDPOINT + "/" + filepath);
+//            } else {
+//                pestsModel.setStumpPic("");
+//            }
+//            if (p.getFinishPic() != null) {
+//                File finishPic = new File(p.getFinishPic());
+//                String filepath = ossUpload(finishPic);
+//                pestsModel.setFinishPic("http://" + AppConstance.BUCKETNAME + "." + AppConstance.ENDPOINT + "/" + filepath);
+//            } else {
+//                pestsModel.setFinishPic("");
+//            }
             pestsModel.setLatitude(p.getLatitude());
             pestsModel.setLongitude(p.getLongitude());
             pestsModel.setOperator(p.getOperator());
@@ -99,7 +105,8 @@ public class PestsWork extends Worker {
             pestsModel.setUserId(p.getUserId());
             pestsModel.setVillage(p.getVillage());
             pestsModel.setStime(p.getStime());
-            uploadServer(pestsModel);
+//            uploadServer(pestsModel);
+            checkUpload(pestsModel);
         }
         Log.e(TAG, "doWork: =======================PestsWork  " + dataString);
         // 反馈数据 给 MainActivity
@@ -108,9 +115,81 @@ public class PestsWork extends Worker {
         Result success = Result.success(outputData);
         return success;
     }
+    public void checkUpload(PestsControlModel pestsModel){
 
+        RetrofitUtil.getInstance().getPestsService().checkUpload(pestsModel.getQrcode(),pestsModel.getLatitude(),pestsModel.getLongitude(),pestsModel.getUserId(),pestsModel.getStime())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<com.aiton.pestscontrolandroid.data.model.Result>() {
+                    Disposable disposable;
+                    @Override
+                    public void onSubscribe(@io.reactivex.rxjava3.annotations.NonNull Disposable d) {
+                        disposable = d;
+                    }
+
+                    @Override
+                    public void onNext(com.aiton.pestscontrolandroid.data.model.@io.reactivex.rxjava3.annotations.NonNull Result result) {
+                        //后台记录是否有
+                        if (result.getSuccess()) {
+                            Log.e(AppConstance.TAG, "onNext: " + result.toString());
+                            // repository.update();
+                            Double longitude = (Double) ((LinkedTreeMap)result.getData().get("row")).get("longitude");
+                            Double latitude = (Double) ((LinkedTreeMap)result.getData().get("row")).get("latitude");
+                            String userId = (String) ((LinkedTreeMap)result.getData().get("row")).get("userId");
+                            String qrcode = (String) ((LinkedTreeMap)result.getData().get("row")).get("qrcode");
+                            Double stime = (Double) ((LinkedTreeMap)result.getData().get("row")).get("stime");
+                            DateTime ddd = DateUtil.date(stime.longValue());
+                            DateTime dt = DateUtil.offsetHour(ddd,-8);
+                            String time = DateUtil.format( dt,"yyyy-MM-dd HH:mm:ss");
+                            Pests p = repository.findByLatLonAndUserIdAndStime(latitude,longitude,time,userId,qrcode);
+                            p.setUpdateServer(true);
+                            repository.update(p);
+                        }else{
+                            Log.e(AppConstance.TAG, "onNext: " + result.toString());
+                            try {
+                                //PestsControlModel pestsModel = new PestsControlModel();
+                                uploadServer(pestsModel);
+                            }catch (Exception e){
+                                Log.e(TAG, "onNext: " + e.toString() );
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onError(@io.reactivex.rxjava3.annotations.NonNull Throwable e) {
+                        Log.e(TAG, "onError: " + e.getMessage());
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+    }
 
     public void uploadServer(PestsControlModel pestsModel) {
+        if (pestsModel.getFellPic() != null) {
+            File fellpic = new File(pestsModel.getFellPic());
+            String filepath = ossUpload(fellpic);
+            pestsModel.setFellPic("http://" + AppConstance.BUCKETNAME + "." + AppConstance.ENDPOINT + "/" + filepath);
+        } else {
+            pestsModel.setFellPic("");
+        }
+
+        if (pestsModel.getStumpPic() != null) {
+            File stumpPic = new File(pestsModel.getStumpPic());
+            String filepath = ossUpload(stumpPic);
+            pestsModel.setStumpPic("http://" + AppConstance.BUCKETNAME + "." + AppConstance.ENDPOINT + "/" + filepath);
+        } else {
+            pestsModel.setStumpPic("");
+        }
+        if (pestsModel.getFinishPic() != null) {
+            File finishPic = new File(pestsModel.getFinishPic());
+            String filepath = ossUpload(finishPic);
+            pestsModel.setFinishPic("http://" + AppConstance.BUCKETNAME + "." + AppConstance.ENDPOINT + "/" + filepath);
+        } else {
+            pestsModel.setFinishPic("");
+        }
         RetrofitUtil.getInstance().getPestsService().savePests(pestsModel)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

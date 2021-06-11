@@ -17,17 +17,18 @@ public class MeViewModel extends AndroidViewModel {
     private MutableLiveData<UcenterMemberOrder> mutableLiveData;
     private MutableLiveData<Boolean> isTest;
     private MutableLiveData<Boolean> isAutoUpload;
-    private MutableLiveData<Boolean> isAutoUploadTrap;
+    private MutableLiveData<Boolean> isLoadSHP;
+    private MutableLiveData<Boolean> isScan;
     ///天地图或ArcGIS地图
     private MutableLiveData<Boolean> tiandiMap;
     public MeViewModel(@NonNull Application application) {
         super(application);
         if (isTest == null){
             isTest = new MutableLiveData<>();
-            isTest.setValue(true);
+            isTest.setValue(false);
             Boolean istest = SPUtil.builder(getApplication(), AppConstance.APP_SP).getData(AppConstance.ISTEST, Boolean.class);
             if (istest == null){
-                SPUtil.builder(getApplication(), AppConstance.APP_SP).setData(AppConstance.ISTEST, true);
+                SPUtil.builder(getApplication(), AppConstance.APP_SP).setData(AppConstance.ISTEST, false);
             }
         }
         if (isAutoUpload == null){
@@ -38,12 +39,20 @@ public class MeViewModel extends AndroidViewModel {
                 SPUtil.builder(getApplication(), AppConstance.APP_SP).setData(AppConstance.AUTO_UPLOAD, false);
             }
         }
-        if (isAutoUploadTrap == null){
-            isAutoUploadTrap = new MutableLiveData<>();
-            isAutoUploadTrap.setValue(false);
-            Boolean istest = SPUtil.builder(getApplication(), AppConstance.APP_SP).getData(AppConstance.AUTO_UPLOAD_TRAP, Boolean.class);
+        if (isLoadSHP == null){
+            isLoadSHP = new MutableLiveData<>();
+            isLoadSHP.setValue(true);
+            Boolean istest = SPUtil.builder(getApplication(), AppConstance.APP_SP).getData(AppConstance.LOAD_SHP, Boolean.class);
             if (istest == null){
-                SPUtil.builder(getApplication(), AppConstance.APP_SP).setData(AppConstance.AUTO_UPLOAD_TRAP, false);
+                SPUtil.builder(getApplication(), AppConstance.APP_SP).setData(AppConstance.LOAD_SHP, true);
+            }
+        }
+        if (isScan == null){
+            isScan = new MutableLiveData<>();
+            Boolean istest = SPUtil.builder(getApplication(), AppConstance.APP_SP).getData(AppConstance.IS_SCAN, Boolean.class);
+            if (istest == null){
+                isScan.setValue(true);
+                SPUtil.builder(getApplication(), AppConstance.APP_SP).setData(AppConstance.IS_SCAN, true);
             }
         }
         if (tiandiMap == null){
@@ -101,16 +110,29 @@ public class MeViewModel extends AndroidViewModel {
         isAutoUpload.setValue(test);
     }
 
-    public MutableLiveData<Boolean> getIsAutoUploadTrap() {
-        return isAutoUploadTrap;
+    public MutableLiveData<Boolean> getIsLoadSHP() {
+        return isLoadSHP;
     }
 
-    public void setIsAutoUploadTrap(Boolean isAutoUploadTrap) {
-        SPUtil.builder(getApplication(), AppConstance.APP_SP).setData(AppConstance.AUTO_UPLOAD_TRAP, isAutoUploadTrap);
+    public void setIsLoadSHP(Boolean isLoadSHP) {
+        SPUtil.builder(getApplication(), AppConstance.APP_SP).setData(AppConstance.LOAD_SHP, isLoadSHP);
     }
 
-    public void loadAutoUploadTrap(){
-        Boolean test = SPUtil.builder(getApplication(), AppConstance.APP_SP).getData(AppConstance.AUTO_UPLOAD_TRAP, Boolean.class);
-        isAutoUploadTrap.setValue(test);
+    public void loadLoadSHP(){
+        Boolean test = SPUtil.builder(getApplication(), AppConstance.APP_SP).getData(AppConstance.LOAD_SHP, Boolean.class);
+        isLoadSHP.setValue(test);
+    }
+
+    public MutableLiveData<Boolean> getIsScan() {
+        return isScan;
+    }
+
+    public void setIsScan(Boolean isScan) {
+        SPUtil.builder(getApplication(), AppConstance.APP_SP).setData(AppConstance.IS_SCAN, isScan);
+    }
+
+    public void loadIsScan(){
+        Boolean test = SPUtil.builder(getApplication(), AppConstance.APP_SP).getData(AppConstance.IS_SCAN, Boolean.class);
+        isScan.setValue(test);
     }
 }

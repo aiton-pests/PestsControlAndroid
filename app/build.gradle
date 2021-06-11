@@ -52,7 +52,19 @@ android {
         exclude 'readme.txt'
         exclude 'META-INF/io.netty.versions.properties'
     }
+
+    signingConfigs {
+        config {
+            keyAlias 'pestscontrol'
+            storeFile file('C:/Users/Administrator.DESKTOP-TNKIEM8/pestscontrol.jks')
+            storePassword 'lure2k13'
+            keyPassword 'lure2k13'
+        }
+    }
     buildTypes {
+        debug {
+            signingConfig signingConfigs.config
+        }
         release {
             signingConfig signingConfigs.release
             minifyEnabled false

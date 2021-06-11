@@ -20,6 +20,11 @@ public interface TrapService {
     @GET(AppConstance.URL_TRAP_FINDALL)
     Observable<Result> findAll();
    // Observable<ServiceResult> getNewsWithRxJava(@Query("key") String key, @Query("type") String type);
+
+    @GET(AppConstance.URL_TRAP_CHECKUPLOAD)
+    Observable<Result> checkUpload(@Path("qrcode") String qrcode,@Path("lat") Double lat,@Path("lon") Double lon,@Path("userId") String userId,@Path("stime") String stime);
+    // Observable<ServiceResult> getNewsWithRxJava(@Query("key") String key, @Query("type") String type);
+
     /**
      * 获取节点 使用rxjava
      * @return

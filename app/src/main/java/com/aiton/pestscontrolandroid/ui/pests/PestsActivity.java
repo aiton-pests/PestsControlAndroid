@@ -18,6 +18,7 @@ import androidx.work.WorkManager;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Intent;
@@ -29,6 +30,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.FileUtils;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.util.Log;
@@ -54,6 +56,7 @@ import com.aiton.pestscontrolandroid.service.PestsWork;
 import com.aiton.pestscontrolandroid.service.RetrofitUtil;
 import com.aiton.pestscontrolandroid.ui.main.MainActivity;
 import com.aiton.pestscontrolandroid.ui.myjob.MyJobActivity;
+import com.aiton.pestscontrolandroid.ui.trap.TrapActivity;
 import com.aiton.pestscontrolandroid.utils.SPUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -108,7 +111,7 @@ public class PestsActivity extends AppCompatActivity {
     private static final int PERMISSION_CAMERA_REQUEST_CODE_FELL = 0x00000012;
     private static final int PERMISSION_CAMERA_REQUEST_CODE_STUMP = 0x00000013;
     private static final int PERMISSION_CAMERA_REQUEST_CODE_FINISH = 0x00000014;
-
+    private Dialog mDialog;
 
     WorkManager workmanager;
 
@@ -530,8 +533,12 @@ public class PestsActivity extends AppCompatActivity {
                         .setAction("Action", new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
-                                Intent intent = new Intent(PestsActivity.this, MainActivity.class);
-                                startActivity(intent);
+//                                Intent intent = new Intent(PestsActivity.this, MainActivity.class);
+//                                startActivity(intent);
+                                Intent intent = getIntent();
+                                intent.putExtra("data", "NO");
+                                setResult(RESULT_CANCELED,intent);
+                                finish();
                             }
                         }).show();
 
@@ -604,12 +611,37 @@ public class PestsActivity extends AppCompatActivity {
                 pests.setUpdateServer(false);
                 pestsViewModel.insert(pests);
 
-                workManagerUpload(pests);
+//                try {
+//                    //TODO 让数据先保存到手机SQLITE中
+//                    TimeUnit.SECONDS.sleep(2);
+//
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        /**
+                         *要执行的操作
+                         */
+                        Pests p = pestsViewModel.findByLatLonAndUserIdAndStime(pests.getLatitude(),pests.getLongitude(),pests.getStime(),pests.getUserId(),pests.getQrcode());
+                        workManagerUpload(p);
+                        Log.e(TAG, "run: 延时3000");
+                    }
+                }, 3000);//3秒后执行Runnable中的run方法
+
 
                 //设置默认操作员
                 setDefaultOper(pests.getOperator());
-                Intent intent = new Intent(PestsActivity.this, MainActivity.class);
-                startActivity(intent);
+//                Intent intent = new Intent(PestsActivity.this,MainActivity.class);
+//                startActivity(intent);
+
+                Intent intent = getIntent();
+                intent.putExtra("data", pests);
+                setResult(RESULT_OK,intent);
+                finish();
+
             }
         });
         ibFellPic.setOnClickListener(new View.OnClickListener() {

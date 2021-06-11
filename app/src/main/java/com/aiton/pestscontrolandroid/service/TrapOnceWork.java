@@ -106,7 +106,8 @@ public class TrapOnceWork extends Worker {
                                 String qrcode = (String) ((LinkedTreeMap)result.getData().get("row")).get("qrcode");
                                 Double stime = (Double) ((LinkedTreeMap)result.getData().get("row")).get("stime");
                                 DateTime ddd = DateUtil.date(stime.longValue());
-                                String time = DateUtil.format( ddd,"yyyy-MM-dd HH:mm:ss");
+                                DateTime dt = DateUtil.offsetHour(ddd,-8);
+                                String time = DateUtil.format( dt,"yyyy-MM-dd HH:mm:ss");
                                 Trap p = repository.findByLatLonAndUserIdAndStime(latitude,longitude,time,userId,qrcode);
                                 p.setUpdateServer(true);
                                 repository.update(p);

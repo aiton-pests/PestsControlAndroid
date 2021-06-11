@@ -5,22 +5,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.work.Constraints;
-import androidx.work.Data;
-import androidx.work.NetworkType;
-import androidx.work.PeriodicWorkRequest;
-import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 
 import android.content.Intent;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -32,35 +25,30 @@ import com.aiton.pestscontrolandroid.data.model.SettingModel;
 import com.aiton.pestscontrolandroid.data.model.ShpFile;
 import com.aiton.pestscontrolandroid.data.model.UcenterMemberOrder;
 import com.aiton.pestscontrolandroid.data.persistence.Pests;
-import com.aiton.pestscontrolandroid.data.persistence.Trap;
-import com.aiton.pestscontrolandroid.service.PestsWork;
-import com.aiton.pestscontrolandroid.service.TrapWork;
 import com.aiton.pestscontrolandroid.ui.login.LoginActivity;
 import com.aiton.pestscontrolandroid.ui.login.LoginViewModel;
-import com.aiton.pestscontrolandroid.ui.main.MainActivity;
 import com.aiton.pestscontrolandroid.ui.main.MainViewModel;
-import com.aiton.pestscontrolandroid.ui.myjob.MyJobActivity;
 import com.aiton.pestscontrolandroid.ui.pests.PestsViewModel;
 import com.aiton.pestscontrolandroid.utils.BugTest;
 import com.aiton.pestscontrolandroid.utils.SPUtil;
-import com.google.common.util.concurrent.ListenableFuture;
 import com.huawei.agconnect.remoteconfig.AGConnectConfig;
 import com.huawei.agconnect.remoteconfig.ConfigValues;
 import com.huawei.hmf.tasks.OnFailureListener;
 import com.huawei.hmf.tasks.OnSuccessListener;
+import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 
 public class MeActivity extends AppCompatActivity {
+    private static final String TAG = "MainActivity";
     MeViewModel meViewModel ;
     private MainViewModel mainViewModel;
     private PestsViewModel pestsViewModel;
     LoginViewModel loginViewModel;
     private ImageView blurImageView;
     private ImageView avatarImageView,ivAbout;
-    private Switch swDisabled,swTest,swAutoUpload,swTiandi,swAutoUploadTrap;
+    private Switch swIsScan,swTest,swAutoUpload,swTiandi,swLoadSHP;
     TextView tvMobile,tvNickname,tvMeAbout;
     CardView cardView;
     Button btnLogout;
@@ -70,13 +58,13 @@ public class MeActivity extends AppCompatActivity {
     private static final String SET_MEMBER_IS_TEST = "SET_MEMBER_IS_TEST";
 
     WorkManager workmanager;
-    WorkManager workmanagerTrap;
+//    WorkManager workmanagerTrap;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_me);
         workmanager = WorkManager.getInstance(this);
-        workmanagerTrap = WorkManager.getInstance(this);
+//        workmanagerTrap = WorkManager.getInstance(this);
         // 华为远程配置
         config = AGConnectConfig.getInstance();
         config.applyDefault(R.xml.remote_config);
@@ -84,9 +72,9 @@ public class MeActivity extends AppCompatActivity {
         tvMeAbout = findViewById(R.id.tv_me_about);
         avatarImageView = findViewById(R.id.h_head);
         swTiandi = findViewById(R.id.sw_tiandi);
-        swDisabled = findViewById(R.id.sw_disabled);
+        swIsScan = findViewById(R.id.sw_is_scan);
         swAutoUpload = findViewById(R.id.sw_auto_upload);
-        swAutoUploadTrap = findViewById(R.id.sw_auto_upload_trap);
+        swLoadSHP = findViewById(R.id.sw_load_shp);
         tvMobile = findViewById(R.id.mobile);
         tvNickname = findViewById(R.id.user_name);
         cardView = findViewById(R.id.aboutme);
@@ -112,6 +100,12 @@ public class MeActivity extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 meViewModel.saveTianDiMap2SHP(isChecked);
                // meViewModel.getTiandiMap().setValue(isChecked);
+            }
+        });
+        swIsScan.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                meViewModel.setIsScan(isChecked);
             }
         });
         ActionBar actionBar = getSupportActionBar();
@@ -156,10 +150,16 @@ public class MeActivity extends AppCompatActivity {
                 swAutoUpload.setChecked(aBoolean);
             }
         });
-        meViewModel.getIsAutoUploadTrap().observe(this, new Observer<Boolean>() {
+        meViewModel.getIsLoadSHP().observe(this, new Observer<Boolean>() {
             @Override
             public void onChanged(Boolean aBoolean) {
-                swAutoUploadTrap.setChecked(aBoolean);
+                swLoadSHP.setChecked(aBoolean);
+            }
+        });
+        meViewModel.getIsScan().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(Boolean aBoolean) {
+                swIsScan.setChecked(aBoolean);
             }
         });
         swTest.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -173,76 +173,77 @@ public class MeActivity extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 meViewModel.setIsAutoUpload(isChecked);
                 if (isChecked){
-
-                    workmanager.cancelAllWork();
-                    // 数据
-                    Data data = new Data.Builder().putString(AppConstance.WORKMANAGER_KEY, "数据传递").build();
-                    Constraints constraints = new Constraints.Builder()
-                            .setRequiredNetworkType(NetworkType.CONNECTED)
-                            .build();
-
-                    PeriodicWorkRequest periodicWorkRequest = new PeriodicWorkRequest
-                            .Builder(PestsWork.class,3, TimeUnit.SECONDS)
-                            .setConstraints(constraints)
-                            .setInputData(data)
-                            .build();
-
-// 【状态机】  为什么一直都是 ENQUEUE，因为 你是轮询的任务，所以你看不到 SUCCESS     [如果你是单个任务，就会看到SUCCESS]
-                    // 监听状态
-                    workmanager.getWorkInfoByIdLiveData(periodicWorkRequest.getId())
-                            .observe(MeActivity.this, new Observer<WorkInfo>() {
-                                @Override
-                                public void onChanged(WorkInfo workInfo) {
-                                    Log.d(AppConstance.TAG, "状态：" + workInfo.getState().name()); // ENQUEEN   SUCCESS
-                                    if (workInfo.getState().isFinished()) {
-                                        Log.d(AppConstance.TAG, "状态：isFinished=true 注意：后台任务已经完成了...");
-                                    }
-                                }
-                            });
-                    workmanager.enqueue(periodicWorkRequest);
+                    LiveEventBus.get(AppConstance.WORK_NOTIFICATION_AUTO_UPLOAD).postDelay(AppConstance.OK,3000);
+//                    workmanager.cancelAllWork();
+//
+//                    // 数据
+//                    Data data = new Data.Builder().putString(AppConstance.WORKMANAGER_KEY, "数据传递").build();
+//                    Constraints constraints = new Constraints.Builder()
+//                            .setRequiredNetworkType(NetworkType.CONNECTED)
+//                            .build();
+//
+//                    PeriodicWorkRequest periodicWorkRequest = new PeriodicWorkRequest
+//                            .Builder(PestsWork.class,16, TimeUnit.MINUTES)
+//                            .setConstraints(constraints)
+//                            .setInputData(data)
+//                            .build();
+//
+//// 【状态机】  为什么一直都是 ENQUEUE，因为 你是轮询的任务，所以你看不到 SUCCESS     [如果你是单个任务，就会看到SUCCESS]
+//                    // 监听状态
+//                    workmanager.getWorkInfoByIdLiveData(periodicWorkRequest.getId())
+//                            .observe(MeActivity.this, new Observer<WorkInfo>() {
+//                                @Override
+//                                public void onChanged(WorkInfo workInfo) {
+//                                    Log.d(AppConstance.TAG, "状态：" + workInfo.getState().name()); // ENQUEEN   SUCCESS
+//                                    if (workInfo.getState().isFinished()) {
+//                                        Log.d(AppConstance.TAG, "状态：isFinished=true 注意：后台任务已经完成了...");
+//                                    }
+//                                }
+//                            });
+//
+//
+//                    // 数据
+//                    Data dataTrap = new Data.Builder().putString(AppConstance.WORKMANAGER_KEY, "数据传递").build();
+//                    Constraints constraintsTrap = new Constraints.Builder()
+//                            .setRequiredNetworkType(NetworkType.CONNECTED)
+//                            .build();
+//
+//                    PeriodicWorkRequest periodicWorkRequestTrap = new PeriodicWorkRequest
+//                            .Builder(TrapWork.class,16, TimeUnit.MINUTES)
+//                            .setConstraints(constraintsTrap)
+//                            .setInputData(dataTrap)
+//                            .build();
+//                    workmanager.getWorkInfoByIdLiveData(periodicWorkRequestTrap.getId())
+//                            .observe(MeActivity.this, new Observer<WorkInfo>() {
+//                                @Override
+//                                public void onChanged(WorkInfo workInfo) {
+//                                    Log.d(AppConstance.TAG, "状态：" + workInfo.getState().name()); // ENQUEEN   SUCCESS
+//                                    if (workInfo.getState().isFinished()) {
+//                                        Log.d(AppConstance.TAG, "状态：isFinished=true 注意：后台任务已经完成了...");
+//                                    }
+//                                }
+//                            });
+//
+//                    List<PeriodicWorkRequest> workRequests = new ArrayList<>();
+//                    workRequests.add(periodicWorkRequest);
+//                    workRequests.add(periodicWorkRequestTrap);
+//                    workmanager.enqueue(workRequests);
                 }else{
-                    workmanager.cancelAllWork();
+                    LiveEventBus.get(AppConstance.WORK_NOTIFICATION_AUTO_UPLOAD).postDelay(AppConstance.NO,3000);
+//                    workmanager.cancelAllWork();
                 }
             }
         });
-        swAutoUploadTrap.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        swLoadSHP.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                meViewModel.setIsAutoUploadTrap(isChecked);
-                if (isChecked){
-// 【状态机】  为什么一直都是 ENQUEUE，因为 你是轮询的任务，所以你看不到 SUCCESS     [如果你是单个任务，就会看到SUCCESS]
-                    // 监听状态
-                    workmanagerTrap.cancelAllWork();
-                    // 数据
-                    Data data = new Data.Builder().putString(AppConstance.WORKMANAGER_KEY, "数据传递").build();
-                    Constraints constraints = new Constraints.Builder()
-                            .setRequiredNetworkType(NetworkType.CONNECTED)
-                            .build();
-
-                    PeriodicWorkRequest periodicWorkRequestTrap = new PeriodicWorkRequest
-                            .Builder(TrapWork.class,3, TimeUnit.SECONDS)
-                            .setConstraints(constraints)
-                            .setInputData(data)
-                            .build();
-                    workmanagerTrap.getWorkInfoByIdLiveData(periodicWorkRequestTrap.getId())
-                            .observe(MeActivity.this, new Observer<WorkInfo>() {
-                                @Override
-                                public void onChanged(WorkInfo workInfo) {
-                                    Log.d(AppConstance.TAG, "状态：" + workInfo.getState().name()); // ENQUEEN   SUCCESS
-                                    if (workInfo.getState().isFinished()) {
-                                        Log.d(AppConstance.TAG, "状态：isFinished=true 注意：后台任务已经完成了...");
-                                    }
-                                }
-                            });
-                    workmanagerTrap.enqueue(periodicWorkRequestTrap);
-                }else{
-                    workmanagerTrap.cancelAllWork();
-                }
+                meViewModel.setIsLoadSHP(isChecked);
             }
         });
         meViewModel.loadTest();
         meViewModel.loadAutoUpload();
-        meViewModel.loadAutoUploadTrap();
+        meViewModel.loadLoadSHP();
+        meViewModel.loadIsScan();
     }
     private void fetchAndApply(){
         config.fetch(0).addOnSuccessListener(new OnSuccessListener<ConfigValues>() {
@@ -336,7 +337,7 @@ public class MeActivity extends AppCompatActivity {
 //        etMobile.setText(umm.getMobile());
 //        etPassword.setText(umm.getPassword());
 //        etGmtModified.setText(umm.getGmtModified());
-        swDisabled.setChecked(umm.getDeleted());
+//        swDisabled.setChecked(umm.getDeleted());
 
     }
 

@@ -20,9 +20,12 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 
+import cn.com.qiter.common.vo.PestsControlModel;
 import cn.com.qiter.common.vo.PestsTrapModel;
 import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
@@ -48,7 +51,7 @@ public class TrapWork extends Worker {
     @Override
     public Result doWork() {
         String dataString = workerParams.getInputData().getString(AppConstance.WORKMANAGER_KEY);
-        Trap[] pests = repository.findAllObject(false);
+        Trap[] pests = repository.findAllObject();
         for (Trap p :
                 pests) {
             Log.e(TAG, "doWork: " + p.toString());
@@ -60,21 +63,23 @@ public class TrapWork extends Worker {
             pestsModel.setLatitude(p.getLatitude());
             pestsModel.setLongitude(p.getLongitude());
             pestsModel.setLureReplaced(p.getLureReplaced());
-            if (p.getPic1() != null) {
-                File fellpic = new File(p.getPic1());
-                String filepath = ossUpload(fellpic);
-                pestsModel.setPic1("http://" + AppConstance.BUCKETNAME + "." + AppConstance.ENDPOINT + "/" + filepath);
-            } else {
-                pestsModel.setPic1("");
-            }
-
-            if (p.getPic2() != null) {
-                File stumpPic = new File(p.getPic2());
-                String filepath = ossUpload(stumpPic);
-                pestsModel.setPic2("http://" + AppConstance.BUCKETNAME + "." + AppConstance.ENDPOINT + "/" + filepath);
-            } else {
-                pestsModel.setPic2("");
-            }
+            pestsModel.setPic1(p.getPic1());
+            pestsModel.setPic2(p.getPic2());
+//            if (p.getPic1() != null) {
+//                File fellpic = new File(p.getPic1());
+//                String filepath = ossUpload(fellpic);
+//                pestsModel.setPic1("http://" + AppConstance.BUCKETNAME + "." + AppConstance.ENDPOINT + "/" + filepath);
+//            } else {
+//                pestsModel.setPic1("");
+//            }
+//
+//            if (p.getPic2() != null) {
+//                File stumpPic = new File(p.getPic2());
+//                String filepath = ossUpload(stumpPic);
+//                pestsModel.setPic2("http://" + AppConstance.BUCKETNAME + "." + AppConstance.ENDPOINT + "/" + filepath);
+//            } else {
+//                pestsModel.setPic2("");
+//            }
             pestsModel.setOperator(p.getOperator());
             pestsModel.setPositionError(p.getPositionError());
             pestsModel.setProjectId(p.getProjectId());
@@ -86,7 +91,7 @@ public class TrapWork extends Worker {
             pestsModel.setUserId(p.getUserId());
             pestsModel.setVillage(p.getVillage());
             pestsModel.setXb(p.getXb());
-            uploadServer(pestsModel);
+            checkUpload(pestsModel);
         }
         Log.e(TAG, "doWork: =======================TrapWork");
         // 反馈数据 给 MainActivity
@@ -95,8 +100,74 @@ public class TrapWork extends Worker {
         Result success = Result.success(outputData);
         return success;
     }
+    public void checkUpload(PestsTrapModel pestsModel){
 
+        RetrofitUtil.getInstance().getTrapService().checkUpload(pestsModel.getQrcode(),pestsModel.getLatitude(),pestsModel.getLongitude(),pestsModel.getUserId(),pestsModel.getStime())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<com.aiton.pestscontrolandroid.data.model.Result>() {
+                    Disposable disposable;
+                    @Override
+                    public void onSubscribe(@io.reactivex.rxjava3.annotations.NonNull Disposable d) {
+                        disposable = d;
+                    }
+
+                    @Override
+                    public void onNext(com.aiton.pestscontrolandroid.data.model.@io.reactivex.rxjava3.annotations.NonNull Result result) {
+                        //后台记录是否有
+                        if (result.getSuccess()) {
+                            Log.e(AppConstance.TAG, "onNext: " + result.toString());
+                            // repository.update();
+                            Double longitude = (Double) ((LinkedTreeMap)result.getData().get("row")).get("longitude");
+                            Double latitude = (Double) ((LinkedTreeMap)result.getData().get("row")).get("latitude");
+                            String userId = (String) ((LinkedTreeMap)result.getData().get("row")).get("userId");
+                            String qrcode = (String) ((LinkedTreeMap)result.getData().get("row")).get("qrcode");
+                            Double stime = (Double) ((LinkedTreeMap)result.getData().get("row")).get("stime");
+                            DateTime ddd = DateUtil.date(stime.longValue());
+                            DateTime dt = DateUtil.offsetHour(ddd,-8);
+                            String time = DateUtil.format( dt,"yyyy-MM-dd HH:mm:ss");
+                            Trap p = repository.findByLatLonAndUserIdAndStime(latitude,longitude,time,userId,qrcode);
+//                            Trap p = repository.findById(id.intValue());
+                            p.setUpdateServer(true);
+                            repository.update(p);
+                        }else{
+                            Log.e(AppConstance.TAG, "onNext: " + result.toString());
+                            try {
+                                //PestsControlModel pestsModel = new PestsControlModel();
+                                uploadServer(pestsModel);
+                            }catch (Exception e){
+                                Log.e(TAG, "onNext: " + e.toString() );
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onError(@io.reactivex.rxjava3.annotations.NonNull Throwable e) {
+                        Log.e(TAG, "onError: " + e.getMessage());
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+    }
     public void uploadServer(PestsTrapModel pestsModel) {
+        if (pestsModel.getPic1() != null) {
+            File fellpic = new File(pestsModel.getPic1());
+            String filepath = ossUpload(fellpic);
+            pestsModel.setPic1("http://" + AppConstance.BUCKETNAME + "." + AppConstance.ENDPOINT + "/" + filepath);
+        } else {
+            pestsModel.setPic1("");
+        }
+
+        if (pestsModel.getPic2() != null) {
+            File stumpPic = new File(pestsModel.getPic2());
+            String filepath = ossUpload(stumpPic);
+            pestsModel.setPic2("http://" + AppConstance.BUCKETNAME + "." + AppConstance.ENDPOINT + "/" + filepath);
+        } else {
+            pestsModel.setPic2("");
+        }
         RetrofitUtil.getInstance().getTrapService().save(pestsModel)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

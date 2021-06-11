@@ -54,10 +54,11 @@ public class AppConstance {
 
     // https://8222.qiter.com.cn/
     //https://peststest.cn.utools.club/
-    public static final String URL_APP = "https://peststest.cn.utools.club/";
+    public static final String URL_APP = "https://8222.qiter.com.cn/";
     public static final String URL_PESTS_SAVE = "educenter/pests/addPestsControl";
     public static final String URL_PESTS_FINDALL_CALL = "educenter/pests/findAll/call";
     public static final String URL_PESTS_FINDALL = "educenter/pests/findAll";
+    public static final String URL_PESTS_CHECKUPLOAD = "educenter/pests/getByQrcodeAndLatLonAndUserIdAndStime/{qrcode}/{lat}/{lon}/{userId}/{stime}";
     public static final String URL_ALIVE = "educenter/alive";
 
     public static final String URL_DICT_NAME = "educms/dictionary/getByName/{name}";
@@ -67,6 +68,7 @@ public class AppConstance {
     public static final String URL_TRAP_SAVE = "educenter/trap/add";
     public static final String URL_TRAP_FINDALL_CALL = "educenter/trap/findAll/call";
     public static final String URL_TRAP_FINDALL = "educenter/trap/findAll";
+    public static final String URL_TRAP_CHECKUPLOAD = "educenter/trap/getByQrcodeAndLatLonAndUserIdAndStime/{qrcode}/{lat}/{lon}/{userId}/{stime}";
 
     public static final String UCENTER_MEMBER_MODEL = "UCENTER_MEMBER_MODEL";
     public static final String URL_USER_LOGIN = "educenter/member/login/{mobile}/{password}";
@@ -84,6 +86,13 @@ public class AppConstance {
     public static final String AUTO_UPLOAD_TRAP = "AUTO_UPLOAD_TRAP";
     public static final String WORKMANAGER_KEY = "WORKMANAGER_KEY";
     public static final String PESTS_ALL_ONCE_WORK_NOTIFICATION = "PESTS_ALL_ONCE_WORK_NOTIFICATION";
+    public static final String WORK_NOTIFICATION_AUTO_UPLOAD = "WORK_NOTIFICATION_AUTO_UPLOAD";
     public static final String OK = "OK";
+    public static final String NO = "NO";
     public static final String TRAP_ALL_ONCE_WORK_NOTIFICATION = "TRAP_ALL_ONCE_WORK_NOTIFICATION";
+
+    public static final int STARTACTIVITY_MAINACTIVITY_TRAPACTIVITY = 111;
+    public static final int STARTACTIVITY_MAINACTIVITY_PESTSACTIVITY = 112;
+    public static final String LOAD_SHP = "LOAD_SHP";
+    public static final String IS_SCAN = "IS_SCAN";
 }

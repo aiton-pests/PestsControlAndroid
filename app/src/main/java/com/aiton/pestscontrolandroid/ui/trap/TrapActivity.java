@@ -27,6 +27,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.FileUtils;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.util.Log;
@@ -43,6 +44,7 @@ import android.widget.Toast;
 import com.aiton.pestscontrolandroid.AppConstance;
 import com.aiton.pestscontrolandroid.R;
 import com.aiton.pestscontrolandroid.data.model.UcenterMemberOrder;
+import com.aiton.pestscontrolandroid.data.persistence.Pests;
 import com.aiton.pestscontrolandroid.data.persistence.Trap;
 import com.aiton.pestscontrolandroid.service.PestsOnceWork;
 import com.aiton.pestscontrolandroid.service.TrapOnceWork;
@@ -52,6 +54,7 @@ import com.aiton.pestscontrolandroid.utils.SPUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.tabs.TabLayout;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -199,8 +202,12 @@ public class TrapActivity extends AppCompatActivity {
                         .setAction("Action", new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
-                                Intent intent = new Intent(TrapActivity.this, MainActivity.class);
-                                startActivity(intent);
+//                                Intent intent = new Intent(TrapActivity.this, MainActivity.class);
+//                                startActivity(intent);
+                                Intent intent = getIntent();
+                                intent.putExtra("data", "NO");
+                                setResult(RESULT_CANCELED,intent);
+                                finish();
                             }
                         }).show();
             }
@@ -268,10 +275,30 @@ public class TrapActivity extends AppCompatActivity {
 
                 trap.setUpdateServer(false);
                 trapViewModel.insert(trap);
-                workmanagerUpload(trap);
+
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        /**
+                         *要执行的操作
+                         */
+                        Trap p = trapViewModel.findByLatLonAndUserIdAndStime(trap.getLatitude(),trap.getLongitude(),trap.getStime(),trap.getUserId(),trap.getQrcode());
+
+                        workmanagerUpload(trap);
+                        Log.e(TAG, "run: 延时3000");
+                    }
+                }, 3000);//3秒后执行Runnable中的run方法
+
+
                 setDefaultOper(trap.getOperator());
-                Intent intent = new Intent(TrapActivity.this, MainActivity.class);
-                startActivity(intent);
+//                Intent intent = new Intent(TrapActivity.this,MainActivity.class);
+//                startActivity(intent);
+
+                Intent intent = getIntent();
+                intent.putExtra("data", trap);
+                setResult(RESULT_OK,intent);
+                finish();
             }
         });
         displayDefaultOperator();

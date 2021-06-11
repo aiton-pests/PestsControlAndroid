@@ -128,11 +128,11 @@
                 android:layout_height="50dp">
 
                 <Switch
-                    android:id="@+id/sw_disabled"
+                    android:id="@+id/sw_is_scan"
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
                     android:background="@color/white"
-                    android:text="@string/member_disabled"
+                    android:text="@string/me_is_scan"
                     android:textColor="@color/upsdk_color_gray_7"
                     android:textSize="14sp"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -211,7 +211,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
                     android:background="@color/white"
-                    android:text="@string/sw_auto_upload_pests"
+                    android:text="@string/auto_update"
                     android:textColor="@color/upsdk_color_gray_7"
                     android:textSize="14sp"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -234,10 +234,10 @@
                 android:layout_height="match_parent">
 
                 <Switch
-                    android:id="@+id/sw_auto_upload_trap"
+                    android:id="@+id/sw_load_shp"
                     android:layout_width="0dp"
                     android:layout_height="50dp"
-                    android:text="@string/sw_auto_upload_trap"
+                    android:text="@string/me_set_load_shp"
                     android:textColor="@color/upsdk_color_gray_7"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
