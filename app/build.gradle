@@ -23,7 +23,7 @@ android {
         signingConfigs {
             release {
                 try {
-                    storeFile file("C:\\Users\\Administrator.DESKTOP-TNKIEM8\\pestscontrol.jks")
+                    storeFile file("pestscontrol.jks")
                     storePassword "lure2k13"
                     keyAlias "pestscontrol"
                     keyPassword "lure2k13"
