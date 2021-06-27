@@ -122,7 +122,7 @@ public class SettingActivity extends AppCompatActivity {
 //                    intent.addCategory(Intent.CATEGORY_OPENABLE);
 //                    startActivityForResult(intent, REQUESTCODE_FROM_ACTIVITY);
                     List<File> files = new ArrayList<>();
-                    files = FileUtil.traverseFolder(files, Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath());
+                    files = FileUtil.traverseFolder(files, getFilesDir().getAbsolutePath());
                     List<File> files1 = FileUtil.filterGeoDatabase(files, "geodatabase");
 //                    List<String> files = FileUtil.getFiles("/storage/emulated/0/Download","geodatabase",true);  /storage/emulated/0/Download/53ad76ba959340fabd7fe8ee7adbace3b3e2489915484baaafc555d544b0cd7d.jpg
                     files1.add(new File("/data/data/com.aiton.pestscontrolandroid/files/xiamen_xiangan.geodatabase"));
