@@ -113,7 +113,7 @@ public class SettingActivity extends AppCompatActivity {
             }
         });
         try {
-
+            //TODO android11 版本，无法直接读取DOWNLOAD目录下的文件。可以读取媒体文件。因此要进行升级
             ivLoadShp.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -124,7 +124,8 @@ public class SettingActivity extends AppCompatActivity {
                     List<File> files = new ArrayList<>();
                     files = FileUtil.traverseFolder(files, Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath());
                     List<File> files1 = FileUtil.filterGeoDatabase(files, "geodatabase");
-//                    List<String> files = FileUtil.getFiles("/storage/sdcard0/Download","geodatabase",true);
+//                    List<String> files = FileUtil.getFiles("/storage/emulated/0/Download","geodatabase",true);  /storage/emulated/0/Download/53ad76ba959340fabd7fe8ee7adbace3b3e2489915484baaafc555d544b0cd7d.jpg
+                    files1.add(new File("/data/data/com.aiton.pestscontrolandroid/files/xiamen_xiangan.geodatabase"));
                     Log.e(AppConstance.TAG, "onClick: " + files1.toString());
                     List<ShpFile> shpFiles = FileUtil.convertGeoFile2ShpFile(files1);
                     settingViewModel.getShpFile().setValue(shpFiles);
