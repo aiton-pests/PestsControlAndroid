@@ -153,20 +153,7 @@ public class SettingActivity extends AppCompatActivity {
 
         adapter = new ShpAdapter(settingViewModel);
         recyclerView.setAdapter(adapter);
-//        settingViewModel.getSettingmodel().observe(this, new Observer<SettingModel>() {
-//            @Override
-//            public void onChanged(SettingModel settingModel) {
-//                if (settingModel != null) {
-//                    rbAmap.setChecked(settingModel.getaMapShow());
-//                    rbArcGIS.setChecked(settingModel.getArcgisShow());
-//                    rbGeoq.setChecked(settingModel.getGeoShow());
-//                    rbGoogle.setChecked(settingModel.getGoogleShow());
-//                    rbOSM.setChecked(settingModel.getOsmShow());
-//                    rbTiandi.setChecked(settingModel.getTiandiShow());
-//                    settingViewModel.saveSettingModel2SP();
-//                }
-//            }
-//        });
+
         settingViewModel.getShpFile().observe(this, new Observer<List<ShpFile>>() {
             @Override
             public void onChanged(List<ShpFile> shpFiles) {
@@ -179,7 +166,6 @@ public class SettingActivity extends AppCompatActivity {
             }
         });
         try {
-            //TODO android11 版本，无法直接读取DOWNLOAD目录下的文件。可以读取媒体文件。因此要进行升级
             ivLoadShp.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
