@@ -8,6 +8,12 @@ public class AppConstance {
     public static final String APP_MAOHAO = "";
     public static final String APP_URL = "";
 
+    public static final int CAMERAX_REQUEST_CODE_PIC1 = 0x00000004;
+    public static final int CAMERAX_REQUEST_CODE_PIC2 = 0x00000005;
+    public static final int CAMERAX_REQUEST_CODE_FELL = 0x00000001;
+    public static final int CAMERAX_REQUEST_CODE_STUMP = 0x00000002;
+    public static final int CAMERAX_REQUEST_CODE_FINISH = 0x00000003;
+
     public static final String APP_SP = "APP_SP";
     public static final String USER_MODEL = "USER_MODEL";
     public static final String SETTING_MODEL = "SETTING_MODEL";
@@ -80,6 +86,7 @@ public class AppConstance {
     public static final String PESTS_OPERATOR_DEFAULT = "PESTS_OPERATOR_DEFAULT";
     public static final String TIANDIMAP = "TIANDIMAP";
     public static final String DICT_NAME_PESTS_TYPE = "pests.pests.type";
+    public static final String DICT_NAME_PESTS_GEODATABASE = "pests.geodatabase.file";
     public static final String TRAP_REMARK = "TRAP_REMARK";
     public static final String URL_TRAP_GET_QRCODE = "educenter/trap/getByQrcode/{qrcode}";
     public static final String AUTO_UPLOAD = "AUTO_UPLOAD";             //是否允许自动上传

@@ -787,8 +787,9 @@ public class MainActivity extends AppCompatActivity {
             Pests pp = (Pests) data.getSerializableExtra("data");
             Log.e(TAG, "MainActivity - onActivityResult: " + pp.toString());
             Pests p = pestsViewModel.findByLatLonAndUserIdAndStime(pp.getLatitude(),pp.getLongitude(),pp.getStime(),pp.getUserId(),pp.getQrcode());
-            Log.e(TAG, "MainActivity - onActivityResult: " + p.toString());
+
             if (p != null){
+                Log.e(TAG, "MainActivity - onActivityResult: " + p.toString());
                 Toast.makeText(this, "二维码 ["+p.getCodeInt()+"] 数据保存成功！", Toast.LENGTH_SHORT).show();
             }
 //            mTvClockInAddress.setText(position);
@@ -798,8 +799,9 @@ public class MainActivity extends AppCompatActivity {
             Trap pp = (Trap) data.getSerializableExtra("data");
             Log.e(TAG, "MainActivity - onActivityResult: " + pp.toString());
             Trap p = trapViewModel.findByLatLonAndUserIdAndStime(pp.getLatitude(),pp.getLongitude(),pp.getStime(),pp.getUserId(),pp.getQrcode());
-            Log.e(TAG, "MainActivity - onActivityResult: " + p.toString());
+
             if (p != null){
+                Log.e(TAG, "MainActivity - onActivityResult: " + p.toString());
                 Toast.makeText(this, "二维码 ["+p.getCodeInt()+"] 数据保存成功！", Toast.LENGTH_SHORT).show();
             }
 //            mTvClockInAddress.setText(position);

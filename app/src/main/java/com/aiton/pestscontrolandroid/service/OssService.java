@@ -133,5 +133,4 @@ public class OssService {
     public interface ProgressCallback {
         void onProgressCallback(double progress);
     }
-
 }

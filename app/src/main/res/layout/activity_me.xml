@@ -35,7 +35,9 @@
             android:paddingBottom="5dp"
             android:text="@string/prompt_email"
             android:textColor="@android:color/white"
-            android:textSize="14sp" />
+            android:textSize="14sp"
+            android:visibility="invisible"
+            tools:visibility="invisible" />
         <ImageView
             android:id="@+id/h_head"
             android:layout_width="60dp"
