@@ -62,7 +62,7 @@ public class PestsWork extends Worker {
         Pests[] pests = repository.findAllObject();
         for (Pests p :
                 pests) {
-            Log.e(TAG, "doWork: " + p.toString());
+//            Log.e(TAG, "doWork: " + p.toString());
             PestsControlModel pestsModel = new PestsControlModel();
             pestsModel.setQrcode(p.getQrcode());
             pestsModel.setAppId(p.getId());
@@ -131,7 +131,7 @@ public class PestsWork extends Worker {
                     public void onNext(com.aiton.pestscontrolandroid.data.model.@io.reactivex.rxjava3.annotations.NonNull Result result) {
                         //后台记录是否有
                         if (result.getSuccess()) {
-                            Log.e(AppConstance.TAG, "onNext: " + result.toString());
+//                            Log.e(AppConstance.TAG, "onNext: " + result.toString());
                             // repository.update();
                             Double longitude = (Double) ((LinkedTreeMap)result.getData().get("row")).get("longitude");
                             Double latitude = (Double) ((LinkedTreeMap)result.getData().get("row")).get("latitude");
@@ -145,7 +145,7 @@ public class PestsWork extends Worker {
                             p.setUpdateServer(true);
                             repository.update(p);
                         }else{
-                            Log.e(AppConstance.TAG, "onNext: " + result.toString());
+//                            Log.e(AppConstance.TAG, "onNext: " + result.toString());
                             try {
                                 //PestsControlModel pestsModel = new PestsControlModel();
                                 uploadServer(pestsModel);
@@ -204,7 +204,7 @@ public class PestsWork extends Worker {
                     @Override
                     public void onNext(@io.reactivex.rxjava3.annotations.NonNull com.aiton.pestscontrolandroid.data.model.Result result) {
                         if (result.getSuccess()) {
-                            Log.e(AppConstance.TAG, "onNext: " + result.toString());
+//                            Log.e(AppConstance.TAG, "onNext: " + result.toString());
                            // repository.update();
                             try {
                                 Double id = (Double) ((LinkedTreeMap)result.getData().get("row")).get("appId");

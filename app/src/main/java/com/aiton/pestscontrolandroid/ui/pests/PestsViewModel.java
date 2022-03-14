@@ -1,17 +1,12 @@
 package com.aiton.pestscontrolandroid.ui.pests;
 
 import android.app.Application;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.SavedStateHandle;
 
-import com.aiton.pestscontrolandroid.AppConstance;
 import com.aiton.pestscontrolandroid.data.model.Result;
 import com.aiton.pestscontrolandroid.data.persistence.Pests;
 import com.aiton.pestscontrolandroid.data.persistence.PestsRepository;
@@ -19,7 +14,6 @@ import com.aiton.pestscontrolandroid.service.RetrofitUtil;
 import com.google.gson.internal.LinkedTreeMap;
 
 import java.util.List;
-import java.util.Map;
 
 import cn.com.qiter.common.vo.PestsControlModel;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -61,7 +55,7 @@ public class PestsViewModel extends AndroidViewModel {
                             }else {
                                 getCodeInt().setValue(0);
                             }
-                            Log.e(AppConstance.TAG, "onNext: " + result.toString());
+//                            Log.e(AppConstance.TAG, "onNext: " + result.toString());
                         }
                     }
 
@@ -93,7 +87,7 @@ public class PestsViewModel extends AndroidViewModel {
                         if (result.getSuccess()) {
                             progress.setValue(100);
 
-                            Log.e(AppConstance.TAG, "onNext: " + result.toString());
+//                            Log.e(AppConstance.TAG, "onNext: " + result.toString());
                         }
                     }
 

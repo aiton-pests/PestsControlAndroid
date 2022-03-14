@@ -285,32 +285,32 @@ public class MeActivity extends AppCompatActivity {
         for (Pests pests1:
                 pests) {
             Toast.makeText(getApplicationContext(),pests1.toString(),Toast.LENGTH_LONG).show();
-            Log.e(AppConstance.TAG_ME, "Pests: " + pests1.toString() );
+//            Log.e(AppConstance.TAG_ME, "Pests: " + pests1.toString() );
         }
 
         List<String> operators = SPUtil.builder(getApplicationContext(),AppConstance.APP_SP).getDataList(AppConstance.OPERATOR,String.class);
 
         for (String op :
                 operators) {
-            Log.e("PESTS", "onClick: " + op );
+//            Log.e("PESTS", "onClick: " + op );
         }
 
         UcenterMemberOrder loggedInUser = SPUtil.builder(getApplicationContext(), AppConstance.APP_SP).getData(AppConstance.UCENTER_MEMBER_MODEL, UcenterMemberOrder.class);
         if (loggedInUser != null){
-            Log.e(AppConstance.TAG_ME, "UcenterMemberModel: " + loggedInUser.toString() );
+//            Log.e(AppConstance.TAG_ME, "UcenterMemberModel: " + loggedInUser.toString() );
             Toast.makeText(getApplicationContext(),loggedInUser.toString(),Toast.LENGTH_LONG).show();
         }
         Boolean tiandi = SPUtil.builder(getApplication().getApplicationContext(), AppConstance.APP_SP).getData(AppConstance.TIANDIMAP, Boolean.class);
-        Log.e(AppConstance.TAG_ME, "天地图/ArcGIS: " + tiandi );
+//        Log.e(AppConstance.TAG_ME, "天地图/ArcGIS: " + tiandi );
         Toast.makeText(getApplicationContext(),"天地图/ArcGIS: " + tiandi,Toast.LENGTH_LONG).show();
         Boolean test = SPUtil.builder(getApplication().getApplicationContext(), AppConstance.APP_SP).getData(AppConstance.ISTEST, Boolean.class);
-        Log.e(AppConstance.TAG_ME, "测试用户: " + test );
+//        Log.e(AppConstance.TAG_ME, "测试用户: " + test );
         Toast.makeText(getApplicationContext(),"测试用户: " + test,Toast.LENGTH_LONG).show();
         SettingModel spSetting = SPUtil.builder(getApplicationContext(),AppConstance.APP_SP).getData(AppConstance.SETTING_MODEL,SettingModel.class);
-        Log.e(AppConstance.TAG_ME, "SettingModel: " + spSetting.toString() );
+//        Log.e(AppConstance.TAG_ME, "SettingModel: " + spSetting.toString() );
         Toast.makeText(getApplicationContext(),spSetting.toString(),Toast.LENGTH_LONG).show();
         List<ShpFile> shpFiles = SPUtil.builder(getApplication(),AppConstance.APP_SP).getDataList(AppConstance.SHP_FILE, ShpFile.class);
-        Log.e(AppConstance.TAG_ME, "ShpFile: " + shpFiles.toString() );
+//        Log.e(AppConstance.TAG_ME, "ShpFile: " + shpFiles.toString() );
         Toast.makeText(getApplicationContext(),shpFiles.toString(),Toast.LENGTH_LONG).show();
     }
     private void logout() {

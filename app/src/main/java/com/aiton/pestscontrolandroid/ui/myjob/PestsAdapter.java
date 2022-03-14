@@ -58,7 +58,7 @@ public class PestsAdapter  extends RecyclerView.Adapter<PestsAdapter.PestsViewHo
                 p.setUpdateServer(!isup);
                 viewHolder.swUpdate.setChecked(!isup);
                 pestsViewModel.update(p);
-                Log.e(TAG, "onClick: " + p.toString() );
+//                Log.e(TAG, "onClick: " + p.toString() );
             }
         });
 

@@ -50,7 +50,7 @@ public class TrapAllOnceWork extends Worker {
         Trap[] pests = repository.findAllObject(false);
         for (Trap p :
                 pests) {
-            Log.e(TAG, "doWork: " + p.toString());
+//            Log.e(TAG, "doWork: " + p.toString());
             PestsTrapModel pestsModel = new PestsTrapModel();
             pestsModel.setDb(p.getDb());
             pestsModel.setAppId(p.getId());
@@ -110,7 +110,7 @@ public class TrapAllOnceWork extends Worker {
                     @Override
                     public void onNext(@io.reactivex.rxjava3.annotations.NonNull com.aiton.pestscontrolandroid.data.model.Result result) {
                         if (result.getSuccess()) {
-                            Log.e(AppConstance.TAG, "onNext: " + result.toString());
+//                            Log.e(AppConstance.TAG, "onNext: " + result.toString());
                             // repository.update();
                             try {
                                 Double longitude = (Double) ((LinkedTreeMap)result.getData().get("row")).get("longitude");

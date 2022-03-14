@@ -56,7 +56,7 @@ public class TrapViewModel extends AndroidViewModel {
                         if (result.getSuccess()) {
                             ArrayList ltm = (ArrayList) result.getData().get("trap");
                             getTrapCount().setValue(ltm.size());
-                            Log.e(AppConstance.TAG, "onNext: " + result.toString());
+//                            Log.e(AppConstance.TAG, "onNext: " + result.toString());
                         }
                     }
 
@@ -97,7 +97,7 @@ public class TrapViewModel extends AndroidViewModel {
                             Double codeint = (Double) ltm.get("codeInt");
                             int codeIntInt = codeint.intValue();
                             getCodeInt().setValue(codeIntInt);
-                            Log.e(AppConstance.TAG, "onNext: " + result.toString());
+//                            Log.e(AppConstance.TAG, "onNext: " + result.toString());
                         }
                     }
 
@@ -136,7 +136,7 @@ public class TrapViewModel extends AndroidViewModel {
                         if (result.getSuccess()) {
 
                             progress.setValue(100);
-                            Log.e(AppConstance.TAG, "onNext: " + result.toString());
+//                            Log.e(AppConstance.TAG, "onNext: " + result.toString());
                         }
                     }
 

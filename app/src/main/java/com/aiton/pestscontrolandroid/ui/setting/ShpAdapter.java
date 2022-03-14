@@ -44,7 +44,7 @@ public class ShpAdapter extends RecyclerView.Adapter<ShpAdapter.ShpViewHolder> {
             public void onClick(View view) {
                 ShpFile shpFile = (ShpFile) view.getTag();
 
-                Log.e(TAG, "onClick: " + shpFile.toString() );
+//                Log.e(TAG, "onClick: " + shpFile.toString() );
             }
         });
         viewHolder.swShp.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {

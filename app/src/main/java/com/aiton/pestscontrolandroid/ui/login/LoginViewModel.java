@@ -1,13 +1,12 @@
 package com.aiton.pestscontrolandroid.ui.login;
 
+import android.app.Application;
+import android.util.Patterns;
+
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.SavedStateHandle;
-
-import android.app.Application;
-import android.util.Log;
-import android.util.Patterns;
 
 import com.aiton.pestscontrolandroid.AppConstance;
 import com.aiton.pestscontrolandroid.data.model.Result;
@@ -22,8 +21,6 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observer;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
-
-import static com.aiton.pestscontrolandroid.AppConstance.TAG;
 
 public class LoginViewModel extends AndroidViewModel {
 
@@ -60,7 +57,7 @@ public class LoginViewModel extends AndroidViewModel {
                     public void onNext(@io.reactivex.rxjava3.annotations.NonNull Result result) {
                         getResult().setValue(result);
                         if (result.getSuccess()){
-                            Log.e(TAG, "onNext: " + result.toString() );
+//                            Log.e(TAG, "onNext: " + result.toString() );
                             String token = (String) result.getData().get("token");
 
                             RetrofitUtil.getInstance().getUserService().getMemberInfo(token)
@@ -76,7 +73,7 @@ public class LoginViewModel extends AndroidViewModel {
                                         @Override
                                         public void onNext(@io.reactivex.rxjava3.annotations.NonNull Result result) {
                                             if (result.getSuccess()){
-                                                Log.e(TAG, "onNext: " + result.toString() );
+//                                                Log.e(TAG, "onNext: " + result.toString() );
                                                 LinkedTreeMap ltm = (LinkedTreeMap) result.getData().get("userInfo");
                                                 Gson gson = new GsonBuilder().enableComplexMapKeySerialization().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
                                                 String jsonString = gson.toJson(ltm);

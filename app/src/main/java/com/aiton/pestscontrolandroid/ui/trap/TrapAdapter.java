@@ -49,7 +49,7 @@ public class TrapAdapter extends RecyclerView.Adapter<TrapAdapter.TrapViewHolder
                 p.setUpdateServer(!isup);
                 viewHolder.trap_card_update.setChecked(!isup);
                 trapViewModel.update(p);
-                Log.e(TAG, "onClick: " + p.toString() );
+//                Log.e(TAG, "onClick: " + p.toString() );
             }
         });
         viewHolder.trap_card_update.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {

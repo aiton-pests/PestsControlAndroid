@@ -1,18 +1,5 @@
 package com.aiton.pestscontrolandroid.ui.main;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.work.Constraints;
-import androidx.work.Data;
-import androidx.work.NetworkType;
-import androidx.work.PeriodicWorkRequest;
-import androidx.work.WorkInfo;
-import androidx.work.WorkManager;
-
 import android.Manifest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -36,17 +23,27 @@ import android.view.View;
 import android.widget.Toast;
 import android.widget.ZoomControls;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.work.Constraints;
+import androidx.work.Data;
+import androidx.work.NetworkType;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkInfo;
+import androidx.work.WorkManager;
+
 import com.aiton.pestscontrolandroid.AppConstance;
 import com.aiton.pestscontrolandroid.R;
 import com.aiton.pestscontrolandroid.data.model.ShpFile;
 import com.aiton.pestscontrolandroid.data.persistence.Pests;
 import com.aiton.pestscontrolandroid.data.persistence.Trap;
 import com.aiton.pestscontrolandroid.service.AutoUpdater;
-import com.aiton.pestscontrolandroid.service.OssService;
 import com.aiton.pestscontrolandroid.service.PestsWork;
-import com.aiton.pestscontrolandroid.service.RetrofitUtil;
 import com.aiton.pestscontrolandroid.service.TrapWork;
-import com.aiton.pestscontrolandroid.ui.login.LoginActivity;
 import com.aiton.pestscontrolandroid.ui.login.LoginViewModel;
 import com.aiton.pestscontrolandroid.ui.me.MeActivity;
 import com.aiton.pestscontrolandroid.ui.me.MeViewModel;
@@ -58,8 +55,6 @@ import com.aiton.pestscontrolandroid.ui.setting.SettingViewModel;
 import com.aiton.pestscontrolandroid.ui.trap.TrapActivity;
 import com.aiton.pestscontrolandroid.ui.trap.TrapViewModel;
 import com.aiton.pestscontrolandroid.ui.trap.TrayJobActivity;
-import com.aiton.pestscontrolandroid.utils.AMapTiledLayerClass;
-import com.aiton.pestscontrolandroid.utils.GoogleMapLayer;
 import com.aiton.pestscontrolandroid.utils.LocationUtils;
 import com.aiton.pestscontrolandroid.utils.SPUtil;
 import com.aiton.pestscontrolandroid.utils.TianDiTuTiledLayerClass;
@@ -74,25 +69,18 @@ import com.esri.arcgisruntime.data.GeodatabaseFeatureTable;
 import com.esri.arcgisruntime.data.QueryParameters;
 import com.esri.arcgisruntime.data.ServiceFeatureTable;
 import com.esri.arcgisruntime.data.ShapefileFeatureTable;
-import com.esri.arcgisruntime.data.TileCache;
 import com.esri.arcgisruntime.geometry.Envelope;
 import com.esri.arcgisruntime.geometry.Geometry;
-import com.esri.arcgisruntime.geometry.GeometryEngine;
 import com.esri.arcgisruntime.geometry.GeometryType;
 import com.esri.arcgisruntime.geometry.SpatialReference;
-import com.esri.arcgisruntime.geometry.SpatialReferences;
 import com.esri.arcgisruntime.layers.ArcGISTiledLayer;
 import com.esri.arcgisruntime.layers.FeatureLayer;
-import com.esri.arcgisruntime.layers.Layer;
-import com.esri.arcgisruntime.layers.OpenStreetMapLayer;
 import com.esri.arcgisruntime.layers.WebTiledLayer;
 import com.esri.arcgisruntime.loadable.LoadStatus;
 import com.esri.arcgisruntime.location.LocationDataSource;
 import com.esri.arcgisruntime.mapping.ArcGISMap;
 import com.esri.arcgisruntime.mapping.Basemap;
 import com.esri.arcgisruntime.mapping.GeoElement;
-import com.esri.arcgisruntime.mapping.LayerList;
-import com.esri.arcgisruntime.mapping.Viewpoint;
 import com.esri.arcgisruntime.mapping.view.DefaultMapViewOnTouchListener;
 import com.esri.arcgisruntime.mapping.view.Graphic;
 import com.esri.arcgisruntime.mapping.view.GraphicsOverlay;
@@ -101,16 +89,12 @@ import com.esri.arcgisruntime.mapping.view.LocationDisplay;
 import com.esri.arcgisruntime.mapping.view.MapView;
 import com.esri.arcgisruntime.mapping.view.SketchEditor;
 import com.esri.arcgisruntime.mapping.view.SketchStyle;
-import com.esri.arcgisruntime.symbology.PictureMarkerSymbol;
 import com.esri.arcgisruntime.symbology.SimpleFillSymbol;
 import com.esri.arcgisruntime.symbology.SimpleLineSymbol;
 import com.esri.arcgisruntime.symbology.SimpleMarkerSymbol;
 import com.esri.arcgisruntime.symbology.SimpleRenderer;
 import com.esri.arcgisruntime.util.ListenableList;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
-import com.huawei.agconnect.crash.AGConnectCrash;
-import com.huawei.agconnect.remoteconfig.AGConnectConfig;
 import com.huawei.hms.hmsscankit.ScanUtil;
 import com.huawei.hms.ml.scan.HmsScan;
 import com.huawei.hms.ml.scan.HmsScanAnalyzerOptions;
@@ -122,7 +106,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import cn.com.qiter.common.vo.PestsControlModel;
@@ -215,7 +198,7 @@ public class MainActivity extends AppCompatActivity {
         shapefileFeatureTable.loadAsync();
         shapefileFeatureTable.addDoneLoadingListener(() -> {
             //  Log.e(TAG, "openShp: " + shapefileFeatureTable.getInfo().toString() );
-            Log.e(TAG, "openShp: " + shapefileFeatureTable.getLoadStatus().toString());
+//            Log.e(TAG, "openShp: " + shapefileFeatureTable.getLoadStatus().toString());
             if (shapefileFeatureTable.getLoadStatus() == LoadStatus.LOADED) {
 
                 //create a feature layer for the shapefile feature table
@@ -323,8 +306,8 @@ public class MainActivity extends AppCompatActivity {
                 public void run() {
                     GeometryType geoType = shapefileFeatureTable.getGeometryType();
                     String name = shapefileFeatureTable.getTableName();
-                    Log.e(TAG, "run: " + shapefileFeatureTable.getPath());
-                    Log.e(TAG, "run: " + shapefileFeatureTable.getLoadStatus().toString());
+//                    Log.e(TAG, "run: " + shapefileFeatureTable.getPath());
+//                    Log.e(TAG, "run: " + shapefileFeatureTable.getLoadStatus().toString());
                     mFeatureLayer = new FeatureLayer(shapefileFeatureTable);
                     if (mFeatureLayer.getFullExtent() != null) {
                         mMapView.setViewpointGeometryAsync(mFeatureLayer.getFullExtent());
@@ -405,7 +388,7 @@ public class MainActivity extends AppCompatActivity {
 
 
                                 Map<String, Object> attributes = feature.getAttributes();
-                                Log.e(TAG, "run: " + attributes.toString());
+//                                Log.e(TAG, "run: " + attributes.toString());
                                 Map<String, Object> hm = (Map<String, Object>) attributes;
                                 Map<String, String> map = new HashMap<>();
                                 Object jyxzcname = hm.get(AppConstance.JYXZCNAME);
@@ -421,9 +404,9 @@ public class MainActivity extends AppCompatActivity {
                                 maps.add(map);
                                 mFeatureLayer.selectFeature(feature);
                                 counter++;
-                                Log.d(TAG, "Selection #: " + counter + " Table name: " + feature.getFeatureTable().getFields().toString());
+//                                Log.d(TAG, "Selection #: " + counter + " Table name: " + feature.getFeatureTable().getFields().toString());
                                 List<Field> fieldList = feature.getFeatureTable().getFields();
-                                Log.e(TAG, "onSingleTapConfirmed: " + feature.getAttributes().toString());
+//                                Log.e(TAG, "onSingleTapConfirmed: " + feature.getAttributes().toString());
                                 for (Field f :
                                         fieldList) {
                                     //  Log.e(TAG, "onSingleTapConfirmed: " + f.toString() );
@@ -548,7 +531,7 @@ public class MainActivity extends AppCompatActivity {
                             Feature feature = iterator.next();
                             //TODO 可以通过华为远程配置，对离线地图的字段与后台数据库的字段对应进行修改
                             Map<String, Object> attributes = feature.getAttributes();
-                            Log.e(TAG, "run: " + attributes.toString());
+//                            Log.e(TAG, "run: " + attributes.toString());
                             Map<String, Object> hm = (Map<String, Object>) attributes;
                             Object jyxzcname = hm.get(AppConstance.JYXZCNAME);
                             Object cgqname = hm.get(AppConstance.CGQNAME);
@@ -562,7 +545,7 @@ public class MainActivity extends AppCompatActivity {
                             map.put(AppConstance.LONGITUDE, String.valueOf(clickPoint.getX()));
                             map.put(AppConstance.LATIDUTE, String.valueOf(clickPoint.getY()));
                             mainViewModel.setMap(map);
-                            Log.e(TAG, "run: " + mainViewModel.getMap().toString());
+//                            Log.e(TAG, "run: " + mainViewModel.getMap().toString());
                             for (String key : attributes.keySet()) {
                                 Log.e("xyh" + key, String.valueOf(attributes.get(key)));
                             }
@@ -785,11 +768,11 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == AppConstance.STARTACTIVITY_MAINACTIVITY_PESTSACTIVITY && resultCode == RESULT_OK) {
             // SearchAddressInfo info = (SearchAddressInfo) data.getParcelableExtra("position");
             Pests pp = (Pests) data.getSerializableExtra("data");
-            Log.e(TAG, "MainActivity - onActivityResult: " + pp.toString());
+//            Log.e(TAG, "MainActivity - onActivityResult: " + pp.toString());
             Pests p = pestsViewModel.findByLatLonAndUserIdAndStime(pp.getLatitude(),pp.getLongitude(),pp.getStime(),pp.getUserId(),pp.getQrcode());
 
             if (p != null){
-                Log.e(TAG, "MainActivity - onActivityResult: " + p.toString());
+//                Log.e(TAG, "MainActivity - onActivityResult: " + p.toString());
                 Toast.makeText(this, "二维码 ["+p.getCodeInt()+"] 数据保存成功！", Toast.LENGTH_SHORT).show();
             }
 //            mTvClockInAddress.setText(position);
@@ -797,11 +780,11 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == AppConstance.STARTACTIVITY_MAINACTIVITY_TRAPACTIVITY && resultCode == RESULT_OK) {
             // SearchAddressInfo info = (SearchAddressInfo) data.getParcelableExtra("position");
             Trap pp = (Trap) data.getSerializableExtra("data");
-            Log.e(TAG, "MainActivity - onActivityResult: " + pp.toString());
+//            Log.e(TAG, "MainActivity - onActivityResult: " + pp.toString());
             Trap p = trapViewModel.findByLatLonAndUserIdAndStime(pp.getLatitude(),pp.getLongitude(),pp.getStime(),pp.getUserId(),pp.getQrcode());
 
             if (p != null){
-                Log.e(TAG, "MainActivity - onActivityResult: " + p.toString());
+//                Log.e(TAG, "MainActivity - onActivityResult: " + p.toString());
                 Toast.makeText(this, "二维码 ["+p.getCodeInt()+"] 数据保存成功！", Toast.LENGTH_SHORT).show();
             }
 //            mTvClockInAddress.setText(position);
@@ -998,14 +981,14 @@ public class MainActivity extends AppCompatActivity {
         pestsViewModel.findAll(true).observe(this, new Observer<List<Pests>>() {
             @Override
             public void onChanged(List<Pests> pests) {
-                Log.e(TAG, "pestsViewModel.findAll().observe: " + pests.toString());
+//                Log.e(TAG, "pestsViewModel.findAll().observe: " + pests.toString());
             }
         });
         pestsViewModel.findAll(false).observe(this, new Observer<List<Pests>>() {
             @Override
             public void onChanged(List<Pests> pests) {
-                if (pests != null && !pests.isEmpty())
-                    Log.e(TAG, "手机端数据新增加一条: " + pests.toString());
+//                if (pests != null && !pests.isEmpty())
+//                    Log.e(TAG, "手机端数据新增加一条: " + pests.toString());
             }
         });
         LiveEventBus.get(AppConstance.WORK_NOTIFICATION_AUTO_UPLOAD).postDelay(AppConstance.OK,3000);

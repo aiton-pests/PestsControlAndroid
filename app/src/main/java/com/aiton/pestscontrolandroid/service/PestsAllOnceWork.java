@@ -50,7 +50,7 @@ public class PestsAllOnceWork extends Worker {
         Pests[] pests = repository.findAllObject(false);
         for (Pests p :
                 pests) {
-            Log.e(TAG, "doWork: " + p.toString());
+//            Log.e(TAG, "doWork: " + p.toString());
             PestsControlModel pestsModel = new PestsControlModel();
             pestsModel.setQrcode(p.getQrcode());
             pestsModel.setAppId(p.getId());
@@ -116,7 +116,7 @@ public class PestsAllOnceWork extends Worker {
                     @Override
                     public void onNext(@io.reactivex.rxjava3.annotations.NonNull com.aiton.pestscontrolandroid.data.model.Result result) {
                         if (result.getSuccess()) {
-                            Log.e(AppConstance.TAG, "onNext: " + result.toString());
+//                            Log.e(AppConstance.TAG, "onNext: " + result.toString());
                            // repository.update();
                             try {
                                 Double longitude = (Double) ((LinkedTreeMap)result.getData().get("row")).get("longitude");

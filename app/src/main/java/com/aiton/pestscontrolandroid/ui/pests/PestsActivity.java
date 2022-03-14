@@ -1,38 +1,9 @@
 package com.aiton.pestscontrolandroid.ui.pests;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
-import androidx.core.os.EnvironmentCompat;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.work.Constraints;
-import androidx.work.Data;
-import androidx.work.NetworkType;
-import androidx.work.OneTimeWorkRequest;
-import androidx.work.PeriodicWorkRequest;
-import androidx.work.WorkInfo;
-import androidx.work.WorkManager;
-
-import android.Manifest;
-import android.app.Activity;
 import android.app.Dialog;
-import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.os.FileUtils;
 import android.os.Handler;
-import android.provider.MediaStore;
-import android.provider.OpenableColumns;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -46,6 +17,17 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.work.Constraints;
+import androidx.work.Data;
+import androidx.work.NetworkType;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkInfo;
+import androidx.work.WorkManager;
+
 import com.aiton.pestscontrolandroid.AppConstance;
 import com.aiton.pestscontrolandroid.CameraActivity;
 import com.aiton.pestscontrolandroid.R;
@@ -53,11 +35,7 @@ import com.aiton.pestscontrolandroid.data.model.Result;
 import com.aiton.pestscontrolandroid.data.model.UcenterMemberOrder;
 import com.aiton.pestscontrolandroid.data.persistence.Pests;
 import com.aiton.pestscontrolandroid.service.PestsOnceWork;
-import com.aiton.pestscontrolandroid.service.PestsWork;
 import com.aiton.pestscontrolandroid.service.RetrofitUtil;
-import com.aiton.pestscontrolandroid.ui.main.MainActivity;
-import com.aiton.pestscontrolandroid.ui.myjob.MyJobActivity;
-import com.aiton.pestscontrolandroid.ui.trap.TrapActivity;
 import com.aiton.pestscontrolandroid.utils.SPUtil;
 import com.bumptech.glide.Glide;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -65,18 +43,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.internal.LinkedTreeMap;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
 
 import cn.com.qiter.common.vo.PestsControlModel;
 import cn.hutool.core.date.DateUtil;
@@ -274,7 +244,7 @@ public class PestsActivity extends AppCompatActivity {
             @Override
             public void onChanged(List<Pests> pests) {
                 if (pests != null){
-                    Log.e(TAG, "onChanged: " + pests.toString() );
+//                    Log.e(TAG, "onChanged: " + pests.toString() );
 
                 }
             }
@@ -307,7 +277,7 @@ public class PestsActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Pests[] p = pestsViewModel.findAllObject();
-                Log.e(TAG, "onClick: " + p.toString() );
+//                Log.e(TAG, "onClick: " + p.toString() );
                 Snackbar.make(view, getResources().getString(R.string.pests_cancel), Snackbar.LENGTH_LONG)
                         .setAction("Action", new View.OnClickListener() {
                             @Override

@@ -175,7 +175,7 @@ public class TrayJobActivity extends AppCompatActivity {
                 Trap[] traps1 = trapViewModel.findAllObject();
                 for (Trap t :
                         traps1) {
-                    Log.e(TAG, "onClick: " + t.toString());
+//                    Log.e(TAG, "onClick: " + t.toString());
                 }
 //                RetrofitUtil.getInstance().getPestsService().aLive()
 //                        .subscribeOn(Schedulers.io())
@@ -282,7 +282,7 @@ public class TrayJobActivity extends AppCompatActivity {
             list.add(parcelable);
             p.setUpdateServer(true);
             trapViewModel.update(p);
-            Log.e(TAG, "updateServer: " + p.toString());
+//            Log.e(TAG, "updateServer: " + p.toString());
            // adapter.notifyDataSetChanged();
         }
 //        trapViewModel.getProgress().setValue(100);

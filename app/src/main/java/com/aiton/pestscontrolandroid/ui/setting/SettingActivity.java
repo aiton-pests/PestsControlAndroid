@@ -179,7 +179,7 @@ public class SettingActivity extends AppCompatActivity {
                     List<File> files1 = FileUtil.filterGeoDatabase(files, "geodatabase");
 //                    List<String> files = FileUtil.getFiles("/storage/emulated/0/Download","geodatabase",true);  /storage/emulated/0/Download/53ad76ba959340fabd7fe8ee7adbace3b3e2489915484baaafc555d544b0cd7d.jpg
                  //   files1.add(new File("/data/data/com.aiton.pestscontrolandroid/files/xiamen_xiangan.geodatabase"));
-                    Log.e(AppConstance.TAG, "onClick: " + files1.toString());
+//                    Log.e(AppConstance.TAG, "onClick: " + files1.toString());
                     List<ShpFile> shpFiles = FileUtil.convertGeoFile2ShpFile(files1);
                     settingViewModel.getShpFile().setValue(shpFiles);
                     if (files1.isEmpty() || files1.size() == 0){
@@ -397,7 +397,7 @@ public class SettingActivity extends AppCompatActivity {
                 if (Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT) {//4.4以后
                     // String path = getPath(this, uri);
 //                    List<String> filess = FileUtil.getFiles("/storage/sdcard1/Download/geodatabase", "geodatabase", true);
-                    Log.e(AppConstance.TAG, "onClick: " + files.toString());
+//                    Log.e(AppConstance.TAG, "onClick: " + files.toString());
 //                    Toast.makeText(this, path + "11111", Toast.LENGTH_SHORT).show();
                 } else {//4.4以下下系统调用方法
                     // String path = getRealPathFromURI(uri);
